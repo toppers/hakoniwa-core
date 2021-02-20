@@ -1,2 +1,2 @@
 # hakoniwa-core
-hakoniwa core functions
+hakoniwa core development repository

@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 package hakoniwa;
+option csharp_namespace = "HakoniwaGrpc";
 
 service HakoniwaCoreService {
   //箱庭アセットを登録する

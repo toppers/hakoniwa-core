@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package hakoniwa;
+
+service HakoniwaCoreService {
+  //箱庭アセットを登録する
+  rpc Register (HakoniwaAssetInfo) returns (HakoniwaReply) {}
+  //箱庭アセットを登録解除する
+  rpc Unregister (HakoniwaAssetInfo) returns (HakoniwaReply) {}
+}
+
+
+message HakoniwaReply {
+  string ercd = 1;
+}
+
+message HakoniwaAssetInfo {
+  string name = 1;
+}
+
+message HakoniwaAssetInfoList {
+  repeated HakoniwaAssetInfo assets = 1;
+}

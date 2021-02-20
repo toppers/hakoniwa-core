@@ -1,0 +1,31 @@
+#include "hakoniwa_client.h"
+#include <string.h>
+#include <stdio.h>
+#include <unistd.h>
+
+int main(int argc, char** argv) 
+{
+  char buf[128];
+  int retlen;
+  char ip_port[128];
+
+  if (argc != 3) {
+    printf("Usage: %s <ipaddr> <portno>\n", argv[0]);
+    return 1;
+  }
+  sprintf(ip_port, "%s:%s", argv[1], argv[2]);
+  hakoniwa_core_init(ip_port);
+
+  ErcdType err;
+  HakoniwaAssetInfoType asset;
+
+  asset.name = "Athrill";
+  asset.len = strlen(asset.name);
+  err = hakoniwa_core_asset_register(&asset);
+  
+  printf("hakoniwa_core_asset_register() returns %d\n", err);
+
+  err = hakoniwa_core_asset_unregister(&asset);
+  printf("hakoniwa_core_asset_unregister() returns %d\n", err);
+  return 0;
+}

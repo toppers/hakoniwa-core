@@ -80,7 +80,7 @@ add_custom_command(
 # Include generated *.pb.h files
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
-foreach(_target hakoniwa)
+foreach(_target hakoniwa_client)
   add_library(${_target} STATIC "${PROJECT_SOURCE_DIR}/${_target}.cc"
     ${hakoniwa_proto_srcs}
     ${hakoniwa_grpc_srcs})
@@ -89,3 +89,9 @@ foreach(_target hakoniwa)
     ${_GRPC_GRPCPP}
     ${_PROTOBUF_LIBPROTOBUF})
 endforeach()
+
+add_executable(hakoniwa_proxy ${PROJECT_SOURCE_DIR}/hakoniwa_proxy.cc)
+target_link_libraries(hakoniwa_proxy hakoniwa_client
+    ${_REFLECTION}
+    ${_GRPC_GRPCPP}
+    ${_PROTOBUF_LIBPROTOBUF})

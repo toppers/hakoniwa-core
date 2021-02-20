@@ -1,0 +1,51 @@
+FROM ubuntu:20.04 as hakoniwa-core
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+ENV CMAKE_INSTALL_DIR /local
+ENV PATH $PATH:/grpc/cmake/build
+ENV PATH $PATH:/grpc/cmake/build/third_party/protobuf
+ENV PATH $PATH:$CMAKE_INSTALL_DIR/bin
+
+RUN apt-get update && apt-get install -y \
+	git	\
+	build-essential	\
+	wget	\
+	gcc	\
+	g++	\
+	ruby	\
+	vim	\
+	libssl-dev \
+	make	\
+	autoconf \
+	automake \
+	pkg-config \
+	curl \
+	&& apt-get clean \
+	&& rm -rf /var/lib/apt/lists/*
+
+RUN	wget -q -O cmake-linux.sh https://github.com/Kitware/CMake/releases/download/v3.17.0/cmake-3.17.0-Linux-x86_64.sh && \
+	mkdir -p $CMAKE_INSTALL_DIR && \
+	sh cmake-linux.sh --skip-license --prefix=$CMAKE_INSTALL_DIR && \
+	rm cmake-linux.sh
+
+# Install grpc
+RUN mkdir -p /root/grpc-build && \
+	cd /root/grpc-build && \
+	git clone https://github.com/grpc/grpc && \
+	cd grpc && \
+	git submodule update --init && \
+	mkdir -p cmake/build && \
+	cd cmake/build && \
+	cmake ../.. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local/grpc -DgRPC_BUILD_CSHARP_EXT=OFF -DOPENSSL_ROOT_DIR=/usr/local/boringssl -DCMAKE_PREFIX_PATH="/usr/local/cares;/usr/local/protobuf;/usr/local/zlib" && \
+	make -j4 && \
+	make install && \
+	cd /root && \
+	rm -rf grpc-build
+ENV PATH /usr/local/grpc/bin:${PATH}
+
+# Install grpc for Ruby
+RUN	gem install grpc grpc-tools
+
+RUN mkdir /root/workspace
+WORKDIR /root/workspace

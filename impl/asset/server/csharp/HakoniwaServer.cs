@@ -32,7 +32,7 @@ namespace HakoniwaService
         }
         public override Task<HakoniwaReply> Register(HakoniwaAssetInfo request, ServerCallContext context)
         {
-            Console.WriteLine("Register");
+            Console.WriteLine("Register:" + request.Name);
             return Task.FromResult(new HakoniwaReply
             {
                 Ercd = "OK"
@@ -40,7 +40,7 @@ namespace HakoniwaService
         }
         public override Task<HakoniwaReply> Unregister(HakoniwaAssetInfo request, ServerCallContext context)
         {
-            Console.WriteLine("Unregister");
+            Console.WriteLine("Unregister:" + request.Name);
             return Task.FromResult(new HakoniwaReply
             {
                 Ercd = "OK"

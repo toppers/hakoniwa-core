@@ -49,17 +49,16 @@ namespace HakoniwaService
         }
         public override async Task AssetNotificationStart(AssetInfo request, IServerStreamWriter<AssetNotification> responseStream, ServerCallContext context)
         {
-            int i;
+            AssetNotification req = new AssetNotification();
+            req.Event = AssetNotificationEvent.Start;
+            Console.WriteLine("Send command:" + req.Event);
+            await responseStream.WriteAsync(req);
 
-            for (i = 0; i < 3; i++)
-            {
-                AssetNotification req = new AssetNotification();
-                req.Event = AssetNotificationEvent.Start;
-                Console.WriteLine("Send command:" + req.Event);
-                await responseStream.WriteAsync(req);
-                //Console.WriteLine("Please Enter key");
-                //Console.ReadKey();
-            }
+
+            req = new AssetNotification();
+            req.Event = AssetNotificationEvent.End;
+            Console.WriteLine("Send command:" + req.Event);
+            await responseStream.WriteAsync(req);
             Console.WriteLine("END");
         }
 

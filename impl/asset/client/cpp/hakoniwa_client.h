@@ -17,6 +17,17 @@ typedef struct {
 extern ErcdType hakoniwa_core_asset_register(const HakoniwaAssetInfoType* asset);
 extern ErcdType hakoniwa_core_asset_unregister(const HakoniwaAssetInfoType* asset);
 
+typedef enum {
+    HakoniwaAssetEvent_Start = 0,
+    HakoniwaAssetEvent_End,
+    HakoniwaAssetEvent_None,
+} HakoniwaAssetEventEnumType;
+
+typedef struct {
+    HakoniwaAssetEventEnumType type;
+} HakoniwaAssetEventType;
+extern HakoniwaAssetEventType hakoniwa_core_asset_get_event(void);
+
 #ifdef __cplusplus
 }
 #endif

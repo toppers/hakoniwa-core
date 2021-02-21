@@ -3,22 +3,42 @@ syntax = "proto3";
 package hakoniwa;
 option csharp_namespace = "HakoniwaGrpc";
 
-service HakoniwaCoreService {
+service CoreService {
   //箱庭アセットを登録する
-  rpc Register (HakoniwaAssetInfo) returns (HakoniwaReply) {}
+  rpc Register (AssetInfo) returns (NormalReply) {}
   //箱庭アセットを登録解除する
-  rpc Unregister (HakoniwaAssetInfo) returns (HakoniwaReply) {}
+  rpc Unregister (AssetInfo) returns (NormalReply) {}
+
+  //箱庭アセット非同期通知
+  rpc AssetNotificationStart (AssetInfo) returns (stream AssetNotification) {}
+  rpc AssetNotificationFeedback (AssetNotificationReply) returns (NormalReply) {}
+}
+enum AssetNotificationEvent {
+  START = 0;
+  END = 1;
+}
+enum ErrorCode {
+  OK = 0;
+  PERM = 1;
+  NOENT = 2;
 }
 
-
-message HakoniwaReply {
-  string ercd = 1;
+message AssetNotification {
+  AssetNotificationEvent event = 1;
+}
+message AssetNotificationReply {
+  AssetNotificationEvent event = 1;
+  AssetInfo asset = 2;
+  ErrorCode ercd = 3;
+}
+message NormalReply {
+  ErrorCode ercd = 1;
 }
 
-message HakoniwaAssetInfo {
+message AssetInfo {
   string name = 1;
 }
 
-message HakoniwaAssetInfoList {
-  repeated HakoniwaAssetInfo assets = 1;
+message HAssetInfoList {
+  repeated AssetInfo assets = 1;
 }

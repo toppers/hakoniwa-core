@@ -9,7 +9,7 @@ using HakoniwaGrpc;
 
 namespace HakoniwaService
 {
-    class HakoniwaServer : HakoniwaCoreService.HakoniwaCoreServiceBase
+    class HakoniwaServer : CoreService.CoreServiceBase
     {
         private static Server server;
         static public void StartServer(string ipaddr, int portno)
@@ -20,7 +20,7 @@ namespace HakoniwaService
             }
             HakoniwaServer.server = new Server
             {
-                Services = { HakoniwaCoreService.BindService(new HakoniwaServer()) },
+                Services = { CoreService.BindService(new HakoniwaServer()) },
                 Ports = { new ServerPort(ipaddr, portno, ServerCredentials.Insecure) }
             };
             server.Start();
@@ -30,20 +30,43 @@ namespace HakoniwaService
             HakoniwaServer.server.ShutdownAsync().Wait();
             HakoniwaServer.server = null;
         }
-        public override Task<HakoniwaReply> Register(HakoniwaAssetInfo request, ServerCallContext context)
+
+        public override Task<NormalReply> Register(AssetInfo request, ServerCallContext context)
         {
             Console.WriteLine("Register:" + request.Name);
-            return Task.FromResult(new HakoniwaReply
+            return Task.FromResult(new NormalReply
             {
-                Ercd = "OK"
+                Ercd = ErrorCode.Ok
             });
         }
-        public override Task<HakoniwaReply> Unregister(HakoniwaAssetInfo request, ServerCallContext context)
+        public override Task<NormalReply> Unregister(AssetInfo request, ServerCallContext context)
         {
             Console.WriteLine("Unregister:" + request.Name);
-            return Task.FromResult(new HakoniwaReply
+            return Task.FromResult(new NormalReply
             {
-                Ercd = "OK"
+                Ercd = ErrorCode.Ok
+            });
+        }
+        public override async Task AssetNotificationStart(AssetInfo request, IServerStreamWriter<AssetNotification> responseStream, ServerCallContext context)
+        {
+            int i;
+
+            for (i = 0; i < 3; i++)
+            {
+                AssetNotification req = new AssetNotification();
+                req.Event = AssetNotificationEvent.Start;
+                Console.WriteLine("Send command:" + req.Event);
+                await responseStream.WriteAsync(req);
+            }
+            Console.WriteLine("END");
+        }
+
+        public override Task<NormalReply> AssetNotificationFeedback(AssetNotificationReply feedback, ServerCallContext context)
+        {
+            Console.WriteLine("CommandReply:" + feedback.Event + " Asset=" + feedback.Asset.Name + " ercd=" + feedback.Ercd);
+            return Task.FromResult(new NormalReply
+            {
+                Ercd = ErrorCode.Ok
             });
         }
     }

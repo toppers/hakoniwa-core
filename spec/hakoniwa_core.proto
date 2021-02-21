@@ -14,13 +14,13 @@ service CoreService {
   rpc AssetNotificationFeedback (AssetNotificationReply) returns (NormalReply) {}
 }
 enum AssetNotificationEvent {
-  START = 0;
-  END = 1;
+  ASSET_NOTIFICATION_EVENT_START = 0;
+  ASSET_NOTIFICATION_EVENT_END = 1;
 }
 enum ErrorCode {
-  OK = 0;
-  PERM = 1;
-  NOENT = 2;
+  ERROR_CODE_OK = 0;
+  ERROR_CODE_PERM = 1;
+  ERROR_CODE_NOENT = 2;
 }
 
 message AssetNotification {

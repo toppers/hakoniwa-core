@@ -1,6 +1,11 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <mutex>
+#include <condition_variable>
+#include <atomic>
+#include <thread>
+#include <queue>
 
 #include <grpcpp/grpcpp.h>
 
@@ -64,11 +69,18 @@ class HakoniwaCoreServiceClient {
 
     std::unique_ptr<grpc::ClientReader<AssetNotification> > reader = stub_->AssetNotificationStart(&context, request);
 
+    notification_is_alive_ = true;
     while (reader->Read(&notification)) {
         std::cout << "Found notification  "
                     << notification.event()  << std::endl;
-        events_.push_back(new AssetNotification(notification));
+        {
+            std::unique_lock<std::mutex> lock(mtx_);
+            events_.push(new AssetNotification(notification));
+            cv_.notify_all();
+        }
     }
+    printf("notification end\n");
+    notification_is_alive_ = false;
     Status status = reader->Finish();
     if (status.ok()) {
         return Ercd_OK;
@@ -76,6 +88,18 @@ class HakoniwaCoreServiceClient {
     else {
       return Ercd_NG;
     }
+  }
+  AssetNotification* GetNotification() {
+      std::unique_lock<std::mutex> lock(mtx_);
+      if (events_.empty() && (notification_is_alive_ == false)) {
+          return nullptr;
+      }
+      while (events_.empty()) {
+        cv_.wait(lock);
+      }
+      AssetNotification *ret = events_.front();
+      events_.pop();
+      return ret;
   }
   ErcdType AssetNotificationFeedback(AssetInfo *asset, AssetNotificationEvent event, ErrorCode ercd) {
     ClientContext context;
@@ -99,7 +123,10 @@ class HakoniwaCoreServiceClient {
 
  private:
   std::unique_ptr<CoreService::Stub> stub_;
-  std::vector<AssetNotification*> events_;
+  std::queue<AssetNotification*> events_;
+  std::mutex mtx_;
+  std::condition_variable cv_;
+  bool notification_is_alive_ = false;
 };
 
 static HakoniwaCoreServiceClient *gl_client;
@@ -117,8 +144,6 @@ ErcdType hakoniwa_core_asset_register(const HakoniwaAssetInfoType* asset)
   ErcdType ercd = gl_client->Register(asset);
   std::cout << "Client Register reply received: " << std::endl;
 
-  ercd = gl_client->AssetNotificationStart(asset);
-  std::cout << "Client AssetNotificationStart reply received: " << std::endl;
   return ercd;
 }
 
@@ -132,6 +157,25 @@ ErcdType hakoniwa_core_asset_unregister(const HakoniwaAssetInfoType* asset)
 HakoniwaAssetEventType hakoniwa_core_asset_get_event(void)
 {
     HakoniwaAssetEventType ev;
+    ErcdType ercd;
     ev.type = HakoniwaAssetEvent_None;
+
+    AssetNotification *notification = gl_client->GetNotification();
+    if (notification != nullptr) {
+        if (notification->event() == hakoniwa::ASSET_NOTIFICATION_EVENT_START) {
+            ev.type = HakoniwaAssetEvent_Start;
+        }
+        else if (notification->event() == hakoniwa::ASSET_NOTIFICATION_EVENT_END) {
+            ev.type = HakoniwaAssetEvent_End;
+        }
+        delete notification;
+    }
     return ev;
+}
+
+ErcdType hakoniwa_core_asset_notification_start(const HakoniwaAssetInfoType* asset)
+{
+  ErcdType ercd = gl_client->AssetNotificationStart(asset);
+  std::cout << "Client AssetNotificationStart reply received: " << std::endl;
+  return ercd;
 }

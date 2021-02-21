@@ -26,6 +26,7 @@ typedef enum {
 typedef struct {
     HakoniwaAssetEventEnumType type;
 } HakoniwaAssetEventType;
+extern ErcdType hakoniwa_core_asset_notification_start(const HakoniwaAssetInfoType* asset);
 extern HakoniwaAssetEventType hakoniwa_core_asset_get_event(void);
 
 #ifdef __cplusplus

@@ -22,8 +22,18 @@ int main(int argc, char** argv)
   asset.name = "Athrill";
   asset.len = strlen(asset.name);
   err = hakoniwa_core_asset_register(&asset);
-  
   printf("hakoniwa_core_asset_register() returns %d\n", err);
+
+  err = hakoniwa_core_asset_notification_start(&asset);
+  printf("hakoniwa_core_asset_notification_start() returns %d\n", err);
+
+  while (true) {
+    HakoniwaAssetEventType ev = hakoniwa_core_asset_get_event();
+    printf("hakoniwa_core_asset_get_event() returns %d\n", ev.type);
+    if (ev.type == HakoniwaAssetEvent_None) {
+        break;
+    }
+  }
 
   err = hakoniwa_core_asset_unregister(&asset);
   printf("hakoniwa_core_asset_unregister() returns %d\n", err);

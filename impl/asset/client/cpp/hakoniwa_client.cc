@@ -60,7 +60,10 @@ class HakoniwaCoreServiceClient {
       return Ercd_NG;
     }
   }
-
+  void AssetNotificationStart()
+  {
+    notification_is_alive_ = true;
+  }
   ErcdType AssetNotificationStart(const HakoniwaAssetInfoType *asset) {
     AssetInfo request;
     AssetNotification notification;
@@ -69,7 +72,6 @@ class HakoniwaCoreServiceClient {
 
     std::unique_ptr<grpc::ClientReader<AssetNotification> > reader = stub_->AssetNotificationStart(&context, request);
 
-    notification_is_alive_ = true;
     while (reader->Read(&notification)) {
         std::cout << "Found notification  "
                     << notification.event()  << std::endl;
@@ -79,8 +81,12 @@ class HakoniwaCoreServiceClient {
             cv_.notify_all();
         }
     }
+    {
+        std::unique_lock<std::mutex> lock(mtx_);
+        notification_is_alive_ = false;
+        cv_.notify_all();
+    }
     printf("notification end\n");
-    notification_is_alive_ = false;
     Status status = reader->Finish();
     if (status.ok()) {
         return Ercd_OK;
@@ -96,9 +102,14 @@ class HakoniwaCoreServiceClient {
       }
       while (events_.empty()) {
         cv_.wait(lock);
+        if (notification_is_alive_ == false) {
+            return nullptr;
+        }
       }
       AssetNotification *ret = events_.front();
-      events_.pop();
+      if (ret != nullptr) {
+          events_.pop();
+      }
       return ret;
   }
   ErcdType AssetNotificationFeedback(AssetInfo *asset, AssetNotificationEvent event, ErrorCode ercd) {
@@ -173,9 +184,19 @@ HakoniwaAssetEventType hakoniwa_core_asset_get_event(void)
     return ev;
 }
 
+static void notification_thread(const HakoniwaAssetInfoType* asset)
+{
+   std::cout << "####THREAD START: " << std::endl;
+   ErcdType ercd = gl_client->AssetNotificationStart(asset);
+   std::cout << "Client AssetNotificationStart reply received: " << std::endl;
+   std::cout << "####THREAD END: " << std::endl;
+   return;
+}
 ErcdType hakoniwa_core_asset_notification_start(const HakoniwaAssetInfoType* asset)
 {
-  ErcdType ercd = gl_client->AssetNotificationStart(asset);
-  std::cout << "Client AssetNotificationStart reply received: " << std::endl;
-  return ercd;
+  gl_client->AssetNotificationStart();
+  std::thread thr(notification_thread, asset);
+  thr.detach();
+  
+  return Ercd_OK;
 }

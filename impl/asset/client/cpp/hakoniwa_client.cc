@@ -64,7 +64,9 @@ class HakoniwaCoreServiceClient {
   {
     notification_is_alive_ = true;
   }
-  ErcdType AssetNotificationStart(const HakoniwaAssetInfoType *asset) {
+
+  ErcdType AssetNotificationStart(const HakoniwaAssetInfoType *asset) 
+  {
     AssetInfo request;
     AssetNotification notification;
     request.set_name(asset->name);
@@ -95,7 +97,8 @@ class HakoniwaCoreServiceClient {
       return Ercd_NG;
     }
   }
-  AssetNotification* GetNotification() {
+  AssetNotification* GetNotification() 
+  {
       std::unique_lock<std::mutex> lock(mtx_);
       if (events_.empty() && (notification_is_alive_ == false)) {
           return nullptr;
@@ -112,17 +115,40 @@ class HakoniwaCoreServiceClient {
       }
       return ret;
   }
-  ErcdType AssetNotificationFeedback(AssetInfo *asset, AssetNotificationEvent event, ErrorCode ercd) {
+  AssetNotificationEvent get_event(HakoniwaAssetEventEnumType event) 
+  {
+      if (event == HakoniwaAssetEvent_Start) {
+          return hakoniwa::ASSET_NOTIFICATION_EVENT_START;
+      }
+      else if (event == HakoniwaAssetEvent_End) {
+          return hakoniwa::ASSET_NOTIFICATION_EVENT_END;
+      }
+      else {
+          return hakoniwa::ASSET_NOTIFICATION_EVENT_NONE;
+      }
+  }
+  ErrorCode get_error_code(ErcdType ercd)
+  {
+      if (ercd == Ercd_OK) {
+          return hakoniwa::ERROR_CODE_OK;
+      }
+      else {
+          return hakoniwa::ERROR_CODE_INVAL;
+      }
+  }
+
+  ErcdType AssetNotificationFeedback(const HakoniwaAssetInfoType *asset, HakoniwaAssetEventEnumType event, ErcdType ercd) {
     ClientContext context;
     AssetNotificationReply feedback;
     NormalReply reply;
+    AssetInfo *info = new AssetInfo();
+    info->set_name(asset->name);
 
-    feedback.set_event(event);
-    feedback.set_allocated_asset(asset);
-    feedback.set_ercd(ercd);
+    feedback.set_event(get_event(event));
+    feedback.set_allocated_asset(info);
+    feedback.set_ercd(get_error_code(ercd));
 
     Status status = stub_->AssetNotificationFeedback(&context, feedback, &reply);
-
     if (status.ok()) {
       return Ercd_OK;
     } else {
@@ -154,7 +180,6 @@ ErcdType hakoniwa_core_asset_register(const HakoniwaAssetInfoType* asset)
 {
   ErcdType ercd = gl_client->Register(asset);
   std::cout << "Client Register reply received: " << std::endl;
-
   return ercd;
 }
 
@@ -199,4 +224,9 @@ ErcdType hakoniwa_core_asset_notification_start(const HakoniwaAssetInfoType* ass
   thr.detach();
   
   return Ercd_OK;
+}
+
+ErcdType hakoniwa_core_asset_event_feedback(const HakoniwaAssetInfoType* asset, HakoniwaAssetEventEnumType event, ErcdType ercd)
+{
+    return gl_client->AssetNotificationFeedback(asset, event, ercd);
 }

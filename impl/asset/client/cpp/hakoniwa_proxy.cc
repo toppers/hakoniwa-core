@@ -34,6 +34,7 @@ int main(int argc, char** argv)
         break;
     }
   }
+  hakoniwa_core_asset_event_feedback(&asset, HakoniwaAssetEvent_End, Ercd_OK);
 
   err = hakoniwa_core_asset_unregister(&asset);
   printf("hakoniwa_core_asset_unregister() returns %d\n", err);

@@ -28,6 +28,7 @@ typedef struct {
 } HakoniwaAssetEventType;
 extern ErcdType hakoniwa_core_asset_notification_start(const HakoniwaAssetInfoType* asset);
 extern HakoniwaAssetEventType hakoniwa_core_asset_get_event(void);
+extern ErcdType hakoniwa_core_asset_event_feedback(const HakoniwaAssetInfoType* asset, HakoniwaAssetEventEnumType event, ErcdType ercd);
 
 #ifdef __cplusplus
 }

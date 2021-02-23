@@ -58,6 +58,7 @@ public:
         struct stat buf;
         int ret = stat(dir.c_str(), &buf);
         if (ret < 0) {
+            printf("ERROR: not found %s\n", dir.c_str());
             return false;
         }
         this->current_dir_.reset();
@@ -66,10 +67,6 @@ public:
     }
     bool set_binary_path(std::string path) {
         struct stat buf;
-        int ret = stat(path.c_str(), &buf);
-        if (ret < 0) {
-            return false;
-        }
         this->binary_path_.reset();
         this->binary_path_ = std::make_unique<std::string>(path);
         this->the_args.clear();

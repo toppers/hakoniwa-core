@@ -9,6 +9,7 @@
 
 #include <grpcpp/grpcpp.h>
 
+#include "hakoniwa_core.pb.h"
 #include "hakoniwa_core.grpc.pb.h"
 #include "hakoniwa_client.h"
 
@@ -157,6 +158,20 @@ class HakoniwaCoreServiceClient {
       return Ercd_NG;
     }
   }
+  ErcdType GetAssetList(hakoniwa::AssetInfoList *response) {
+    ClientContext context;
+    const ::google::protobuf::Empty request;
+
+    Status status = stub_->GetAssetList(&context, request, response);
+
+    if (status.ok()) {
+      return Ercd_OK;
+    } else {
+      std::cout << status.error_code() << ": " << status.error_message()
+                << std::endl;
+      return Ercd_NG;
+    }
+  }
 
  private:
   std::unique_ptr<CoreService::Stub> stub_;
@@ -229,4 +244,47 @@ ErcdType hakoniwa_core_asset_notification_start(const HakoniwaAssetInfoType* ass
 ErcdType hakoniwa_core_asset_event_feedback(const HakoniwaAssetInfoType* asset, HakoniwaAssetEventEnumType event, ErcdType ercd)
 {
     return gl_client->AssetNotificationFeedback(asset, event, ercd);
+}
+
+ErcdType hakonwia_core_get_asset_list(HakoniwaAssetInfoArrayType *list)
+{
+  hakoniwa::AssetInfoList response;
+  ErcdType ercd = gl_client->GetAssetList(&response);
+  int i;
+  list->array_size = response.assets_size();
+  list->entries = (HakoniwaAssetInfoType *)malloc(sizeof(HakoniwaAssetInfoType) * list->array_size);
+  if (list->entries == NULL) {
+    return Ercd_NG;
+  }
+  memset(list->entries, 0, sizeof(HakoniwaAssetInfoType) * list->array_size);
+  for (i = 0; i < response.assets_size(); i++) {
+    int namelen = strlen(response.assets(i).name().c_str());
+    list->entries[i].name = (char*)malloc(namelen + 1);
+    if (list->entries[i].name == NULL) {
+      goto errdone;
+    }
+    memcpy((void*)list->entries[i].name, response.assets(i).name().c_str(), namelen);
+    list->entries[i].name[namelen] = '\0';
+  }
+
+  return Ercd_OK;
+errdone:
+  hakonwia_core_free_asset_list(list);
+  return Ercd_NG;
+}
+void hakonwia_core_free_asset_list(HakoniwaAssetInfoArrayType *list)
+{
+  int i;
+  if (list->entries == NULL) {
+    return;
+  }
+  for (i = 0; i < list->array_size; i++) {
+    if (list->entries[i].name != NULL) {
+      free((void*)list->entries[i].name);
+      list->entries[i].name = NULL;
+    }
+  }
+  free(list->entries);
+  list->entries = NULL;
+  return;
 }

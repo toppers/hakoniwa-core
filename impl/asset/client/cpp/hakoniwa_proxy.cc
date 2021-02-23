@@ -19,10 +19,19 @@ int main(int argc, char** argv)
   ErcdType err;
   HakoniwaAssetInfoType asset;
 
-  asset.name = "Athrill";
+  asset.name = (char*)"Athrill";
   asset.len = strlen(asset.name);
   err = hakoniwa_core_asset_register(&asset);
   printf("hakoniwa_core_asset_register() returns %d\n", err);
+
+  HakoniwaAssetInfoArrayType list;
+  err = hakonwia_core_get_asset_list(&list);
+  printf("hakonwia_core_get_asset_list() returns %d\n", err);
+  int i;
+  for (i = 0; i < list.array_size; i++) {
+    printf("entry[%d]=%s\n", i, list.entries[i].name);
+  }
+  hakonwia_core_free_asset_list(&list);
 
   err = hakoniwa_core_asset_notification_start(&asset);
   printf("hakoniwa_core_asset_notification_start() returns %d\n", err);

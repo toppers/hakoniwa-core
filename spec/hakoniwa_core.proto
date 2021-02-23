@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "google/protobuf/empty.proto";
+
 package hakoniwa;
 option csharp_namespace = "HakoniwaGrpc";
 
@@ -8,6 +10,9 @@ service CoreService {
   rpc Register (AssetInfo) returns (NormalReply) {}
   //箱庭アセットを登録解除する
   rpc Unregister (AssetInfo) returns (NormalReply) {}
+  
+  //箱庭アセットのリストを取得する
+  rpc GetAssetList (google.protobuf.Empty) returns (AssetInfoList) {}
 
   //箱庭アセット非同期通知
   rpc AssetNotificationStart (AssetInfo) returns (stream AssetNotification) {}
@@ -23,6 +28,7 @@ enum ErrorCode {
   ERROR_CODE_PERM = 1;
   ERROR_CODE_NOENT = 2;
   ERROR_CODE_INVAL = 3;
+  ERROR_CODE_EXIST = 4;
 }
 
 message AssetNotification {
@@ -41,6 +47,6 @@ message AssetInfo {
   string name = 1;
 }
 
-message HAssetInfoList {
+message AssetInfoList {
   repeated AssetInfo assets = 1;
 }

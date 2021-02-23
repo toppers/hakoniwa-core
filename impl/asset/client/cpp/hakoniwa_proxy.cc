@@ -41,12 +41,22 @@ int main(int argc, char** argv)
 
   ProcessManager process;
 
-  process.set_binary_path("/usr/bin/ls");
-  process.set_current_dir("/");
-  process.add_option("-l");
-  process.add_option("-a");
-  process.add_option("/");
+  process.set_binary_path("/mnt/c/Users/kanet/project/toppers/athrill/bin/linux//athrill2");
+  process.set_current_dir("/mnt/c/Users/kanet/project/toppers/ev3rt-athrill-v850e2m/sdk/workspace/base_practice_1");
+  process.add_option("-t");
+  process.add_option("-1");
+  process.add_option("-c");
+  process.add_option("1");
+  process.add_option("-m");
+  process.add_option("memory.txt");
+  process.add_option("-d");
+  process.add_option("device_config.txt");
+  process.add_option("../asp");
   process.invoke();
+
+  usleep(1000*1000 * 5);
+
+  process.terminate();
 
   while (true) {
     HakoniwaAssetEventType ev = hakoniwa_core_asset_get_event();

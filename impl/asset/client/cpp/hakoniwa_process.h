@@ -9,6 +9,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <sys/wait.h>
+#include <signal.h>
 
 namespace hakoniwa {
 
@@ -25,7 +27,6 @@ public:
             return false;
         }
         int ret = fork();
-        printf("fork:%d\n", ret);
         if (ret < 0) {
             return false;
         }
@@ -34,10 +35,19 @@ public:
             ret = ProcessManager::monitoring(this);
             exit(ret);
         }
-        this->exec_args[this->exec_arg_count] = NULL;
         this->status_is_running = true;
         this->pid_ = ret;
+        printf("pid:%d\n", ret);
         return true;
+    }
+    void terminate()
+    {
+        int status;
+        int ret = kill(this->pid_, SIGTERM);
+        printf("kill ret=%d\n", ret);
+        ret = wait(&status);
+        printf("wait ret=%d status=0x%x\n", ret, status);
+        this->finish();
     }
     bool is_running()
     {
@@ -63,7 +73,6 @@ public:
         this->binary_path_.reset();
         this->binary_path_ = std::make_unique<std::string>(path);
         this->the_args.clear();
-        this->exec_arg_count = 0;
         this->add_option(path);
         return true;
     }
@@ -77,17 +86,11 @@ public:
             return false;
         }
     }
-    int get_process_exeuted_result() {
-        return this->process_executed_result;
-    }
 
 private:
     std::unique_ptr<std::string> binary_path_ = nullptr;
     std::unique_ptr<std::string> current_dir_ = nullptr;
     bool status_is_running = false;
-    int process_executed_result = 0;
-    int exec_arg_count = 0;
-    char *exec_args[1024];
     std::vector<std::string> the_args;
     int pid_;
     void finish()
@@ -97,19 +100,26 @@ private:
     static int monitoring(ProcessManager *mgrp)
     {
         printf("monitring:\n");
+        int exec_arg_count = 0;
+        char **exec_args = (char**)malloc( (mgrp->the_args.size() + 1) * sizeof(char*));
+        if (exec_args == NULL) {
+            return -1;
+        }
         int ret = chdir(mgrp->current_dir_->c_str());
         if (ret >= 0) {
             printf("exec_args_count=%ld\n", mgrp->the_args.size());
             int i;
             for (i = 0; i < mgrp->the_args.size(); i++) {
                 printf("the_args[%d]=%s\n", i, mgrp->the_args.at(i).c_str());
-                mgrp->exec_args[mgrp->exec_arg_count++] = (char*)mgrp->the_args.at(i).c_str();
+                exec_args[exec_arg_count++] = (char*)mgrp->the_args.at(i).c_str();
             }
-            mgrp->exec_args[mgrp->exec_arg_count] = NULL;
-            ret = execv(mgrp->binary_path_->c_str(), mgrp->exec_args);
+            exec_args[exec_arg_count] = NULL;
+            ret = execv(mgrp->binary_path_->c_str(), exec_args);
         }
+        free(exec_args);
         return ret;
     }
+
 };
 
 }

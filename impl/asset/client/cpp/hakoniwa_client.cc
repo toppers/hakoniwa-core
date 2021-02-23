@@ -24,6 +24,8 @@ using hakoniwa::AssetInfo;
 using hakoniwa::ErrorCode;
 using hakoniwa::AssetNotificationEvent;
 
+namespace hakoniwa {
+
 class HakoniwaCoreServiceClient {
  public:
   HakoniwaCoreServiceClient(std::shared_ptr<Channel> channel)
@@ -287,4 +289,6 @@ void hakonwia_core_free_asset_list(HakoniwaAssetInfoArrayType *list)
   free(list->entries);
   list->entries = NULL;
   return;
+}
+
 }

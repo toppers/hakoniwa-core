@@ -1,6 +1,8 @@
 #ifndef _HAKONIW_CLIENT_H_
 #define _HAKONIW_CLIENT_H_
 
+namespace hakoniwa {
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -40,5 +42,7 @@ extern void hakonwia_core_free_asset_list(HakoniwaAssetInfoArrayType *list);
 #ifdef __cplusplus
 }
 #endif
+
+}
 
 #endif /* _HAKONIW_CLIENT_H_ */

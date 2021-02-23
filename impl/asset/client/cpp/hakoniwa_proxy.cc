@@ -2,6 +2,9 @@
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
+#include "hakoniwa_process.h"
+
+using namespace hakoniwa;
 
 int main(int argc, char** argv) 
 {
@@ -35,6 +38,15 @@ int main(int argc, char** argv)
 
   err = hakoniwa_core_asset_notification_start(&asset);
   printf("hakoniwa_core_asset_notification_start() returns %d\n", err);
+
+  ProcessManager process;
+
+  process.set_binary_path("/usr/bin/ls");
+  process.set_current_dir("/");
+  process.add_option("-l");
+  process.add_option("-a");
+  process.add_option("/");
+  process.invoke();
 
   while (true) {
     HakoniwaAssetEventType ev = hakoniwa_core_asset_get_event();

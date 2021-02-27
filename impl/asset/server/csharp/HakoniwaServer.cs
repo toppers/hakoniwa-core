@@ -67,6 +67,9 @@ namespace HakoniwaService
             Console.WriteLine("Send command:" + req.Event);
             await responseStream.WriteAsync(req);
 
+            //Console.WriteLine("Press any key to next event...");
+            //Console.ReadKey();
+
 
             req = new AssetNotification();
             req.Event = AssetNotificationEvent.End;

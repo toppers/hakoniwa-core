@@ -78,7 +78,10 @@ add_custom_command(
       DEPENDS "${hakoniwa_proto}")
 
 # Include generated *.pb.h files
-include_directories("${CMAKE_CURRENT_BINARY_DIR}")
+include_directories(
+  "${CMAKE_CURRENT_BINARY_DIR}"
+  "../../../../third-party/json/single_include"
+)
 
 foreach(_target hakoniwa_client)
   add_library(${_target} STATIC "${PROJECT_SOURCE_DIR}/${_target}.cc"

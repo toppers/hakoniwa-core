@@ -8,7 +8,7 @@ namespace HakoniwaService
     {
         static void Main(string[] args)
         {
-            string ipaddr = "172.25.144.1";
+            string ipaddr = "172.30.0.1";
             int portno = 50051;
 
             Console.WriteLine("ipaddr=" + ipaddr + " portno=" + portno.ToString());

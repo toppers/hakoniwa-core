@@ -1,54 +1,70 @@
 #include "hakoniwa_client.h"
+#include <fstream>
+#include <iostream>
+#include <string>
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
 #include "hakoniwa_process.h"
+#include "nlohmann/json.hpp"
+using json = nlohmann::json;
 
 using namespace hakoniwa;
 
-int main(int argc, char** argv) 
-{
-  char buf[128];
-  int retlen;
-  char ip_port[128];
+typedef struct {
+  json param;
+  ProcessManager process;
+  HakoniwaAssetInfoType *asset;
+} HakoniwaProxyControllerType;
 
-  if (argc != 3) {
-    printf("Usage: %s <ipaddr> <portno>\n", argv[0]);
-    return 1;
-  }
-  sprintf(ip_port, "%s:%s", argv[1], argv[2]);
+
+static ErcdType init(char *ip_port, HakoniwaProxyControllerType *ctrlp)
+{
+  ErcdType err;
+
   hakoniwa_core_init(ip_port);
 
-  ErcdType err;
-  HakoniwaAssetInfoType asset;
-
-  asset.name = (char*)"Athrill";
-  asset.len = strlen(asset.name);
-  err = hakoniwa_core_asset_register(&asset);
-  printf("hakoniwa_core_asset_register() returns %d\n", err);
-
-  HakoniwaAssetInfoArrayType list;
-  err = hakonwia_core_get_asset_list(&list);
-  printf("hakonwia_core_get_asset_list() returns %d\n", err);
-  int i;
-  for (i = 0; i < list.array_size; i++) {
-    printf("entry[%d]=%s\n", i, list.entries[i].name);
+  err = hakoniwa_core_asset_register(ctrlp->asset);
+  if (err != Ercd_OK) {
+    printf("ERROR: hakoniwa_core_asset_register() returns %d\n", err);
+    return err;
   }
-  hakonwia_core_free_asset_list(&list);
+  err = hakoniwa_core_asset_notification_start(ctrlp->asset);
+  if (err != Ercd_OK) {
+    printf("hakoniwa_core_asset_notification_start() returns %d\n", err);
+    return err;
+  }
+  ctrlp->process.set_current_dir(ctrlp->param["target_exec_dir"]);
+  ctrlp->process.set_binary_path(ctrlp->param["target_bin_path"]);
+  for (int i = 0; i < ctrlp->param["target_options"].size(); i++) {
+    ctrlp->process.add_option(ctrlp->param["target_options"][i]);
+  }
+  return Ercd_OK;
+}
 
-  err = hakoniwa_core_asset_notification_start(&asset);
-  printf("hakoniwa_core_asset_notification_start() returns %d\n", err);
+int main(int argc, char** argv) 
+{
+  HakoniwaProxyControllerType ctrl;
+  char ip_port[128];
+  char *param_file = nullptr;
 
-  ProcessManager process;
+  if (argc != 4) {
+    printf("Usage: %s <param_file> <ipaddr> <portno>\n", argv[0]);
+    return 1;
+  }
+  HakoniwaAssetInfoType asset;
+  ctrl.asset = &asset;
+  param_file = argv[1];
+  std::ifstream ifs(param_file);
+  ctrl.param = json::parse(ifs);
+  asset.name = (char*)ctrl.param["asset_name"].get<std::string>().c_str();
+  asset.len = strlen(ctrl.param["asset_name"].get<std::string>().c_str());
 
-  process.set_current_dir("../cpp");
-  process.set_binary_path("./start_athrill.bash");
-  process.add_option("base_practice_1");
-
-  process.invoke();
-  usleep(1000*1000 * 5);
-
-  process.terminate();
+  sprintf(ip_port, "%s:%s", argv[2], argv[3]);
+  ErcdType err = init(ip_port, &ctrl);
+  if (err != Ercd_OK) {
+    return 1;
+  }
 
   while (true) {
     HakoniwaAssetEventType ev = hakoniwa_core_asset_get_event();
@@ -56,10 +72,27 @@ int main(int argc, char** argv)
     if (ev.type == HakoniwaAssetEvent_None) {
         break;
     }
+    bool result = false;
+    switch (ev.type) {
+      case HakoniwaAssetEvent_Start:
+        result = ctrl.process.invoke();
+        break;
+      case HakoniwaAssetEvent_End:
+        usleep(1000*1000 * 5);
+        result = true;
+        ctrl.process.terminate();
+       break;
+      default:
+        break;
+    }
+    if (result) {
+      hakoniwa_core_asset_event_feedback(ctrl.asset, HakoniwaAssetEvent_End, Ercd_OK);
+    }
+    else {
+      hakoniwa_core_asset_event_feedback(ctrl.asset, HakoniwaAssetEvent_End, Ercd_NG);
+    }
   }
-  hakoniwa_core_asset_event_feedback(&asset, HakoniwaAssetEvent_End, Ercd_OK);
-
-  err = hakoniwa_core_asset_unregister(&asset);
+  err = hakoniwa_core_asset_unregister(ctrl.asset);
   printf("hakoniwa_core_asset_unregister() returns %d\n", err);
   return 0;
 }

@@ -20,6 +20,10 @@ public:
     ~ProcessManager() {
     }
     bool invoke() {
+        if (this->is_running()) {
+            printf("ERROR: already running...\n");
+            return false;
+        }
         if (this->current_dir_ == nullptr) {
             return false;
         }

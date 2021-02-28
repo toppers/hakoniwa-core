@@ -78,7 +78,6 @@ int main(int argc, char** argv)
         result = ctrl.process.invoke();
         break;
       case HakoniwaAssetEvent_End:
-        usleep(1000*1000 * 5);
         result = true;
         ctrl.process.terminate();
        break;

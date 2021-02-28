@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace HakoniwaService
+namespace HakoniwaCore
 {
     public enum HakoniwaSimulationState
     {
@@ -18,11 +18,11 @@ namespace HakoniwaService
         Success = 0,
         Failed = 1,
     }
-    class SimulationController
+    public class SimulationController
     {
         private Object lockObj = new Object();
-        private HakoniwaSimulationState state = HakoniwaSimulationState.Stopped;
-        private HakoniwaSimulationResult result = HakoniwaSimulationResult.Success;
+        public HakoniwaSimulationState state = HakoniwaSimulationState.Stopped;
+        public HakoniwaSimulationResult result = HakoniwaSimulationResult.Success;
 
         private int asset_feedback_count;
         public AssetManager asset_mgr = new AssetManager();

@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace HakoniwaService
+namespace HakoniwaCore
 {
-    class RequestManager
+    public class RequestManager
     {
         private List<Request> req_list;
 

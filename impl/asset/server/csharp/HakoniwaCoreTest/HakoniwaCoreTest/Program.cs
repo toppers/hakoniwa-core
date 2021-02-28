@@ -1,11 +1,9 @@
-﻿using HakoniwaGrpc;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
+using HakoniwaCore;
 
-namespace HakoniwaService
+namespace HakoniwaCoreTest
 {
-    class MainProgram
+    class Program
     {
         static void Main(string[] args)
         {
@@ -35,7 +33,6 @@ namespace HakoniwaService
             Console.ReadKey();
 
             HakoniwaServer.ShutdownServer();
-
         }
     }
 }

@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace HakoniwaService
+namespace HakoniwaCore
 {
-    class AssetEvent
+    public class AssetEvent
     {
         private AssetNotificationEvent ev;
         public AssetEvent(AssetNotificationEvent ev_type)

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace HakoniwaService
+namespace HakoniwaCore
 {
-    class AssetManager
+    public class AssetManager
     {
         private List<Asset> asset_list;
 

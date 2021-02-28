@@ -8,9 +8,9 @@ using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using HakoniwaGrpc;
 
-namespace HakoniwaService
+namespace HakoniwaCore
 {
-    class HakoniwaServer : CoreService.CoreServiceBase
+    public class HakoniwaServer : CoreService.CoreServiceBase
     {
         private static Server server;
         private static SimulationController simulator = new SimulationController();

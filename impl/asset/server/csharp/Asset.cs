@@ -9,6 +9,7 @@ namespace HakoniwaService
         static private int asset_id = 0;
         private int id;
         private string name;
+        private AssetEvent asset_event = null;
 
         public Asset(string asset_name)
         {
@@ -23,6 +24,17 @@ namespace HakoniwaService
         public string GetName()
         {
             return name;
+        }
+
+        public void SetEvent(AssetEvent aev)
+        {
+            this.asset_event = aev;
+        }
+        public AssetEvent GetEvent()
+        {
+            AssetEvent aev = this.asset_event;
+            this.asset_event = null;
+            return aev;
         }
 
     }

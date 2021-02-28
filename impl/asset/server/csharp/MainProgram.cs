@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HakoniwaGrpc;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -15,6 +16,20 @@ namespace HakoniwaService
             Console.WriteLine("Hello World!!");
             HakoniwaServer.StartServer(ipaddr, portno);
 
+            Console.WriteLine("Press any key to Start...");
+            Console.ReadKey();
+
+            SimulationController simulator = HakoniwaServer.GetSimulator();
+            simulator.Start();
+
+            Console.WriteLine("Press any key to End...");
+            Console.ReadKey();
+            simulator.Stop();
+
+
+            Console.WriteLine("Press any key to Terminate...");
+            Console.ReadKey();
+            simulator.Terminate();
 
             Console.WriteLine("Press any key to shutdown the server...");
             Console.ReadKey();

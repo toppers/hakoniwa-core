@@ -8,11 +8,16 @@ namespace HakoniwaService
     {
         private List<Asset> asset_list;
 
+        public int GetAssetCount()
+        {
+            return asset_list.Count;
+        }
+
         public AssetManager()
         {
             asset_list = new List<Asset>();
         }
-        private bool IsExist(string name)
+        public bool IsExist(string name)
         {
             foreach (var asset in asset_list)
             {
@@ -23,11 +28,32 @@ namespace HakoniwaService
             }
             return false;
         }
+        public AssetEvent GetEvent(string name)
+        {
+            foreach (var asset in asset_list)
+            {
+                if (asset.GetName().Equals(name))
+                {
+                    return asset.GetEvent();
+                }
+            }
+            return null;
+        }
+        public void SetEvent(string name, AssetEvent aev)
+        {
+            foreach (var asset in asset_list)
+            {
+                if (asset.GetName().Equals(name))
+                {
+                    asset.SetEvent(aev);
+                }
+            }
+            return;
+        }
         /*
          * 箱庭アセットを登録する
          * 箱庭アセットを登録解除する
          */
-
         public bool Register(string name)
         {
             if (IsExist(name))

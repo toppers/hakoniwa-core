@@ -86,10 +86,10 @@ int main(int argc, char** argv)
         break;
     }
     if (result) {
-      hakoniwa_core_asset_event_feedback(ctrl.asset, HakoniwaAssetEvent_End, Ercd_OK);
+      hakoniwa_core_asset_event_feedback(ctrl.asset, ev.type, Ercd_OK);
     }
     else {
-      hakoniwa_core_asset_event_feedback(ctrl.asset, HakoniwaAssetEvent_End, Ercd_NG);
+      hakoniwa_core_asset_event_feedback(ctrl.asset, ev.type, Ercd_NG);
     }
   }
   err = hakoniwa_core_asset_unregister(ctrl.asset);

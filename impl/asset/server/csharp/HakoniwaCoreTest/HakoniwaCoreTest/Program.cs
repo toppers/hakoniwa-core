@@ -1,5 +1,5 @@
 ﻿using System;
-using HakoniwaCore;
+using Hakoniwa.Core;
 
 namespace HakoniwaCoreTest
 {

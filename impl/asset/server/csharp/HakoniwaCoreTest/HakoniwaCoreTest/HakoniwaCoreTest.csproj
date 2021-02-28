@@ -4,12 +4,6 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Reference Include="HakoniwaCore">
-      <HintPath>..\..\HakoniwaCore\bin\Debug\netstandard2.0\HakoniwaCore.dll</HintPath>
-    </Reference>
-  </ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Google.Protobuf" Version="3.14.0" />
 		<PackageReference Include="Grpc" Version="2.35.0" />
@@ -24,6 +18,12 @@
 
 	<ItemGroup>
 		<None Remove="..\..\..\..\..\spec\hakoniwa_core.proto" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="HakoniwaCore">
+	    <HintPath>..\..\HakoniwaCore\bin\Debug\netstandard2.0\HakoniwaCore.dll</HintPath>
+	  </Reference>
 	</ItemGroup>
 
 </Project>

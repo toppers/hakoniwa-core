@@ -8,7 +8,7 @@ using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using HakoniwaGrpc;
 
-namespace HakoniwaCore
+namespace Hakoniwa.Core
 {
     public class HakoniwaServer : CoreService.CoreServiceBase
     {

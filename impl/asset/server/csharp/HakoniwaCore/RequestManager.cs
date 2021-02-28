@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace HakoniwaCore
+namespace Hakoniwa.Core
 {
     public class RequestManager
     {

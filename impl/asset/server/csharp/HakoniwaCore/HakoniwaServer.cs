@@ -14,11 +14,7 @@ namespace Hakoniwa.Core
     {
         private static Server server;
         private static SimulationController simulator = new SimulationController();
-        //TODO
 
-        static private void RemoveFirstEvent()
-        {
-        }
         static public SimulationController GetSimulator()
         {
             return simulator;

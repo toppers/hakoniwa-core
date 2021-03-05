@@ -79,10 +79,16 @@ namespace Hakoniwa.Core
                 Console.WriteLine("StartFeedback:" + state);
                 if (state == HakoniwaSimulationState.Runnable)
                 {
-                    state = HakoniwaSimulationState.Running;
-                    AssetFeedback(isStarted);
-                    Console.WriteLine("StateChanged:" + state);
-                    return true;
+                    if (AssetFeedback(isStarted))
+                    {
+                        Console.WriteLine("StateChanged:" + state);
+                        state = HakoniwaSimulationState.Running;
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
                 else
                 {
@@ -117,10 +123,16 @@ namespace Hakoniwa.Core
             {
                 if (state == HakoniwaSimulationState.Stopping)
                 {
-                    state = HakoniwaSimulationState.Stopped;
-                    AssetFeedback(isStopped);
-                    Console.WriteLine("StateChanged:" + state);
-                    return true;
+                    if (AssetFeedback(isStopped))
+                    {
+                        state = HakoniwaSimulationState.Stopped;
+                        Console.WriteLine("StateChanged:" + state);
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
                 else
                 {

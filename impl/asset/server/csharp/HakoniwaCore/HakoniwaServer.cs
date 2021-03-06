@@ -155,7 +155,14 @@ namespace Hakoniwa.Core
             }
             return Task.FromResult(ret_list);
         }
+        public override Task<NormalReply> FlushSimulationTimeSyncInfo(SimulationTimeSyncOutputFile request, ServerCallContext context)
+        {
+
+            return Task.FromResult(new NormalReply
+            {
+                Ercd = ErrorCode.Ok
+            });
+        }
+
     }
-
-
 }

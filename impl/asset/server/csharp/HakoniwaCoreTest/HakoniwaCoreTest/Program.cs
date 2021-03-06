@@ -7,12 +7,16 @@ namespace HakoniwaCoreTest
     {
         static void Main(string[] args)
         {
-            string ipaddr = "172.30.0.1";
+            string ipaddr = "172.27.160.1";
             int portno = 50051;
 
             Console.WriteLine("ipaddr=" + ipaddr + " portno=" + portno.ToString());
             Console.WriteLine("Hello World!!");
             HakoniwaServer.StartServer(ipaddr, portno);
+
+            LineBinaryStorageTest test = new LineBinaryStorageTest();
+            test.DoTest();
+
 
             Console.WriteLine("Press any key to Start...");
             Console.ReadKey();

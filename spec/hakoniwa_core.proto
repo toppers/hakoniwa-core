@@ -13,6 +13,9 @@ service CoreService {
   
   //箱庭アセットのリストを取得する
   rpc GetAssetList (google.protobuf.Empty) returns (AssetInfoList) {}
+  
+  //シミュレーション時間同期度合いを取得する
+  rpc FlushSimulationTimeSyncInfo (SimulationTimeSyncOutputFile) returns (NormalReply) {}
 
   //箱庭アセット非同期通知
   rpc AssetNotificationStart (AssetInfo) returns (stream AssetNotification) {}
@@ -49,4 +52,8 @@ message AssetInfo {
 
 message AssetInfoList {
   repeated AssetInfo assets = 1;
+}
+
+message SimulationTimeSyncOutputFile {
+	string filepath = 1;
 }

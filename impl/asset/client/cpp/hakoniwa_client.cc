@@ -63,7 +63,7 @@ class HakoniwaCoreServiceClient {
       return Ercd_NG;
     }
   }
-  void AssetNotificationStart()
+  void AsyncAssetNotificationStart()
   {
     notification_is_alive_ = true;
   }
@@ -236,10 +236,9 @@ static void notification_thread(const HakoniwaAssetInfoType* asset)
 }
 ErcdType hakoniwa_core_asset_notification_start(const HakoniwaAssetInfoType* asset)
 {
-  gl_client->AssetNotificationStart();
+  gl_client->AsyncAssetNotificationStart();
   std::thread thr(notification_thread, asset);
   thr.detach();
-  
   return Ercd_OK;
 }
 

@@ -14,8 +14,8 @@ namespace HakoniwaCoreTest
             Console.WriteLine("Hello World!!");
             HakoniwaServer.StartServer(ipaddr, portno);
 
-            LineBinaryStorageTest test = new LineBinaryStorageTest();
-            test.DoTest();
+            //LineBinaryStorageTest test = new LineBinaryStorageTest();
+            //test.DoTest();
 
 
             Console.WriteLine("Press any key to Start...");

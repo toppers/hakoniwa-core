@@ -1,5 +1,7 @@
 ﻿using System;
 using Hakoniwa.Core;
+using Hakoniwa.Core.Rpc;
+using Hakoniwa.Core.Simulation;
 
 namespace HakoniwaCoreTest
 {
@@ -7,21 +9,21 @@ namespace HakoniwaCoreTest
     {
         static void Main(string[] args)
         {
-            string ipaddr = "172.27.160.1";
+            string ipaddr = "172.18.144.1";
             int portno = 50051;
 
             Console.WriteLine("ipaddr=" + ipaddr + " portno=" + portno.ToString());
             Console.WriteLine("Hello World!!");
-            HakoniwaServer.StartServer(ipaddr, portno);
+            RpcServer.StartServer(ipaddr, portno);
 
-            //LineBinaryStorageTest test = new LineBinaryStorageTest();
-            //test.DoTest();
+            LineBinaryStorageTest test = new LineBinaryStorageTest();
+            test.DoTest();
 
 
             Console.WriteLine("Press any key to Start...");
             Console.ReadKey();
 
-            SimulationController simulator = HakoniwaServer.GetSimulator();
+            SimulationController simulator = RpcServer.GetSimulator();
             simulator.Start();
 
             Console.WriteLine("Press any key to End...");
@@ -36,7 +38,7 @@ namespace HakoniwaCoreTest
             Console.WriteLine("Press any key to shutdown the server...");
             Console.ReadKey();
 
-            HakoniwaServer.ShutdownServer();
+            RpcServer.ShutdownServer();
         }
     }
 }

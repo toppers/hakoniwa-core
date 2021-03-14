@@ -112,7 +112,7 @@ namespace HakoniwaCoreTest
             this.DoTest1();
             this.DoTest2();
             this.DoTest3();
-            this.DoTestFile(@"C:\Users\kanet\project\toppers\hakoniwa-core\impl\asset\server\csharp\HakoniwaCoreTest\HakoniwaCoreTest\test1.csv");
+            this.DoTestFile(@"C:\project\oss\hakoniwa-core\impl\asset\server\csharp\HakoniwaCoreTest\HakoniwaCoreTest\test1.csv");
         }
     }
 }

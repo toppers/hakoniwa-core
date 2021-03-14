@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Hakoniwa.Core
+namespace Hakoniwa.Core.Asset
 {
     class Asset
     {

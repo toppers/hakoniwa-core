@@ -1,11 +1,11 @@
-﻿using HakoniwaGrpc;
+﻿using Hakoniwa.Core.Asset;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Hakoniwa.Core
+namespace Hakoniwa.Core.Simulation
 {
     public class RequestManager
     {
@@ -16,7 +16,7 @@ namespace Hakoniwa.Core
             this.req_list = new List<Request>();
         }
 
-        public void PutEvent(AssetNotificationEvent ev)
+        public void PutEvent(CoreAssetNotificationEvent ev)
         {
             Request req = new Request(ev);
             this.req_list.Add(req);

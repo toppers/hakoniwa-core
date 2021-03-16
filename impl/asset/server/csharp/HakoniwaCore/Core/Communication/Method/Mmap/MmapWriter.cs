@@ -8,13 +8,12 @@ namespace Hakoniwa.Core.Communication.Method.Mmap
 {
     class MmapWriter : IIoWriter
     {
-        private byte[] buffer;
         private MmapWriterConfig mmap_config;
         private MemoryMappedFile mappedFile;
         private UnmanagedMemoryAccessor accessor;
-        public void Flush()
+        public void Flush(ref byte[] buf)
         {
-            accessor.WriteArray<byte>(0, buffer, 0, buffer.Length);
+            accessor.WriteArray<byte>(0, buf, 0, buf.Length);
         }
 
         public void Initialize(IIoWriterConfig config)
@@ -31,10 +30,6 @@ namespace Hakoniwa.Core.Communication.Method.Mmap
             {
                 accessor.Write<byte>(i, ref init_data);
             }
-        }
-        public void SetBuffer(ref byte[] buf)
-        {
-            this.buffer = buf;
         }
 
     }

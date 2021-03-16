@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Hakoniwa.Core.Communication.Method.Mmap
 {
-    class MmapReaderConfig : IIoReaderConfig
+    public class MmapReaderConfig : IIoReaderConfig
     {
         public string filepath;
         public int io_size;

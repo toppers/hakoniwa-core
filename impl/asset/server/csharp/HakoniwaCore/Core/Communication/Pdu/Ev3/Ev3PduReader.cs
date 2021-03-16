@@ -1,4 +1,4 @@
-﻿using Hakoniwa.Core.Communication.Channel;
+﻿using Hakoniwa.Core.Communication.Method;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,7 +7,6 @@ namespace Hakoniwa.Core.Communication.Pdu.Ev3
 {
     class Ev3PduReader : IPduReader
     {
-        private ReaderChannel channel;
         private PduConfig pdu_config;
         private byte[] buffer;
         private int io_size = 1024;
@@ -16,9 +15,8 @@ namespace Hakoniwa.Core.Communication.Pdu.Ev3
         private int packet_ext_off = 512;
         private int packet_ext_size = 512;
 
-        public Ev3PduReader(ReaderChannel ch)
+        public Ev3PduReader()
         {
-            this.channel = ch;
             this.buffer = new byte[io_size];
             this.pdu_config = new PduConfig(32);
             this.pdu_config.SetOffset("led", 0, 4);
@@ -78,9 +76,9 @@ namespace Hakoniwa.Core.Communication.Pdu.Ev3
             }
             return true;
         }
-        public void Recv()
+        public void Recv(IIoReader reader)
         {
-            this.channel.GetReaer().Recv(ref this.buffer);
+            reader.Recv(ref this.buffer);
         }
 
     }

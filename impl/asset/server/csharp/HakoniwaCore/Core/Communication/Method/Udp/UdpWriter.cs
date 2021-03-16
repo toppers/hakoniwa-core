@@ -8,11 +8,10 @@ namespace Hakoniwa.Core.Communication.Method.Udp
     class UdpWriter : IIoWriter
     {
         UdpWriterConfig udp_config = null;
-        private byte[] buffer = null;
         private UdpClient client;
-        public void Flush()
+        public void Flush(ref byte[] buf)
         {
-            client.Send(this.buffer, this.buffer.Length);
+            client.Send(buf, buf.Length);
         }
 
         public void Initialize(IIoWriterConfig config)
@@ -23,9 +22,5 @@ namespace Hakoniwa.Core.Communication.Method.Udp
             return;
         }
 
-        public void SetBuffer(ref byte[] buf)
-        {
-            this.buffer = buf;
-        }
     }
 }

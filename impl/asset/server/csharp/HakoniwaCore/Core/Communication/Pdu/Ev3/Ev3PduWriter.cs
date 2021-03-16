@@ -1,4 +1,4 @@
-﻿using Hakoniwa.Core.Communication.Channel;
+﻿using Hakoniwa.Core.Communication.Method;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,13 +7,11 @@ namespace Hakoniwa.Core.Communication.Pdu.Ev3
 {
     class Ev3PduWriter : IPduWriter
     {
-        private WriterChannel channel;
         private PduConfig pdu_config;
         private byte[] buffer;
 
-        public Ev3PduWriter(WriterChannel ch)
+        public Ev3PduWriter()
         {
-            this.channel = ch;
             this.buffer = new byte[1024];
             {
                 //header
@@ -33,7 +31,6 @@ namespace Hakoniwa.Core.Communication.Pdu.Ev3
                 tmp_buf[6] = 512; //ext_size
                 Buffer.BlockCopy(tmp_buf, 0, buffer, 4, 28);
             }
-            this.channel.GetWriter().SetBuffer(ref this.buffer);
 
             this.pdu_config = new PduConfig(32);
             this.pdu_config.SetOffset("sensor_color", 8, 4);
@@ -54,9 +51,9 @@ namespace Hakoniwa.Core.Communication.Pdu.Ev3
             this.pdu_config.SetOffset("gps_lon", 488, 8);
 
         }
-        public void Send()
+        public void Send(IIoWriter writer)
         {
-            this.channel.GetWriter().Flush();
+            writer.Flush(ref this.buffer);
         }
 
         public void SetData(string field_name, int value)

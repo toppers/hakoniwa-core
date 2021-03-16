@@ -18,8 +18,5 @@
 	<ItemGroup>
 		<None Remove="..\..\..\..\..\spec\hakoniwa_core.proto" />
 	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="Core\Communication\Connector\" />
-	</ItemGroup>
 
 </Project>

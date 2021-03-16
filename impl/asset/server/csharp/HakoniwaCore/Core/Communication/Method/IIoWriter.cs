@@ -7,7 +7,6 @@ namespace Hakoniwa.Core.Communication.Method
     public interface IIoWriter
     {
         void Initialize(IIoWriterConfig config);
-        void SetBuffer(ref byte[] buffer);
-        void Flush();
+        void Flush(ref byte[] buffer);
     }
 }

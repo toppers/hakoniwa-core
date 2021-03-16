@@ -6,7 +6,7 @@ namespace Hakoniwa.Core.Asset
 {
     public class AssetManager
     {
-        private List<Asset> asset_list;
+        private List<RegisteredAsset> asset_list;
 
         public int GetAssetCount()
         {
@@ -15,7 +15,7 @@ namespace Hakoniwa.Core.Asset
 
         public AssetManager()
         {
-            asset_list = new List<Asset>();
+            asset_list = new List<RegisteredAsset>();
         }
         public bool IsExist(string name)
         {
@@ -60,12 +60,12 @@ namespace Hakoniwa.Core.Asset
             {
                 return false;
             }
-            asset_list.Add(new Asset(name));
+            asset_list.Add(new RegisteredAsset(name));
             return true;
         }
         public void Unregister(string name)
         {
-            Asset entry = null;
+            RegisteredAsset entry = null;
             foreach (var asset in asset_list)
             {
                 if (asset.GetName().Equals(name))

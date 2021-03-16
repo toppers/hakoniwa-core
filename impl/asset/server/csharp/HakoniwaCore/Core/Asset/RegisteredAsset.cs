@@ -4,16 +4,16 @@ using System.Text;
 
 namespace Hakoniwa.Core.Asset
 {
-    class Asset
+    class RegisteredAsset
     {
         static private int asset_id = 0;
         private int id;
         private string name;
         private AssetEvent asset_event = null;
 
-        public Asset(string asset_name)
+        public RegisteredAsset(string asset_name)
         {
-            this.id = Asset.asset_id++;
+            this.id = RegisteredAsset.asset_id++;
             this.name = asset_name;
         }
 

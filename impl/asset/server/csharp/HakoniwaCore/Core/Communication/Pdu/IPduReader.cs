@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hakoniwa.Core.Communication.Method;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -10,7 +11,7 @@ namespace Hakoniwa.Core.Communication.Pdu
         void GetData(string field_name, out int value);
         void GetData(string field_name, out ulong value);
         void GetData(string field_name, out double value);
-        void Recv();
+        void Recv(IIoReader reader);
 
     }
 }

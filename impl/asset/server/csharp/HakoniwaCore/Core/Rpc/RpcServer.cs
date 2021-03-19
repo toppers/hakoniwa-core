@@ -50,7 +50,7 @@ namespace Hakoniwa.Core.Rpc
                 }); ;
 
             }
-            if (RpcServer.GetSimulator().asset_mgr.Register(request.Name))
+            if (RpcServer.GetSimulator().asset_mgr.RegisterOutsideAsset(request.Name))
             {
                 return Task.FromResult(new NormalReply
                 {

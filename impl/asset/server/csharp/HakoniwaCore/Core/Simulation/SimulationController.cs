@@ -4,6 +4,8 @@ using System.Text;
 using Hakoniwa.Core.Asset;
 using Hakoniwa.Core.Simulation.Environment;
 using Hakoniwa.Core.Simulation.Logger;
+using Hakoniwa.Core.Simulation.Time;
+using Hakoniwa.PluggableAsset.Assets;
 
 namespace Hakoniwa.Core.Simulation
 {
@@ -26,6 +28,7 @@ namespace Hakoniwa.Core.Simulation
         private Object lockObj = new Object();
         private SimulationLogger logger = new SimulationLogger();
         public SimulationState state = SimulationState.Stopped;
+        private TheWorld theWorld = new TheWorld();
 
         public static SimulationController Get()
         {
@@ -47,6 +50,7 @@ namespace Hakoniwa.Core.Simulation
         public SimulationController()
         {
             this.sim_env = new SimulationEnvironment();
+            this.theWorld.SetMaxDelayTime(20000); //TODO
         }
         public void RegisterEnvironmentOperation(IEnvironmentOperation env_op)
         {
@@ -77,9 +81,28 @@ namespace Hakoniwa.Core.Simulation
             this.asset_feedback_count = 0;
             this.result = HakoniwaSimulationResult.Success;
             req_mgr.PutEvent(ev);
-            foreach (var asset in asset_mgr.GetAssetList())
+            foreach (var asset in asset_mgr.RefList())
             {
-                asset_mgr.SetEvent(asset.GetName(), new AssetEvent(ev));
+                if (asset.GetAssetType() == AssetType.Outside)
+                {
+                    asset_mgr.SetEvent(asset.GetName(), new AssetEvent(ev));
+                }
+                else
+                {
+                    // inside asset
+                    if (ev == CoreAssetNotificationEvent.Start)
+                    {
+                        this.StartFeedback(true);
+                    }
+                    else if (ev == CoreAssetNotificationEvent.Stop)
+                    {
+                        this.StopFeedback(true);
+                    }
+                    else
+                    {
+                        // nothing to do.
+                    }
+                }
             }
         }
 
@@ -205,6 +228,60 @@ namespace Hakoniwa.Core.Simulation
         public SimulationState GetState()
         {
             return state;
+        }
+
+        private List<IInsideAssetController> inside_assets;
+        private List<IOutsideAssetController> outside_assets;
+        public void Prepare()
+        {
+            if (state != SimulationState.Running)
+            {
+                return;
+            }
+            this.inside_assets = this.asset_mgr.RefInsideAssetList();
+            this.outside_assets = this.asset_mgr.RefOutsideAssetList();
+            foreach (var e in this.asset_mgr.RefList())
+            {
+                e.GetController().Initialize();
+            }
+        }
+
+        public bool Execute()
+        {
+            if (state != SimulationState.Running)
+            {
+                return false;
+            }
+            /********************
+             * Inside assets
+             ********************/
+            foreach (var asset in outside_assets) 
+            {
+                asset.RecvPdu();
+            }
+            /********************
+             * Hakoniwa Time sync
+             ********************/
+            bool canStep = theWorld.CanStep(this.outside_assets);
+            if (canStep)
+            {
+                foreach (var asset in inside_assets)
+                {
+                    asset.DoUpdate();
+                }
+                //TODO ここでUnityを駆動すべきかどうかは要確認．．
+                theWorld.StepFoward();
+            }
+
+            /********************
+             * Onside assets
+             ********************/
+            foreach (var asset in outside_assets)
+            {
+                asset.PutHakoniwaTime(theWorld.GetWorldTime());
+                asset.SendPdu();
+            }
+            return canStep;
         }
     }
 }

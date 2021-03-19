@@ -18,5 +18,9 @@
 	<ItemGroup>
 		<None Remove="..\..\..\..\..\spec\hakoniwa_core.proto" />
 	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Core\Simulation\State\" />
+	  <Folder Include="PluggableAsset\Assets\Robot\EV3\" />
+	</ItemGroup>
 
 </Project>

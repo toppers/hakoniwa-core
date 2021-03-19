@@ -1,20 +1,42 @@
-﻿using System;
+﻿using Hakoniwa.PluggableAsset.Assets;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Hakoniwa.Core.Asset
 {
-    class RegisteredAsset
+    public enum AssetType
+    {
+        Inside = 0,
+        Outside = 1,
+    }
+
+    public class RegisteredAsset
     {
         static private int asset_id = 0;
         private int id;
         private string name;
         private AssetEvent asset_event = null;
+        private AssetType type;
+        private IAssetController controller;
 
-        public RegisteredAsset(string asset_name)
+        public RegisteredAsset(string asset_name, AssetType type)
         {
             this.id = RegisteredAsset.asset_id++;
             this.name = asset_name;
+            this.type = type;
+        }
+        public void SetController(IAssetController ctrl)
+        {
+            this.controller = ctrl;
+        }
+        public IAssetController GetController()
+        {
+            return this.controller;
+        }
+        public AssetType GetAssetType()
+        {
+            return this.type;
         }
 
         public int GetId()

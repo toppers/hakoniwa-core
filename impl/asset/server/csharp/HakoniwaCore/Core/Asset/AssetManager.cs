@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Hakoniwa.PluggableAsset;
+using Hakoniwa.PluggableAsset.Assets;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -7,6 +9,42 @@ namespace Hakoniwa.Core.Asset
     public class AssetManager
     {
         private List<RegisteredAsset> asset_list;
+
+        public List<RegisteredAsset> RefList()
+        {
+            var list = new List<RegisteredAsset>();
+            foreach (var e in this.asset_list)
+            {
+                list.Add(e);
+            }
+            return list;
+        }
+        public List<IOutsideAssetController> RefOutsideAssetList()
+        {
+            var list = new List<IOutsideAssetController>();
+            foreach (var e in this.asset_list)
+            {
+                if (e.GetController() is IOutsideAssetController)
+                {
+                    var asset = e as IOutsideAssetController;
+                    list.Add(asset);
+                }
+            }
+            return list;
+        }
+        public List<IInsideAssetController> RefInsideAssetList()
+        {
+            var list = new List<IInsideAssetController>();
+            foreach (var e in this.asset_list)
+            {
+                if (e.GetController() is IInsideAssetController)
+                {
+                    var asset = e as IInsideAssetController;
+                    list.Add(asset);
+                }
+            }
+            return list;
+        }
 
         public int GetAssetCount()
         {
@@ -54,13 +92,37 @@ namespace Hakoniwa.Core.Asset
          * 箱庭アセットを登録する
          * 箱庭アセットを登録解除する
          */
-        public bool Register(string name)
+        public bool RegisterOutsideAsset(string name)
         {
             if (IsExist(name))
             {
                 return false;
             }
-            asset_list.Add(new RegisteredAsset(name));
+            var controller = AssetConfiguration.GetOutsideAsset(name);
+            if (controller == null)
+            {
+                return false;
+            }
+
+            var asset = new RegisteredAsset(name, AssetType.Outside);
+            asset.SetController(controller);
+            asset_list.Add(asset);
+            return true;
+        }
+        public bool RegisterInsideAsset(string name)
+        {
+            if (IsExist(name))
+            {
+                return false;
+            }
+            var controller = AssetConfiguration.GetInsideAsset(name);
+            if (controller == null)
+            {
+                return false;
+            }
+            var asset = new RegisteredAsset(name, AssetType.Inside);
+            asset.SetController(controller);
+            asset_list.Add(asset);
             return true;
         }
         public void Unregister(string name)
@@ -87,6 +149,18 @@ namespace Hakoniwa.Core.Asset
             foreach (var asset in asset_list)
             {
                 list.Add(new AssetEntry(asset.GetName()));
+            }
+            return list;
+        }
+        public List<AssetEntry> GetAssetList(AssetType type)
+        {
+            List<AssetEntry> list = new List<AssetEntry>();
+            foreach (var asset in asset_list)
+            {
+                if (asset.GetAssetType() == type)
+                {
+                    list.Add(new AssetEntry(asset.GetName()));
+                }
             }
             return list;
         }

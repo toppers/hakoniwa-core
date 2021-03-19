@@ -131,10 +131,10 @@ namespace Hakoniwa.Core.Simulation
                         Console.WriteLine("StateChanged:" + state);
                         state = SimulationState.Running;
 
-                        string[] names = new string[this.asset_mgr.GetAssetCount() + 1];
+                        string[] names = new string[this.asset_mgr.RefOutsideAssetList().Count + 1];
                         names[0] = "Hakoniwa";
                         int i = 1;
-                        foreach (var asset in this.asset_mgr.GetAssetList())
+                        foreach (var asset in this.asset_mgr.RefOutsideAssetList())
                         {
                             names[i] = asset.GetName();
                             i++;
@@ -248,10 +248,15 @@ namespace Hakoniwa.Core.Simulation
              * Inside assets
              * - Recv Actuation Data
              ********************/
+            this.logger.GetSimTimeLogger().SetSimTime(0, theWorld.GetWorldTime());
+            int i = 1;
             foreach (var asset in this.asset_mgr.RefOutsideAssetList()) 
             {
+                this.logger.GetSimTimeLogger().SetSimTime(i++, asset.GetSimTime());
                 asset.RecvPdu();
             }
+            this.logger.GetSimTimeLogger().Next();
+
             /********************
              * Hakoniwa Time Sync
              ********************/

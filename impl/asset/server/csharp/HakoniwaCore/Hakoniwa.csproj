@@ -20,7 +20,6 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Core\Simulation\State\" />
-	  <Folder Include="PluggableAsset\Assets\Robot\EV3\" />
 	</ItemGroup>
 
 </Project>

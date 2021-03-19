@@ -11,7 +11,7 @@ using System.Text;
 
 namespace Hakoniwa.PluggableAsset
 {
-    class AssetConfiguration
+    public class AssetConfiguration
     {
         private static List<IInsideAssetController> inside_assets = new List<IInsideAssetController>();
         private static List<IOutsideAssetController> outside_assets = new List<IOutsideAssetController>();

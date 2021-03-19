@@ -14,6 +14,19 @@ namespace Hakoniwa.Core.Simulation.Time
         public TheWorld()
         {
         }
+
+        private long saved_world_time;
+        private long saved_wait_time;
+        public void Save()
+        {
+            this.saved_wait_time = this.wait_time;
+            this.saved_world_time = this.world_time;
+        }
+        public void Restore()
+        {
+            this.wait_time = this.saved_wait_time;
+            this.world_time = this.saved_world_time;
+        }
         public void SetMaxDelayTime(long max)
         {
             this.max_delay_time = max;

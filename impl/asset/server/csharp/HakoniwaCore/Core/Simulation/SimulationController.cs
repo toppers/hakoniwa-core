@@ -69,10 +69,12 @@ namespace Hakoniwa.Core.Simulation
         }
         public void SaveEnvironment()
         {
+            this.theWorld.Save();
             this.sim_env.Save();
         }
         public void RestoreEnvironment()
         {
+            this.theWorld.Restore();
             this.sim_env.Restore();
         }
         private bool AssetFeedback(bool isOK)

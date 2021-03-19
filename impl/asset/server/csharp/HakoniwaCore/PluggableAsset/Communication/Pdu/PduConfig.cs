@@ -56,7 +56,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
             {
                 if (e.name == name)
                 {
-                    return e.off + base_offset;
+                    return e.off;
                 }
             }
             throw new FieldAccessException("ERROR: Invalid offset:" + name);

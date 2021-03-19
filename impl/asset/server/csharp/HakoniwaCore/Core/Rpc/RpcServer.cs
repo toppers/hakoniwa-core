@@ -42,7 +42,6 @@ namespace Hakoniwa.Core.Rpc
 
         public override Task<NormalReply> Register(AssetInfo request, ServerCallContext context)
         {
-            Console.WriteLine("Register:" + request.Name);
             if (RpcServer.GetSimulator().GetState() != SimulationState.Stopped) {
                 return Task.FromResult(new NormalReply
                 {

@@ -7,7 +7,7 @@ namespace Hakoniwa.Core.Simulation.Time
 {
     class TheWorld
     {
-        private long world_time = 0; /* usec */
+        private long world_time = 1; /* usec */
         private long max_delay_time = 0; /* usec */
         public long wait_time = 0; /* usec */
         private long delta_time = 0; /* usec */
@@ -22,14 +22,24 @@ namespace Hakoniwa.Core.Simulation.Time
         {
             this.delta_time = dtime;
         }
+        public long GetDeltaTime()
+        {
+            return this.delta_time;
+        }
+        public long GetWaitTime()
+        {
+            return this.wait_time;
+        }
         public bool CanStep(List<IOutsideAssetController> assets)
         {
             bool isConnected = true;
             bool canStep = true;
             foreach (var outside_asset in assets)
             {
-                max_delay_time = outside_asset.GetSimTime();
-                if (max_delay_time <= -this.max_delay_time)
+                long diff = outside_asset.GetSimTime() - this.world_time;
+                //Debug.Log("micon=" + outside_asset.GetSimTime());
+                //Debug.Log("world_time=" + world_time);
+                if (diff <= -this.max_delay_time)
                 {
                     canStep = false;
                 }
@@ -40,17 +50,18 @@ namespace Hakoniwa.Core.Simulation.Time
             }
             if (isConnected && canStep)
             {
-                this.wait_time++;
                 return true;
             }
             else
             {
+                this.wait_time += this.delta_time;
                 return false;
             }
         }
         public void StepFoward()
         {
-            this.world_time++;
+            this.world_time += this.delta_time;
+            //Debug.Log("world_time=" + world_time +"delta_time=" + this.delta_time);
         }
 
         internal long GetWorldTime()

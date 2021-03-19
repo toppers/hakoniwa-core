@@ -10,7 +10,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Udp
     class UdpReader : IIoReader
     {
         UdpConfig udp_config = null;
-        private Object lockObj = new Object();
+        private System.Object lockObj = new System.Object();
         private byte[] buffer = null;
         private Thread thread;
         public void Initialize(IIoReaderConfig config)
@@ -33,7 +33,8 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Udp
         private void ThreadMethod()
         {
             UdpClient client;
-            client = new UdpClient(udp_config.IpAddr, udp_config.Portno);
+            //client = new UdpClient(udp_config.IpAddr, udp_config.Portno);
+            client = new UdpClient(udp_config.Portno);
             while (true)
             {
                 IPEndPoint remoteEP = null;

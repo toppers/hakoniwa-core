@@ -61,18 +61,21 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
 
         public void SetData(string field_name, int value)
         {
+            //Debug.Log("filed_name=" + field_name + " value=" + value);
             byte[] tmp_buf = BitConverter.GetBytes(value);
             Buffer.BlockCopy(tmp_buf, 0, this.buffer, pdu_config.GetOffset(field_name), tmp_buf.Length);
         }
 
         public void SetData(string field_name, ulong value)
         {
+            //Debug.Log("filed_name=" + field_name + " value=" + value);
             byte[] tmp_buf = BitConverter.GetBytes(value);
             Buffer.BlockCopy(tmp_buf, 0, this.buffer, pdu_config.GetOffset(field_name), tmp_buf.Length);
         }
 
-        public void setData(string field_name, double value)
+        public void SetData(string field_name, double value)
         {
+            //Debug.Log("filed_name=" + field_name + " value=" + value);
             byte[] tmp_buf = BitConverter.GetBytes(value);
             Buffer.BlockCopy(tmp_buf, 0, this.buffer, pdu_config.GetOffset(field_name), tmp_buf.Length);
         }
@@ -83,6 +86,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
 
         public void SetHeaderData(string field_name, long value)
         {
+            //Debug.Log("filed_name=" + field_name + " value=" + value);
             byte[] tmp_buf = BitConverter.GetBytes(value);
             Buffer.BlockCopy(tmp_buf, 0, this.buffer, pdu_config.GetHeaderOffset(field_name), tmp_buf.Length);
         }

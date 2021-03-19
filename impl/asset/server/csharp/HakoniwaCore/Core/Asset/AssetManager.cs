@@ -26,7 +26,7 @@ namespace Hakoniwa.Core.Asset
             {
                 if (e.GetController() is IOutsideAssetController)
                 {
-                    var asset = e as IOutsideAssetController;
+                    var asset = e.GetController() as IOutsideAssetController;
                     list.Add(asset);
                 }
             }
@@ -39,7 +39,7 @@ namespace Hakoniwa.Core.Asset
             {
                 if (e.GetController() is IInsideAssetController)
                 {
-                    var asset = e as IInsideAssetController;
+                    var asset = e.GetController() as IInsideAssetController;
                     list.Add(asset);
                 }
             }
@@ -107,17 +107,20 @@ namespace Hakoniwa.Core.Asset
             var asset = new RegisteredAsset(name, AssetType.Outside);
             asset.SetController(controller);
             asset_list.Add(asset);
+            controller.Initialize();
             return true;
         }
         public bool RegisterInsideAsset(string name)
         {
             if (IsExist(name))
             {
+                //Debug.Log("ERROR:already exit:" + name);
                 return false;
             }
             var controller = AssetConfiguration.GetInsideAsset(name);
             if (controller == null)
             {
+                //Debug.Log("ERROR:Not found:" + name);
                 return false;
             }
             var asset = new RegisteredAsset(name, AssetType.Inside);

@@ -11,6 +11,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Udp
         private UdpClient client;
         public void Flush(ref byte[] buf)
         {
+            //Debug.Log("UdpSend:" + buf.Length);
             client.Send(buf, buf.Length);
         }
 

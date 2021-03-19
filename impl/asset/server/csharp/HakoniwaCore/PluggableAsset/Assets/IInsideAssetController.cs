@@ -6,6 +6,7 @@ namespace Hakoniwa.PluggableAsset.Assets
 {
     public interface IInsideAssetController : IAssetController
     {
-        void DoUpdate();
+        void DoActuation();
+        void CopySensingDataToPdu();
     }
 }

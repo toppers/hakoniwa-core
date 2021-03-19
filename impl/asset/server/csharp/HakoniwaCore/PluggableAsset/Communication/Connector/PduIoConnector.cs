@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Hakoniwa.PluggableAsset.Communication.Connector
 {
-    class PduIoConnector
+    public class PduIoConnector
     {
         public static List<PduIoConnector> connectors = new List<PduIoConnector>();
         public static PduIoConnector Create(string name)

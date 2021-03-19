@@ -10,10 +10,16 @@ namespace Hakoniwa.PluggableAsset.Assets.Micon.EV3
         private string name;
         private PduChannelConnector connector;
 
-        public Ev3MiconAssetController(string name)
+        public Ev3MiconAssetController(string asset_name)
         {
-            this.name = name;
+            this.name = asset_name;
         }
+
+        public string GetName()
+        {
+            return this.name;
+        }
+
         public long GetSimTime()
         {
             return this.connector.Reader.GetPdu().GetHeaderData("simulation_time");

@@ -5,14 +5,14 @@ using System.Text;
 
 namespace Hakoniwa.PluggableAsset.Communication.Pdu
 {
-    interface IPduWriter
+    public interface IPduWriter
     {
         string GetName();
 
         void SetHeaderData(string field_name, long value);
         void SetData(string field_name, int value);
         void SetData(string field_name, ulong value);
-        void setData(string field_name, double value);
+        void SetData(string field_name, double value);
         void Send(IIoWriter writer);
     }
 }

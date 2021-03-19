@@ -63,8 +63,8 @@ namespace Hakoniwa.PluggableAsset
             //Method
             UdpConfig config = new UdpConfig();
             config.IoSize = 1024;
-            config.IpAddr = "127.0.0.1";
-            config.Portno = 50004;
+            config.IpAddr = "172.30.24.61";
+            config.Portno = 54002;
             IIoWriter writer = new UdpWriter();
             writer.Initialize(config);
 
@@ -84,8 +84,8 @@ namespace Hakoniwa.PluggableAsset
             //Method
             config = new UdpConfig();
             config.IoSize = 1024;
-            config.IpAddr = "127.0.0.1";
-            config.Portno = 50005;
+            config.IpAddr = "172.30.16.1";
+            config.Portno = 54001;
             IIoReader reader = new UdpReader();
             reader.Initialize(config);
 
@@ -103,8 +103,6 @@ namespace Hakoniwa.PluggableAsset
             var robo_connector = PduIoConnector.Create("RoboModel");
             robo_connector.AddWriter(wpdu);
             robo_connector.AddReader(rpdu);
-
-            //TODO roboto controller registration..
         }
     }
 }

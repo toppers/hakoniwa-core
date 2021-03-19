@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Hakoniwa.PluggableAsset.Communication.Pdu
 {
-    interface IPduReader
+    public interface IPduReader
     {
         string GetName();
         bool IsValidData();

@@ -131,9 +131,10 @@ namespace Hakoniwa.Core.Simulation
                         Console.WriteLine("StateChanged:" + state);
                         state = SimulationState.Running;
 
-                        string[] names = new string[this.asset_mgr.RefOutsideAssetList().Count + 1];
-                        names[0] = "Hakoniwa";
-                        int i = 1;
+                        string[] names = new string[this.asset_mgr.RefOutsideAssetList().Count + 2];
+                        names[0] = "Host";
+                        names[1] = "Hakoniwa";
+                        int i = 2;
                         foreach (var asset in this.asset_mgr.RefOutsideAssetList())
                         {
                             names[i] = asset.GetName();
@@ -237,7 +238,13 @@ namespace Hakoniwa.Core.Simulation
         {
             return this.theWorld.GetWorldTime();
         }
-
+        private long GetUnixTime()
+        {
+            //var baseDt = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
+            //var unixtime = (DateTimeOffset.Now - baseDt).Ticks / 10;//usec
+            //return unixtime;
+            return (DateTimeOffset.Now.ToUnixTimeMilliseconds()*1000);
+        }
         public bool Execute()
         {
             if (state != SimulationState.Running)
@@ -248,14 +255,10 @@ namespace Hakoniwa.Core.Simulation
              * Inside assets
              * - Recv Actuation Data
              ********************/
-            this.logger.GetSimTimeLogger().SetSimTime(0, theWorld.GetWorldTime());
-            int i = 1;
             foreach (var asset in this.asset_mgr.RefOutsideAssetList()) 
             {
-                this.logger.GetSimTimeLogger().SetSimTime(i++, asset.GetSimTime());
                 asset.RecvPdu();
             }
-            this.logger.GetSimTimeLogger().Next();
 
             /********************
              * Hakoniwa Time Sync
@@ -286,11 +289,16 @@ namespace Hakoniwa.Core.Simulation
              * - Send Sensor Data 
              * - Time Sync
              ********************/
+            int i = 2;
             foreach (var asset in this.asset_mgr.RefOutsideAssetList())
             {
+                this.logger.GetSimTimeLogger().SetSimTime(i++, ((double)asset.GetSimTime()) / 1000000f);
                 asset.PutHakoniwaTime(theWorld.GetWorldTime());
                 asset.SendPdu();
             }
+            this.logger.GetSimTimeLogger().SetSimTime(0, GetUnixTime());
+            this.logger.GetSimTimeLogger().SetSimTime(1, ((double)theWorld.GetWorldTime()) / 1000000f);
+            this.logger.GetSimTimeLogger().Next();
             return canStep;
         }
     }

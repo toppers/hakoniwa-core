@@ -7,7 +7,7 @@ namespace Hakoniwa.Core.Simulation.Logger
 {
     public class SimulationLogger
     {
-        private string filepath;
+        private string filepath = null;
         private SimulationTimeStorage sim_time_logger = null;
         public SimulationLogger()
         {
@@ -19,6 +19,10 @@ namespace Hakoniwa.Core.Simulation.Logger
 
         public void Flush()
         {
+            if (filepath == null)
+            {
+                return;
+            }
             if (this.sim_time_logger != null)
             {
                 this.sim_time_logger.Flush(filepath);

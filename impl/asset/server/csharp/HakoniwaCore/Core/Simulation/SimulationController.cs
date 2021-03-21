@@ -240,10 +240,10 @@ namespace Hakoniwa.Core.Simulation
         }
         private long GetUnixTime()
         {
-            //var baseDt = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
-            //var unixtime = (DateTimeOffset.Now - baseDt).Ticks / 10;//usec
-            //return unixtime;
-            return (DateTimeOffset.Now.ToUnixTimeMilliseconds()*1000);
+            var baseDt = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
+            var unixtime = (DateTimeOffset.Now - baseDt).Ticks / 10;//usec
+            return unixtime;
+            //return (DateTimeOffset.Now.ToUnixTimeMilliseconds()*1000);
         }
         public bool Execute()
         {

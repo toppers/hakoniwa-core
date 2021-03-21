@@ -9,6 +9,13 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Udp
     {
         UdpConfig udp_config = null;
         private UdpClient client;
+
+        public string Name { get; internal set; }
+
+        public string GetName()
+        {
+            return this.Name;
+        }
         public void Flush(ref byte[] buf)
         {
             //Debug.Log("UdpSend:" + buf.Length);

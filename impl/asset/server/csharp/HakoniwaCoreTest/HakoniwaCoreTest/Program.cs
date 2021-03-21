@@ -2,6 +2,7 @@
 using Hakoniwa.Core;
 using Hakoniwa.Core.Rpc;
 using Hakoniwa.Core.Simulation;
+using Hakoniwa.PluggableAsset;
 
 namespace HakoniwaCoreTest
 {
@@ -9,11 +10,13 @@ namespace HakoniwaCoreTest
     {
         static void Main(string[] args)
         {
+            string filepath = @"C:\project\oss\hakoniwa-core\impl\asset\server\csharp\HakoniwaCoreTest\HakoniwaCoreTest\core_config.json";
+            AssetConfigLoader.Load(filepath);
+#if false
             string ipaddr = "172.18.144.1";
             int portno = 50051;
 
             Console.WriteLine("ipaddr=" + ipaddr + " portno=" + portno.ToString());
-            Console.WriteLine("Hello World!!");
             RpcServer.StartServer(ipaddr, portno);
 
             LineBinaryStorageTest test = new LineBinaryStorageTest();
@@ -39,6 +42,7 @@ namespace HakoniwaCoreTest
             Console.ReadKey();
 
             RpcServer.ShutdownServer();
+#endif
         }
     }
 }

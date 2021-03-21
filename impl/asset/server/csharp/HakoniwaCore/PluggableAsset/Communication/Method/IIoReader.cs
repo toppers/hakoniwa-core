@@ -8,6 +8,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method
     {
         void Initialize(IIoReaderConfig config);
 
+        string GetName();
         void Recv(ref byte[] buf);
     }
 }

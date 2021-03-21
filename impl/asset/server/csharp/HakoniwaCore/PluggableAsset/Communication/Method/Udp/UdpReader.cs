@@ -13,6 +13,14 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Udp
         private System.Object lockObj = new System.Object();
         private byte[] buffer = null;
         private Thread thread;
+
+        public string Name { get; internal set; }
+
+        public string GetName()
+        {
+            return this.Name;
+        }
+
         public void Initialize(IIoReaderConfig config)
         {
             udp_config = config as UdpConfig;

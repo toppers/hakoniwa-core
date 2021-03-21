@@ -98,7 +98,7 @@ namespace Hakoniwa.Core.Asset
             {
                 return false;
             }
-            var controller = AssetConfiguration.GetOutsideAsset(name);
+            var controller = AssetConfigLoader.GetOutsideAsset(name);
             if (controller == null)
             {
                 return false;
@@ -117,7 +117,7 @@ namespace Hakoniwa.Core.Asset
                 //Debug.Log("ERROR:already exit:" + name);
                 return false;
             }
-            var controller = AssetConfiguration.GetInsideAsset(name);
+            var controller = AssetConfigLoader.GetInsideAsset(name);
             if (controller == null)
             {
                 //Debug.Log("ERROR:Not found:" + name);

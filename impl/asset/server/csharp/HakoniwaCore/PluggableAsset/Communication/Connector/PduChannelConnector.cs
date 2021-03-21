@@ -29,6 +29,10 @@ namespace Hakoniwa.PluggableAsset.Communication.Connector
         private WriterConnector writer_connector;
         private ReaderConnector reader_connector;
 
+        public string GetName()
+        {
+            return name;
+        }
         public WriterConnector Writer
         {
             set { this.writer_connector = value; }

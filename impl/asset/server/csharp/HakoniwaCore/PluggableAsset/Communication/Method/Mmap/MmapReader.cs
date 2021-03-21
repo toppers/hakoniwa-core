@@ -13,6 +13,13 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Mmap
         private MemoryMappedFile mappedFile;
         private UnmanagedMemoryAccessor accessor;
 
+        public string Name { get; private set; }
+
+        public string GetName()
+        {
+            return this.Name;
+        }
+
         public void Initialize(IIoReaderConfig config)
         {
             mmap_config = config as MmapReaderConfig;

@@ -6,6 +6,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method
 {
     public interface IIoWriter
     {
+        string GetName();
         void Initialize(IIoWriterConfig config);
         void Flush(ref byte[] buffer);
     }

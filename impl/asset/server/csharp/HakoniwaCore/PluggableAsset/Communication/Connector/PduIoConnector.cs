@@ -30,6 +30,10 @@ namespace Hakoniwa.PluggableAsset.Communication.Connector
         private List<IPduWriter> pdu_writer = new List<IPduWriter>();
         private List<IPduReader> pdu_reader = new List<IPduReader>();
 
+        public string GetName()
+        {
+            return name;
+        }
         public bool AddWriter(IPduWriter writer)
         {
             foreach (var e in this.pdu_writer)

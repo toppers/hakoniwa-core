@@ -9,6 +9,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Connector
 {
     class ReaderConnector
     {
+        public string Name { get; set; }
         private static List<ReaderConnector> connectors = new List<ReaderConnector>();
         public static ReaderConnector Create(IPduReader p, ReaderChannel c)
         {

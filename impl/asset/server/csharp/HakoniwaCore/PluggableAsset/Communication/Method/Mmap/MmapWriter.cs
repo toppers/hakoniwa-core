@@ -11,6 +11,13 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Mmap
         private MmapWriterConfig mmap_config;
         private MemoryMappedFile mappedFile;
         private UnmanagedMemoryAccessor accessor;
+
+        public string Name { get; private set; }
+
+        public string GetName()
+        {
+            return this.Name;
+        }
         public void Flush(ref byte[] buf)
         {
             accessor.WriteArray<byte>(0, buf, 0, buf.Length);

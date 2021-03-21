@@ -13,6 +13,7 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
+		<PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
 		<Protobuf Include="..\..\..\..\..\spec\*.proto" HakoniwaCoreService="Both" />
 	</ItemGroup>
 
@@ -21,8 +22,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Reference Include="HakoniwaCore">
-	    <HintPath>..\..\HakoniwaCore\bin\Debug\netstandard2.0\HakoniwaCore.dll</HintPath>
+	  <Reference Include="Hakoniwa">
+	    <HintPath>..\..\HakoniwaCore\bin\Debug\netstandard2.0\Hakoniwa.dll</HintPath>
 	  </Reference>
 	</ItemGroup>
 

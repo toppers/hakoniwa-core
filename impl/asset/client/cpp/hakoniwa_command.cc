@@ -39,6 +39,15 @@ int main(int argc, char** argv)
   else if (strncmp(cmdp, "reset", strlen("reset")) == 0) {
     hakoniwa_core_reset_simulation();
   }
+  else if (strncmp(cmdp, "ls", strlen("ls")) == 0) {
+    HakoniwaAssetInfoArrayType list;
+    hakonwia_core_get_asset_list(&list);
+    int i;
+    for (i = 0; i < list.array_size; i++) {
+      printf("asset[%d]=%s\n", i, list.entries[i].name);
+    }
+    hakonwia_core_free_asset_list(&list);
+  }
   else {
     printf("ERROR: invalid commad %s\n", cmdp);
   }

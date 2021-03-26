@@ -81,6 +81,58 @@ namespace Hakoniwa.Core.Rpc
                 Ercd = ErrorCode.Ok
             });
         }
+        public override Task<NormalReply> StartSimulation(Empty empty, ServerCallContext context)
+        {
+            if (RpcServer.GetSimulator().Start())
+            {
+                return Task.FromResult(new NormalReply
+                {
+                    Ercd = ErrorCode.Ok
+                });
+            }
+            else
+            {
+                return Task.FromResult(new NormalReply
+                {
+                    Ercd = ErrorCode.Inval
+                });
+            }
+        }
+        public override Task<NormalReply> StopSimulation(Empty empty, ServerCallContext context)
+        {
+            if (RpcServer.GetSimulator().Stop())
+            {
+                return Task.FromResult(new NormalReply
+                {
+                    Ercd = ErrorCode.Ok
+                });
+            }
+            else
+            {
+                return Task.FromResult(new NormalReply
+                {
+                    Ercd = ErrorCode.Inval
+                });
+            }
+        }
+        public override Task<NormalReply> ResetSimulation(Empty empty, ServerCallContext context)
+        {
+            if (RpcServer.GetSimulator().ResetRequest())
+            {
+                return Task.FromResult(new NormalReply
+                {
+                    Ercd = ErrorCode.Ok
+                });
+            }
+            else
+            {
+                return Task.FromResult(new NormalReply
+                {
+                    Ercd = ErrorCode.Inval
+                });
+            }
+        }
+
         private AssetNotificationEvent InternalEvent2RpcEvent(CoreAssetNotificationEvent iev)
         {
             switch (iev)

@@ -14,6 +14,15 @@ service CoreService {
   //箱庭アセットのリストを取得する
   rpc GetAssetList (google.protobuf.Empty) returns (AssetInfoList) {}
   
+  //シミュレーションを開始する
+  rpc StartSimulation(google.protobuf.Empty) returns (NormalReply) {}
+  
+  //シミュレーションを終了する
+  rpc StopSimulation(google.protobuf.Empty) returns (NormalReply) {}
+
+  //シミュレーションを実行開始状態に戻す
+  rpc ResetSimulation(google.protobuf.Empty) returns (NormalReply) {}
+  
   //シミュレーション時間同期度合いを取得する
   rpc FlushSimulationTimeSyncInfo (SimulationTimeSyncOutputFile) returns (NormalReply) {}
 

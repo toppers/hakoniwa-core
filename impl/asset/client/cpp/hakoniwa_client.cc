@@ -63,6 +63,62 @@ class HakoniwaCoreServiceClient {
       return Ercd_NG;
     }
   }
+  ErcdType StartSimulation(void) {
+    NormalReply reply;
+    const ::google::protobuf::Empty request;
+    ClientContext context;
+
+    Status status = stub_->StartSimulation(&context, request, &reply);
+    if (status.ok()) {
+      if (reply.ercd() != ErrorCode::ERROR_CODE_OK) {
+        std::cout << "FAILED: error code = " << reply.ercd() << std::endl;
+        return Ercd_NG;
+      }
+      return Ercd_OK;
+    } else {
+      std::cout << "ERROR:" << status.error_code() << ": " << status.error_message()
+                << std::endl;
+      return Ercd_NG;
+    }
+  }
+  ErcdType StopSimulation(void) {
+    NormalReply reply;
+    const ::google::protobuf::Empty request;
+    ClientContext context;
+
+    Status status = stub_->StopSimulation(&context, request, &reply);
+    if (status.ok()) {
+      if (reply.ercd() != ErrorCode::ERROR_CODE_OK) {
+        std::cout << "FAILED: error code = " << reply.ercd() << std::endl;
+        return Ercd_NG;
+      }
+      return Ercd_OK;
+    } else {
+      std::cout << "ERROR:" << status.error_code() << ": " << status.error_message()
+                << std::endl;
+      return Ercd_NG;
+    }
+  }
+  ErcdType ResetSimulation(void) {
+    NormalReply reply;
+    const ::google::protobuf::Empty request;
+    ClientContext context;
+
+    Status status = stub_->ResetSimulation(&context, request, &reply);
+    if (status.ok()) {
+      if (reply.ercd() != ErrorCode::ERROR_CODE_OK) {
+        std::cout << "FAILED: error code = " << reply.ercd() << std::endl;
+        return Ercd_NG;
+      }
+      return Ercd_OK;
+    } else {
+      std::cout << "ERROR:" << status.error_code() << ": " << status.error_message()
+                << std::endl;
+      return Ercd_NG;
+    }
+  }
+
+
   void AsyncAssetNotificationStart()
   {
     notification_is_alive_ = true;
@@ -204,6 +260,21 @@ ErcdType hakoniwa_core_asset_unregister(const HakoniwaAssetInfoType* asset)
 {
   ErcdType ercd = gl_client->Unregister(asset);
   std::cout << "Client Unregister reply received: " << std::endl;
+  return ercd;
+}
+ErcdType hakoniwa_core_start_simulation(void)
+{
+  ErcdType ercd = gl_client->StartSimulation();
+  return ercd;
+}
+ErcdType hakoniwa_core_stop_simulation(void)
+{
+  ErcdType ercd = gl_client->StopSimulation();
+  return ercd;
+}
+ErcdType hakoniwa_core_reset_simulation(void)
+{
+  ErcdType ercd = gl_client->ResetSimulation();
   return ercd;
 }
 

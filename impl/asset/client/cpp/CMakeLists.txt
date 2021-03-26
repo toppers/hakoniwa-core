@@ -98,3 +98,9 @@ target_link_libraries(hakoniwa_proxy hakoniwa_client
     ${_REFLECTION}
     ${_GRPC_GRPCPP}
     ${_PROTOBUF_LIBPROTOBUF})
+
+add_executable(hakoniwa_command ${PROJECT_SOURCE_DIR}/hakoniwa_command.cc)
+target_link_libraries(hakoniwa_command hakoniwa_client
+    ${_REFLECTION}
+    ${_GRPC_GRPCPP}
+    ${_PROTOBUF_LIBPROTOBUF})

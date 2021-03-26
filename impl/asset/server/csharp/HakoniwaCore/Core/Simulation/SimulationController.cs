@@ -77,6 +77,38 @@ namespace Hakoniwa.Core.Simulation
             this.theWorld.Restore();
             this.sim_env.Restore();
         }
+        private bool reset_request = false;
+        public bool ResetRequest()
+        {
+            lock (this.lockObj)
+            {
+                if (state == SimulationState.Stopped)
+                {
+                    this.reset_request = true;
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+            public bool Reset()
+        {
+            lock (this.lockObj)
+            {
+                if (state == SimulationState.Stopped)
+                {
+                    this.RestoreEnvironment();
+                    this.reset_request = false;
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
         private bool AssetFeedback(bool isOK)
         {
             bool all_done = false;
@@ -131,15 +163,16 @@ namespace Hakoniwa.Core.Simulation
                         Console.WriteLine("StateChanged:" + state);
                         state = SimulationState.Running;
 
-                        string[] names = new string[this.asset_mgr.RefOutsideAssetList().Count + 2];
+                        string[] names = new string[this.asset_mgr.RefOutsideAssetList().Count + 3];
                         names[0] = "Host";
-                        names[1] = "Hakoniwa";
+                        names[1] = "Hakoniwa-prev";
                         int i = 2;
                         foreach (var asset in this.asset_mgr.RefOutsideAssetList())
                         {
                             names[i] = asset.GetName();
                             i++;
                         }
+                        names[i] = "Hakoniwa-after";
                         this.logger.SetColumnNames(names);
 
                         return true;
@@ -249,8 +282,13 @@ namespace Hakoniwa.Core.Simulation
         {
             if (state != SimulationState.Running)
             {
+                if (this.reset_request)
+                {
+                    this.Reset();
+                }
                 return false;
             }
+            long prev_hakoniwa_time = theWorld.GetWorldTime();
             /********************
              * Inside assets
              * - Recv Actuation Data
@@ -297,7 +335,8 @@ namespace Hakoniwa.Core.Simulation
                 asset.SendPdu();
             }
             this.logger.GetSimTimeLogger().SetSimTime(0, GetUnixTime());
-            this.logger.GetSimTimeLogger().SetSimTime(1, ((double)theWorld.GetWorldTime()) / 1000000f);
+            this.logger.GetSimTimeLogger().SetSimTime(1, ((double)prev_hakoniwa_time) / 1000000f);
+            this.logger.GetSimTimeLogger().SetSimTime(i, ((double)theWorld.GetWorldTime()) / 1000000f);
             this.logger.GetSimTimeLogger().Next();
             return canStep;
         }

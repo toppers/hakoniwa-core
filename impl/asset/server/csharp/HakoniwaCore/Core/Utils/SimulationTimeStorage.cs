@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hakoniwa.Core.Utils.Logger;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -97,8 +98,7 @@ namespace Hakoniwa.Core.Utils
             }
             catch (Exception e)
             {
-                Console.WriteLine("ERROR:" + e.Message);
-                Console.WriteLine(e.StackTrace);
+                SimpleLogger.Get().Log(Level.ERROR, e);
                 throw e;
             }
         }

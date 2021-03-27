@@ -1,4 +1,5 @@
-﻿using Hakoniwa.PluggableAsset.Assets;
+﻿using Hakoniwa.Core.Utils.Logger;
+using Hakoniwa.PluggableAsset.Assets;
 using Hakoniwa.PluggableAsset.Assets.Micon.EV3;
 using Hakoniwa.PluggableAsset.Communication.Channel;
 using Hakoniwa.PluggableAsset.Communication.Connector;
@@ -149,17 +150,15 @@ namespace Hakoniwa.PluggableAsset
         }
         public static void Load(string filepath)
         {
-            Console.WriteLine("Hello---:" + filepath);
             try
             {
                 string jsonString = File.ReadAllText(filepath);
                 core_config = JsonConvert.DeserializeObject<CoreConfig>(jsonString);
-                Console.WriteLine("jsonstring=" + jsonString);
-                Console.WriteLine("core_config=" + core_config);
+                SimpleLogger.Get().Log(Level.INFO, "jsonstring=" + jsonString);
             }
             catch (Exception e)
             {
-                Console.WriteLine("Not found config file:" + e);
+                SimpleLogger.Get().Log(Level.ERROR, e);
                 throw e;
             }
             //writer pdu configs

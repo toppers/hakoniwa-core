@@ -8,6 +8,8 @@ using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Hakoniwa.Core.Asset;
 using Hakoniwa.Core.Simulation;
+using Hakoniwa.Core.Utils;
+using Hakoniwa.Core.Utils.Logger;
 using HakoniwaGrpc;
 
 namespace Hakoniwa.Core.Rpc
@@ -42,6 +44,7 @@ namespace Hakoniwa.Core.Rpc
 
         public override Task<NormalReply> Register(AssetInfo request, ServerCallContext context)
         {
+            SimpleLogger.Get().Log(Level.INFO, "Register:" + request.Name);
             if (RpcServer.GetSimulator().GetState() != SimulationState.Stopped) {
                 return Task.FromResult(new NormalReply
                 {
@@ -66,7 +69,7 @@ namespace Hakoniwa.Core.Rpc
         }
         public override Task<NormalReply> Unregister(AssetInfo request, ServerCallContext context)
         {
-            Console.WriteLine("Unregister:" + request.Name);
+            SimpleLogger.Get().Log(Level.INFO, "Unregister:" + request.Name);
             if (RpcServer.GetSimulator().GetState() != SimulationState.Stopped)
             {
                 return Task.FromResult(new NormalReply
@@ -83,6 +86,7 @@ namespace Hakoniwa.Core.Rpc
         }
         public override Task<NormalReply> StartSimulation(Empty empty, ServerCallContext context)
         {
+            SimpleLogger.Get().Log(Level.INFO, "StartSimulation");
             if (RpcServer.GetSimulator().Start())
             {
                 return Task.FromResult(new NormalReply
@@ -100,6 +104,7 @@ namespace Hakoniwa.Core.Rpc
         }
         public override Task<NormalReply> StopSimulation(Empty empty, ServerCallContext context)
         {
+            SimpleLogger.Get().Log(Level.INFO, "StopSimulation");
             if (RpcServer.GetSimulator().Stop())
             {
                 return Task.FromResult(new NormalReply
@@ -117,6 +122,7 @@ namespace Hakoniwa.Core.Rpc
         }
         public override Task<NormalReply> ResetSimulation(Empty empty, ServerCallContext context)
         {
+            SimpleLogger.Get().Log(Level.INFO, "ResetSimulation");
             if (RpcServer.GetSimulator().ResetRequest())
             {
                 return Task.FromResult(new NormalReply
@@ -201,14 +207,13 @@ namespace Hakoniwa.Core.Rpc
                 //イベント通知
                 req = new AssetNotification();
                 req.Event = InternalEvent2RpcEvent(ev);
-                Console.WriteLine("Send command:" + req.Event);
                 await responseStream.WriteAsync(req);
             }
         }
 
         public override Task<NormalReply> AssetNotificationFeedback(AssetNotificationReply feedback, ServerCallContext context)
         {
-            Console.WriteLine("AssetNotificationFeedback:" + feedback.Event + " Asset=" + feedback.Asset.Name + " ercd=" + feedback.Ercd);
+            //SimpleLogger.Get().Log(Level.INFO, "AssetNotificationFeedback:" + feedback.Event + " Asset=" + feedback.Asset.Name + " ercd=" + feedback.Ercd);
             if (!RpcServer.GetSimulator().asset_mgr.IsExist(feedback.Asset.Name))
             {
                 //未登録のアセットからの要求

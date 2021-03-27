@@ -6,6 +6,7 @@ using Hakoniwa.Core.Simulation.Environment;
 using Hakoniwa.Core.Simulation.Logger;
 using Hakoniwa.Core.Simulation.Time;
 using Hakoniwa.Core.Utils;
+using Hakoniwa.Core.Utils.Logger;
 using Hakoniwa.PluggableAsset;
 using Hakoniwa.PluggableAsset.Assets;
 
@@ -115,7 +116,7 @@ namespace Hakoniwa.Core.Simulation
         private bool AssetFeedback(string name, bool isOK)
         {
             bool all_done = false;
-            Console.WriteLine("AssetFeedback:" + isOK);
+            SimpleLogger.Get().Log(Level.INFO, "AssetFeedback("+ name +"):" + isOK);
             string found_asset = null;
             foreach (var asset in this.event_list)
             {
@@ -183,12 +184,12 @@ namespace Hakoniwa.Core.Simulation
                         this.StartFeedback(asset.GetName(), true);
                     }
 
-                    Console.WriteLine("StateChanged:" + state);
+                    SimpleLogger.Get().Log(Level.INFO, "StateChanged:" + state);
                     return true;
                 }
                 else
                 {
-                    Console.WriteLine("StateNotChanged:" + state);
+                    SimpleLogger.Get().Log(Level.INFO, "StateNotChanged:" + state);
                     return false;
                 }
             }
@@ -198,12 +199,12 @@ namespace Hakoniwa.Core.Simulation
         {
             lock (this.lockObj)
             {
-                Console.WriteLine("StartFeedback:" + state);
+                SimpleLogger.Get().Log(Level.INFO, "StartFeedback:" + state);
                 if (state == SimulationState.Runnable)
                 {
                     if (AssetFeedback(name, isStarted))
                     {
-                        Console.WriteLine("StateChanged:" + state);
+                        SimpleLogger.Get().Log(Level.INFO, "StateChanged:" + state);
                         state = SimulationState.Running;
                         this.StartLogging();
                         this.outside_asset_list = this.asset_mgr.RefOutsideAssetList();
@@ -218,7 +219,7 @@ namespace Hakoniwa.Core.Simulation
                 else
                 {
                     AssetFeedback(name, false);
-                    Console.WriteLine("StateNotChanged:" + state);
+                    SimpleLogger.Get().Log(Level.INFO, "StateNotChanged:" + state);
                     return false;
                 }
             }
@@ -235,12 +236,12 @@ namespace Hakoniwa.Core.Simulation
                     {
                         this.StopFeedback(asset.GetName(), true);
                     }
-                    Console.WriteLine("StateChanged:" + state);
+                    SimpleLogger.Get().Log(Level.INFO, "StateChanged:" + state);
                     return true;
                 }
                 else
                 {
-                    Console.WriteLine("StateNotChanged:" + state);
+                    SimpleLogger.Get().Log(Level.INFO, "StateNotChanged:" + state);
                     return false;
                 }
             }
@@ -255,7 +256,7 @@ namespace Hakoniwa.Core.Simulation
                     if (AssetFeedback(name, isStopped))
                     {
                         state = SimulationState.Stopped;
-                        Console.WriteLine("StateChanged:" + state);
+                        SimpleLogger.Get().Log(Level.INFO, "StateChanged:" + state);
                         this.logger.Flush();
                         return true;
                     }
@@ -267,7 +268,7 @@ namespace Hakoniwa.Core.Simulation
                 else
                 {
                     AssetFeedback(name, false);
-                    Console.WriteLine("StateNotChanged:" + state);
+                    SimpleLogger.Get().Log(Level.INFO, "StateNotChanged:" + state);
                     return false;
                 }
             }
@@ -280,12 +281,12 @@ namespace Hakoniwa.Core.Simulation
                 {
                     state = SimulationState.Terminated;
                     PublishEvent(CoreAssetNotificationEvent.None);
-                    Console.WriteLine("StateChanged:" + state);
+                    SimpleLogger.Get().Log(Level.INFO, "StateChanged:" + state);
                     return true;
                 }
                 else
                 {
-                    Console.WriteLine("StateNotChanged:" + state);
+                    SimpleLogger.Get().Log(Level.INFO, "StateNotChanged:" + state);
                     return false;
                 }
             }

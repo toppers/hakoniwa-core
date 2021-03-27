@@ -19,12 +19,22 @@ namespace Hakoniwa.Core.Asset
         private AssetEvent asset_event = null;
         private AssetType type;
         private IAssetController controller;
+        private long update_time;
 
         public RegisteredAsset(string asset_name, AssetType type)
         {
             this.id = RegisteredAsset.asset_id++;
             this.name = asset_name;
             this.type = type;
+            this.update_time = Utils.UtilTime.GetUnixTime();
+        }
+        public void UpdateTime()
+        {
+            this.update_time = Utils.UtilTime.GetUnixTime();
+        }
+        public long GetUpdateTime()
+        {
+            return this.update_time;
         }
         public void SetController(IAssetController ctrl)
         {

@@ -66,6 +66,27 @@ namespace Hakoniwa.Core.Asset
             }
             return false;
         }
+        public void UpdateTime(string name)
+        {
+            foreach (var asset in asset_list)
+            {
+                if (asset.GetName().Equals(name))
+                {
+                    asset.UpdateTime();
+                }
+            }
+        }
+        public bool IsTimeout(string name, long timeout)
+        {
+            foreach (var asset in asset_list)
+            {
+                if (asset.GetName().Equals(name))
+                {
+                    return Utils.UtilTime.IsTimeout(asset.GetUpdateTime(), timeout);
+                }
+            }
+            return true;
+        }
         public AssetEvent GetEvent(string name)
         {
             foreach (var asset in asset_list)

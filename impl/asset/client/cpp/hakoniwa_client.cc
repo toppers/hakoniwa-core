@@ -40,7 +40,13 @@ class HakoniwaCoreServiceClient {
     Status status = stub_->Register(&context, request, &reply);
 
     if (status.ok()) {
-      return Ercd_OK;
+      if (reply.ercd() == ERROR_CODE_OK) {
+        return Ercd_OK;
+      }
+      else {
+        std::cout << "ERROR: " << reply.ercd() << std::endl;
+        return Ercd_NG;
+      }
     } else {
       std::cout << status.error_code() << ": " << status.error_message()
                 << std::endl;
@@ -56,7 +62,13 @@ class HakoniwaCoreServiceClient {
     Status status = stub_->Unregister(&context, request, &reply);
 
     if (status.ok()) {
-      return Ercd_OK;
+      if (reply.ercd() == ERROR_CODE_OK) {
+        return Ercd_OK;
+      }
+      else {
+        std::cout << "ERROR: " << reply.ercd() << std::endl;
+        return Ercd_NG;
+      }
     } else {
       std::cout << status.error_code() << ": " << status.error_message()
                 << std::endl;
@@ -71,7 +83,7 @@ class HakoniwaCoreServiceClient {
     Status status = stub_->StartSimulation(&context, request, &reply);
     if (status.ok()) {
       if (reply.ercd() != ErrorCode::ERROR_CODE_OK) {
-        std::cout << "FAILED: error code = " << reply.ercd() << std::endl;
+        std::cout << "ERROR: " << reply.ercd() << std::endl;
         return Ercd_NG;
       }
       return Ercd_OK;
@@ -89,7 +101,7 @@ class HakoniwaCoreServiceClient {
     Status status = stub_->StopSimulation(&context, request, &reply);
     if (status.ok()) {
       if (reply.ercd() != ErrorCode::ERROR_CODE_OK) {
-        std::cout << "FAILED: error code = " << reply.ercd() << std::endl;
+        std::cout << "ERROR: " << reply.ercd() << std::endl;
         return Ercd_NG;
       }
       return Ercd_OK;
@@ -107,8 +119,44 @@ class HakoniwaCoreServiceClient {
     Status status = stub_->ResetSimulation(&context, request, &reply);
     if (status.ok()) {
       if (reply.ercd() != ErrorCode::ERROR_CODE_OK) {
-        std::cout << "FAILED: error code = " << reply.ercd() << std::endl;
+        std::cout << "ERROR: " << reply.ercd() << std::endl;
         return Ercd_NG;
+      }
+      return Ercd_OK;
+    } else {
+      std::cout << "ERROR:" << status.error_code() << ": " << status.error_message()
+                << std::endl;
+      return Ercd_NG;
+    }
+  }
+  ErcdType GetSimStatus(SimStatusType *sim_status) {
+    SimStatReply reply;
+    const ::google::protobuf::Empty request;
+    ClientContext context;
+
+    Status status = stub_->GetSimStatus(&context, request, &reply);
+    if (status.ok()) {
+      if (reply.ercd() != ErrorCode::ERROR_CODE_OK) {
+        std::cout << "ERROR: " << reply.ercd() << std::endl;
+        return Ercd_NG;
+      }
+      switch (reply.status()) {
+        case SimulationStatus::STATUS_STOPPED:
+          *sim_status = SimStatus_Stopped;
+          break;
+        case SimulationStatus::STATUS_RUNNABLE:
+          *sim_status = SimStatus_Runnable;
+          break;
+        case SimulationStatus::STATUS_RUNNING:
+          *sim_status = SimStatus_Running;
+          break;
+        case SimulationStatus::STATUS_STOPPING:
+          *sim_status = SimStatus_Stopping;
+          break;
+        case SimulationStatus::STATUS_TERMINATED:
+        default:
+          *sim_status = SimStatus_Terminated;
+          break;
       }
       return Ercd_OK;
     } else {
@@ -134,8 +182,6 @@ class HakoniwaCoreServiceClient {
     std::unique_ptr<grpc::ClientReader<AssetNotification> > reader = stub_->AssetNotificationStart(&context, request);
 
     while (reader->Read(&notification)) {
-        std::cout << "Found notification  "
-                    << notification.event()  << std::endl;
         {
             std::unique_lock<std::mutex> lock(mtx_);
             events_.push(new AssetNotification(notification));
@@ -178,6 +224,9 @@ class HakoniwaCoreServiceClient {
   {
       if (event == HakoniwaAssetEvent_Start) {
           return hakoniwa::ASSET_NOTIFICATION_EVENT_START;
+      }
+      else if (event == HakoniwaAssetEvent_Heartbeat) {
+          return hakoniwa::ASSET_NOTIFICATION_EVENT_HEARTBEAT;
       }
       else if (event == HakoniwaAssetEvent_End) {
           return hakoniwa::ASSET_NOTIFICATION_EVENT_END;
@@ -277,6 +326,11 @@ ErcdType hakoniwa_core_reset_simulation(void)
   ErcdType ercd = gl_client->ResetSimulation();
   return ercd;
 }
+ErcdType hakoniwa_core_get_simstatus(SimStatusType *status)
+{
+  ErcdType ercd = gl_client->GetSimStatus(status);
+  return ercd;
+}
 
 HakoniwaAssetEventType hakoniwa_core_asset_get_event(void)
 {
@@ -288,6 +342,9 @@ HakoniwaAssetEventType hakoniwa_core_asset_get_event(void)
     if (notification != nullptr) {
         if (notification->event() == hakoniwa::ASSET_NOTIFICATION_EVENT_START) {
             ev.type = HakoniwaAssetEvent_Start;
+        }
+        else if (notification->event() == hakoniwa::ASSET_NOTIFICATION_EVENT_HEARTBEAT) {
+            ev.type = HakoniwaAssetEvent_Heartbeat;
         }
         else if (notification->event() == hakoniwa::ASSET_NOTIFICATION_EVENT_END) {
             ev.type = HakoniwaAssetEvent_End;

@@ -21,7 +21,7 @@ int main(int argc, char** argv)
   char *param_file = nullptr;
 
   if (argc != 4) {
-    printf("Usage: %s <ipaddr> <portno> {start|stop|reset}\n", argv[0]);
+    printf("Usage: %s <ipaddr> <portno> {start|stop|reset|ls|status}\n", argv[0]);
     return 1;
   }
   sprintf(ip_port, "%s:%s", argv[1], argv[2]);
@@ -47,6 +47,18 @@ int main(int argc, char** argv)
       printf("asset[%d]=%s\n", i, list.entries[i].name);
     }
     hakonwia_core_free_asset_list(&list);
+  }
+  else if (strncmp(cmdp, "status", strlen("status")) == 0) {
+    SimStatusType status = SimStatus_Terminated;
+    const char *status_name[SimStatus_Num] = {
+      "Stopped",
+      "Runnable",
+      "Running",
+      "Stopping",
+      "Terminated",
+    };
+    hakoniwa_core_get_simstatus(&status);
+    printf("%s\n", status_name[status]);
   }
   else {
     printf("ERROR: invalid commad %s\n", cmdp);

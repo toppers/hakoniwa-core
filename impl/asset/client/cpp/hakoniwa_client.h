@@ -23,10 +23,20 @@ extern ErcdType hakoniwa_core_start_simulation(void);
 extern ErcdType hakoniwa_core_stop_simulation(void);
 extern ErcdType hakoniwa_core_reset_simulation(void);
 
+typedef enum {
+    SimStatus_Stopped = 0,
+    SimStatus_Runnable,
+    SimStatus_Running,
+    SimStatus_Stopping,
+    SimStatus_Terminated,
+    SimStatus_Num,
+} SimStatusType;
+extern ErcdType hakoniwa_core_get_simstatus(SimStatusType *status);
 
 typedef enum {
     HakoniwaAssetEvent_Start = 0,
     HakoniwaAssetEvent_End,
+    HakoniwaAssetEvent_Heartbeat,
     HakoniwaAssetEvent_None,
 } HakoniwaAssetEventEnumType;
 

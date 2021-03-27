@@ -29,11 +29,13 @@ static ErcdType init(char *ip_port, HakoniwaProxyControllerType *ctrlp)
     printf("ERROR: hakoniwa_core_asset_register() returns %d\n", err);
     return err;
   }
+  printf("INFO: Register Asset %s success\n", ctrlp->asset->name);
   err = hakoniwa_core_asset_notification_start(ctrlp->asset);
   if (err != Ercd_OK) {
     printf("hakoniwa_core_asset_notification_start() returns %d\n", err);
     return err;
   }
+  printf("INFO: Notification Setting success\n");
   ctrlp->process.set_current_dir(ctrlp->param["target_exec_dir"]);
   ctrlp->process.set_binary_path(ctrlp->param["target_bin_path"]);
   for (int i = 0; i < ctrlp->param["target_options"].size(); i++) {
@@ -68,7 +70,6 @@ int main(int argc, char** argv)
 
   while (true) {
     HakoniwaAssetEventType ev = hakoniwa_core_asset_get_event();
-    printf("hakoniwa_core_asset_get_event() returns %d\n", ev.type);
     if (ev.type == HakoniwaAssetEvent_None) {
         break;
     }
@@ -81,6 +82,9 @@ int main(int argc, char** argv)
         result = true;
         ctrl.process.terminate();
        break;
+      case HakoniwaAssetEvent_Heartbeat:
+        result = true;
+        break;
       default:
         break;
     }
@@ -92,6 +96,6 @@ int main(int argc, char** argv)
     }
   }
   err = hakoniwa_core_asset_unregister(ctrl.asset);
-  printf("hakoniwa_core_asset_unregister() returns %d\n", err);
+  printf("INFO Unregister Asset %s result=%d\n", ctrl.asset->name, err);
   return 0;
 }

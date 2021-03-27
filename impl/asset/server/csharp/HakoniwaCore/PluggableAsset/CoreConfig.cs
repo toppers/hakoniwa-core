@@ -9,6 +9,7 @@ namespace Hakoniwa.PluggableAsset
     {
         public string core_ipaddr;
         public int core_portno;
+        public long asset_timeout;
         public string SymTimeMeasureFilePath;
         public InsideAssetConfig []  inside_assets;
         public OutsideAssetConfig [] outside_assets;

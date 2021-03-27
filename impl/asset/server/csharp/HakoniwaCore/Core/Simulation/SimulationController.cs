@@ -5,6 +5,8 @@ using Hakoniwa.Core.Asset;
 using Hakoniwa.Core.Simulation.Environment;
 using Hakoniwa.Core.Simulation.Logger;
 using Hakoniwa.Core.Simulation.Time;
+using Hakoniwa.Core.Utils;
+using Hakoniwa.PluggableAsset;
 using Hakoniwa.PluggableAsset.Assets;
 
 namespace Hakoniwa.Core.Simulation
@@ -38,9 +40,10 @@ namespace Hakoniwa.Core.Simulation
 
         public HakoniwaSimulationResult result = HakoniwaSimulationResult.Success;
 
-        private int asset_feedback_count;
         public AssetManager asset_mgr = new AssetManager();
         public RequestManager req_mgr = new RequestManager();
+        List<IOutsideAssetController> outside_asset_list = null;
+        List<IInsideAssetController> inside_asset_list = null;
 
         private SimulationEnvironment sim_env;
 
@@ -93,7 +96,7 @@ namespace Hakoniwa.Core.Simulation
                 }
             }
         }
-            public bool Reset()
+        public bool Reset()
         {
             lock (this.lockObj)
             {
@@ -109,30 +112,64 @@ namespace Hakoniwa.Core.Simulation
                 }
             }
         }
-        private bool AssetFeedback(bool isOK)
+        private bool AssetFeedback(string name, bool isOK)
         {
             bool all_done = false;
             Console.WriteLine("AssetFeedback:" + isOK);
-            this.asset_feedback_count++;
-            if (isOK == false)
+            string found_asset = null;
+            foreach (var asset in this.event_list)
+            {
+                if (asset.Equals(name))
+                {
+                    found_asset = asset;
+                    break;
+                }
+            }
+            if (found_asset != null)
+            {
+                this.event_list.Remove(found_asset);
+                if (isOK == false)
+                {
+                    this.result = HakoniwaSimulationResult.Failed;
+                }
+            }
+            else
             {
                 this.result = HakoniwaSimulationResult.Failed;
             }
-            all_done = (this.asset_feedback_count == this.asset_mgr.RefOutsideAssetList().Count);
+            all_done = (this.event_list.Count == 0);
             return all_done;
         }
+        private List<string> event_list;
         private void PublishEvent(CoreAssetNotificationEvent ev)
         {
-            this.asset_feedback_count = 0;
+            this.event_list = new List<string>();
             this.result = HakoniwaSimulationResult.Success;
-            req_mgr.PutEvent(ev);
+            //req_mgr.PutEvent(ev); TODO
             foreach (var asset in asset_mgr.RefOutsideAssetList())
             {
+                event_list.Add(asset.GetName());
                 asset_mgr.SetEvent(asset.GetName(), new AssetEvent(ev));
-
+            }
+            foreach (var asset in asset_mgr.RefInsideAssetList())
+            {
+                event_list.Add(asset.GetName());
             }
         }
-
+        private void StartLogging()
+        {
+            string[] names = new string[this.asset_mgr.RefOutsideAssetList().Count + 3];
+            names[0] = "Host";
+            names[1] = "Hakoniwa-prev";
+            int i = 2;
+            foreach (var asset in this.asset_mgr.RefOutsideAssetList())
+            {
+                names[i] = asset.GetName();
+                i++;
+            }
+            names[i] = "Hakoniwa-after";
+            this.logger.SetColumnNames(names);
+        }
         public bool Start()
         {
             lock (this.lockObj)
@@ -141,6 +178,11 @@ namespace Hakoniwa.Core.Simulation
                 {
                     state = SimulationState.Runnable;
                     PublishEvent(CoreAssetNotificationEvent.Start);
+                    foreach (var asset in asset_mgr.RefInsideAssetList())
+                    {
+                        this.StartFeedback(asset.GetName(), true);
+                    }
+
                     Console.WriteLine("StateChanged:" + state);
                     return true;
                 }
@@ -151,30 +193,21 @@ namespace Hakoniwa.Core.Simulation
                 }
             }
         }
-        public bool StartFeedback(bool isStarted)
+
+        public bool StartFeedback(string name, bool isStarted)
         {
             lock (this.lockObj)
             {
                 Console.WriteLine("StartFeedback:" + state);
                 if (state == SimulationState.Runnable)
                 {
-                    if (AssetFeedback(isStarted))
+                    if (AssetFeedback(name, isStarted))
                     {
                         Console.WriteLine("StateChanged:" + state);
                         state = SimulationState.Running;
-
-                        string[] names = new string[this.asset_mgr.RefOutsideAssetList().Count + 3];
-                        names[0] = "Host";
-                        names[1] = "Hakoniwa-prev";
-                        int i = 2;
-                        foreach (var asset in this.asset_mgr.RefOutsideAssetList())
-                        {
-                            names[i] = asset.GetName();
-                            i++;
-                        }
-                        names[i] = "Hakoniwa-after";
-                        this.logger.SetColumnNames(names);
-
+                        this.StartLogging();
+                        this.outside_asset_list = this.asset_mgr.RefOutsideAssetList();
+                        this.inside_asset_list = this.asset_mgr.RefInsideAssetList();
                         return true;
                     }
                     else
@@ -184,7 +217,7 @@ namespace Hakoniwa.Core.Simulation
                 }
                 else
                 {
-                    AssetFeedback(false);
+                    AssetFeedback(name, false);
                     Console.WriteLine("StateNotChanged:" + state);
                     return false;
                 }
@@ -198,6 +231,10 @@ namespace Hakoniwa.Core.Simulation
                 {
                     state = SimulationState.Stopping;
                     PublishEvent(CoreAssetNotificationEvent.Stop);
+                    foreach (var asset in asset_mgr.RefInsideAssetList())
+                    {
+                        this.StopFeedback(asset.GetName(), true);
+                    }
                     Console.WriteLine("StateChanged:" + state);
                     return true;
                 }
@@ -209,13 +246,13 @@ namespace Hakoniwa.Core.Simulation
             }
 
         }
-        public bool StopFeedback(bool isStopped)
+        public bool StopFeedback(string name, bool isStopped)
         {
             lock (this.lockObj)
             {
                 if (state == SimulationState.Stopping)
                 {
-                    if (AssetFeedback(isStopped))
+                    if (AssetFeedback(name, isStopped))
                     {
                         state = SimulationState.Stopped;
                         Console.WriteLine("StateChanged:" + state);
@@ -229,7 +266,7 @@ namespace Hakoniwa.Core.Simulation
                 }
                 else
                 {
-                    AssetFeedback(false);
+                    AssetFeedback(name, false);
                     Console.WriteLine("StateNotChanged:" + state);
                     return false;
                 }
@@ -259,24 +296,36 @@ namespace Hakoniwa.Core.Simulation
             return state;
         }
 
-        private void Prepare()
-        {
-
-            foreach (var e in this.asset_mgr.RefOutsideAssetList())
-            {
-                e.Initialize();
-            }
-        }
         public long GetWorldTime()
         {
             return this.theWorld.GetWorldTime();
         }
-        private long GetUnixTime()
+
+        public void UnregisterDeadAssets()
         {
-            var baseDt = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
-            var unixtime = (DateTimeOffset.Now - baseDt).Ticks / 10;//usec
-            return unixtime;
-            //return (DateTimeOffset.Now.ToUnixTimeMilliseconds()*1000);
+            if (AssetConfigLoader.core_config.asset_timeout < 0)
+            {
+                return;
+            }
+            lock (this.lockObj)
+            {
+                foreach (var asset in this.asset_mgr.RefOutsideAssetList())
+                {
+                    if (this.asset_mgr.IsTimeout(asset.GetName(), AssetConfigLoader.core_config.asset_timeout * 1000000))
+                    {
+                        if (this.state == SimulationState.Runnable)
+                        {
+                            this.StartFeedback(asset.GetName(), false);
+                        }
+                        else if (this.state == SimulationState.Stopping)
+                        {
+                            this.StopFeedback(asset.GetName(), false);
+                        }
+                        this.asset_mgr.Unregister(asset.GetName());
+                    }
+                }
+                this.outside_asset_list = this.asset_mgr.RefOutsideAssetList();
+            }
         }
         public bool Execute()
         {
@@ -286,6 +335,7 @@ namespace Hakoniwa.Core.Simulation
                 {
                     this.Reset();
                 }
+                this.UnregisterDeadAssets();
                 return false;
             }
             long prev_hakoniwa_time = theWorld.GetWorldTime();
@@ -293,7 +343,7 @@ namespace Hakoniwa.Core.Simulation
              * Inside assets
              * - Recv Actuation Data
              ********************/
-            foreach (var asset in this.asset_mgr.RefOutsideAssetList()) 
+            foreach (var asset in this.outside_asset_list) 
             {
                 asset.RecvPdu();
             }
@@ -301,21 +351,21 @@ namespace Hakoniwa.Core.Simulation
             /********************
              * Hakoniwa Time Sync
              ********************/
-            bool canStep = theWorld.CanStep(this.asset_mgr.RefOutsideAssetList());
+            bool canStep = theWorld.CanStep(this.outside_asset_list);
             if (canStep)
             {
                 /********************
                  * Inside Assets 
                  * - Do Simulation
                  ********************/
-                foreach (var asset in this.asset_mgr.RefInsideAssetList())
+                foreach (var asset in this.inside_asset_list)
                 {
                     asset.DoActuation();
                 }
 
                 this.inside_simulator.DoSimulation();
 
-                foreach (var asset in this.asset_mgr.RefInsideAssetList())
+                foreach (var asset in this.inside_asset_list)
                 {
                     asset.CopySensingDataToPdu();
                 }
@@ -328,13 +378,13 @@ namespace Hakoniwa.Core.Simulation
              * - Time Sync
              ********************/
             int i = 2;
-            foreach (var asset in this.asset_mgr.RefOutsideAssetList())
+            foreach (var asset in this.outside_asset_list)
             {
                 this.logger.GetSimTimeLogger().SetSimTime(i++, ((double)asset.GetSimTime()) / 1000000f);
                 asset.PutHakoniwaTime(theWorld.GetWorldTime());
                 asset.SendPdu();
             }
-            this.logger.GetSimTimeLogger().SetSimTime(0, GetUnixTime());
+            this.logger.GetSimTimeLogger().SetSimTime(0, UtilTime.GetUnixTime());
             this.logger.GetSimTimeLogger().SetSimTime(1, ((double)prev_hakoniwa_time) / 1000000f);
             this.logger.GetSimTimeLogger().SetSimTime(i, ((double)theWorld.GetWorldTime()) / 1000000f);
             this.logger.GetSimTimeLogger().Next();

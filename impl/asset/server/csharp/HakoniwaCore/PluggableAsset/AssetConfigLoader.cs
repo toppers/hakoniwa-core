@@ -74,7 +74,7 @@ namespace Hakoniwa.PluggableAsset
         }
         private static IPduReader GetIpduReader(string name)
         {
-            foreach(var e in pdu_readers)
+            foreach (var e in pdu_readers)
             {
                 if (e.GetName().Equals(name))
                 {
@@ -127,7 +127,7 @@ namespace Hakoniwa.PluggableAsset
         }
         public static IInsideAssetController GetInsideAsset(string name)
         {
-            foreach(var e in inside_assets)
+            foreach (var e in inside_assets)
             {
                 if (e.GetName().Equals(name))
                 {
@@ -252,24 +252,20 @@ namespace Hakoniwa.PluggableAsset
             {
                 var real_connector = PduChannelConnector.Create(connector.outside_asset_name);
                 var reader = AssetConfigLoader.GetReaderConnector(connector.reader_connector_name);
-                if (reader == null)
-                {
-                    throw new InvalidDataException("ERROR: can not found pdu channel connector reader=" + connector.reader_connector_name);
-                }
                 var writer = AssetConfigLoader.GetWriterConnector(connector.writer_connector_name);
-                if (writer == null)
+                if ((reader == null) && (writer == null))
                 {
-                    throw new InvalidDataException("ERROR: can not found pdu channel connector writer=" + connector.writer_connector_name);
+                    throw new InvalidDataException("ERROR: can not found pdu channel connector writer=" + connector.writer_connector_name + " reader="+connector.reader_connector_name);
                 }
                 real_connector.Writer = writer;
                 real_connector.Reader = reader;
                 AssetConfigLoader.pdu_channel_connectors.Add(real_connector);
             }
             //inside asset configs
-            foreach(var asset in core_config.inside_assets)
+            foreach (var asset in core_config.inside_assets)
             {
                 var connector = PduIoConnector.Create(asset.name);
-                foreach(var name in asset.pdu_writer_names)
+                foreach (var name in asset.pdu_writer_names)
                 {
                     var pdu = AssetConfigLoader.GetIpduWriter(name);
                     if (pdu == null)
@@ -295,7 +291,7 @@ namespace Hakoniwa.PluggableAsset
                 IOutsideAssetController controller = null;
                 if (asset.class_name.Equals("Ev3MiconAssetController"))
                 {
-                    controller = new Ev3MiconAssetController("Athrill");
+                    controller = new Ev3MiconAssetController(asset.name);
                 }
                 if (controller == null)
                 {
@@ -303,60 +299,6 @@ namespace Hakoniwa.PluggableAsset
                 }
                 AssetConfigLoader.AddOutsideAsset(controller);
             }
-        }
-        private static void LoadConfig()
-        {
-            /***********************************
-             * 
-             *     RoboModel(inner) ==> Athrill(outer)
-             * 
-             ***********************************/
-            //Pdu
-            Ev3PduWriter wpdu = new Ev3PduWriter("Ev3SensorPdu");
-
-            //Method
-            UdpConfig config = new UdpConfig();
-            config.IoSize = 1024;
-            config.IpAddr = "172.20.172.177";
-            config.Portno = 54002;
-            IIoWriter writer = new UdpWriter();
-            writer.Initialize(config);
-
-            //Channel
-            WriterChannel wchannel = new WriterChannel(writer);
-
-            var wconnector = WriterConnector.Create(wpdu, wchannel);
-
-            /***********************************
-             * 
-             *     Athrill(outer) ==> RoboModel(inner)
-             * 
-             ***********************************/
-            //Pdu
-            Ev3PduReader rpdu = new Ev3PduReader("Ev3ActuatorPdu");
-
-            //Method
-            config = new UdpConfig();
-            config.IoSize = 1024;
-            config.IpAddr = "172.20.160.1";
-            config.Portno = 54001;
-            IIoReader reader = new UdpReader();
-            reader.Initialize(config);
-
-            //Channel
-            ReaderChannel rchannel = new ReaderChannel(reader);
-
-            var rconnector = ReaderConnector.Create(rpdu, rchannel);
-
-            var athrill_connector = PduChannelConnector.Create("Athrill");
-            athrill_connector.Writer = wconnector;
-            athrill_connector.Reader = rconnector;
-
-            AssetConfigLoader.AddOutsideAsset(new Ev3MiconAssetController("Athrill"));
-
-            var robo_connector = PduIoConnector.Create("RoboModel");
-            robo_connector.AddWriter(wpdu);
-            robo_connector.AddReader(rpdu);
         }
     }
 }

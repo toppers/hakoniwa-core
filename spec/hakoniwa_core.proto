@@ -15,10 +15,13 @@ service CoreService {
   rpc GetAssetList (google.protobuf.Empty) returns (AssetInfoList) {}
   
   //シミュレーションを開始する
-  rpc StartSimulation(google.protobuf.Empty) returns (NormalReply) {}
+  rpc StartSimulation (google.protobuf.Empty) returns (NormalReply) {}
   
   //シミュレーションを終了する
-  rpc StopSimulation(google.protobuf.Empty) returns (NormalReply) {}
+  rpc StopSimulation (google.protobuf.Empty) returns (NormalReply) {}
+
+  //シミュレーション実行状況を取得する
+  rpc GetSimStatus (google.protobuf.Empty) returns (SimStatReply) {}
 
   //シミュレーションを実行開始状態に戻す
   rpc ResetSimulation(google.protobuf.Empty) returns (NormalReply) {}
@@ -33,7 +36,8 @@ service CoreService {
 enum AssetNotificationEvent {
   ASSET_NOTIFICATION_EVENT_START = 0;
   ASSET_NOTIFICATION_EVENT_END = 1;
-  ASSET_NOTIFICATION_EVENT_NONE = 2;
+  ASSET_NOTIFICATION_EVENT_HEARTBEAT = 2;
+  ASSET_NOTIFICATION_EVENT_NONE = 3;
 }
 enum ErrorCode {
   ERROR_CODE_OK = 0;
@@ -41,6 +45,13 @@ enum ErrorCode {
   ERROR_CODE_NOENT = 2;
   ERROR_CODE_INVAL = 3;
   ERROR_CODE_EXIST = 4;
+}
+enum SimulationStatus {
+  STATUS_STOPPED = 0;
+  STATUS_RUNNABLE = 1;
+  STATUS_RUNNING = 2;
+  STATUS_STOPPING = 3;
+  STATUS_TERMINATED = 4;
 }
 
 message AssetNotification {
@@ -53,6 +64,10 @@ message AssetNotificationReply {
 }
 message NormalReply {
   ErrorCode ercd = 1;
+}
+message SimStatReply {
+  ErrorCode ercd = 1;
+  SimulationStatus status = 2;
 }
 
 message AssetInfo {

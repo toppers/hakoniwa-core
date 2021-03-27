@@ -132,6 +132,31 @@ namespace Hakoniwa.Core.Rpc
                 });
             }
         }
+        public override Task<SimStatReply> GetSimStatus(Empty empty, ServerCallContext context)
+        {
+            var reply = new SimStatReply();
+            reply.Ercd = ErrorCode.Ok;
+            switch (RpcServer.GetSimulator().GetState())
+            {
+                case SimulationState.Stopped:
+                    reply.Status = SimulationStatus.StatusStopped;
+                    break;
+                case SimulationState.Runnable:
+                    reply.Status = SimulationStatus.StatusRunnable;
+                    break;
+                case SimulationState.Running:
+                    reply.Status = SimulationStatus.StatusRunning;
+                    break;
+                case SimulationState.Stopping:
+                    reply.Status = SimulationStatus.StatusStopping;
+                    break;
+                case SimulationState.Terminated:
+                default:
+                    reply.Status = SimulationStatus.StatusTerminated;
+                    break;
+            }
+            return Task.FromResult(reply);
+        }
 
         private AssetNotificationEvent InternalEvent2RpcEvent(CoreAssetNotificationEvent iev)
         {
@@ -155,11 +180,16 @@ namespace Hakoniwa.Core.Rpc
             }
             while (true)
             {
+                AssetNotification req = null;
                 //アセットイベントチェック
                 AssetEvent aev = RpcServer.GetSimulator().asset_mgr.GetEvent(request.Name);
                 if (aev == null)
                 {
                     await Task.Delay(1000);
+                    //ハートビート監視する
+                    req = new AssetNotification();
+                    req.Event = AssetNotificationEvent.Heartbeat;
+                    await responseStream.WriteAsync(req);
                     continue;
                 }
                 CoreAssetNotificationEvent ev = aev.GetEvent();
@@ -169,7 +199,7 @@ namespace Hakoniwa.Core.Rpc
                     break;
                 }
                 //イベント通知
-                AssetNotification req = new AssetNotification();
+                req = new AssetNotification();
                 req.Event = InternalEvent2RpcEvent(ev);
                 Console.WriteLine("Send command:" + req.Event);
                 await responseStream.WriteAsync(req);
@@ -193,10 +223,13 @@ namespace Hakoniwa.Core.Rpc
                 case AssetNotificationEvent.None:
                     break;
                 case AssetNotificationEvent.Start:
-                    RpcServer.GetSimulator().StartFeedback(isOk);
+                    RpcServer.GetSimulator().StartFeedback(feedback.Asset.Name, isOk);
                     break;
                 case AssetNotificationEvent.End:
-                    RpcServer.GetSimulator().StopFeedback(isOk);
+                    RpcServer.GetSimulator().StopFeedback(feedback.Asset.Name, isOk);
+                    break;
+                case AssetNotificationEvent.Heartbeat:
+                    RpcServer.GetSimulator().asset_mgr.UpdateTime(feedback.Asset.Name);
                     break;
                 default:
                     //TODO

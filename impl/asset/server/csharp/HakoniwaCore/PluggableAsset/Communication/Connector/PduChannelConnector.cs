@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Hakoniwa.PluggableAsset.Communication.Connector
 {
-    class PduChannelConnector
+    public class PduChannelConnector
     {
         public static List<PduChannelConnector> connectors = new List<PduChannelConnector>();
         public static PduChannelConnector Create(string name)

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Hakoniwa.PluggableAsset.Communication.Channel
 {
-    class ReaderChannel
+    public class ReaderChannel
     {
         private IIoReader reader;
 

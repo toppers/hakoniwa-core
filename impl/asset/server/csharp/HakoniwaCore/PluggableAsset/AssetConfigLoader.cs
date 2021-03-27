@@ -40,6 +40,11 @@ namespace Hakoniwa.PluggableAsset
             }
             return null;
         }
+        public static List<PduChannelConnector> RefPduChannelConnector()
+        {
+            return pdu_channel_connectors;
+        }
+
         private static PduIoConnector GetPduIoConnector(string name)
         {
             foreach (var e in pdu_io_connectors)

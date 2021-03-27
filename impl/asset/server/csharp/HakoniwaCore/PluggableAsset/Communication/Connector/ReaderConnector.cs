@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Hakoniwa.PluggableAsset.Communication.Connector
 {
-    class ReaderConnector
+    public class ReaderConnector
     {
         public string Name { get; set; }
         private static List<ReaderConnector> connectors = new List<ReaderConnector>();

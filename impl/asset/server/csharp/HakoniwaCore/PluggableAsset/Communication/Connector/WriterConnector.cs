@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Hakoniwa.PluggableAsset.Communication.Connector
 {
-    class WriterConnector
+    public class WriterConnector
     {
         public string Name { get; set; }
         private static List<WriterConnector> connectors = new List<WriterConnector>();

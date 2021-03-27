@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Hakoniwa.PluggableAsset.Communication.Channel
 {
-    class WriterChannel
+    public class WriterChannel
     {
         private IIoWriter writer;
 

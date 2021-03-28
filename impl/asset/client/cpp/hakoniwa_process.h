@@ -50,8 +50,13 @@ public:
         int ret = kill(this->pid_, SIGTERM);
         printf("kill ret=%d\n", ret);
         ret = wait(&status);
-        printf("wait ret=%d status=0x%x\n", ret, status);
+        sync();
+        sync();
+        sync();
+        sync();
+        sync();
         this->finish();
+        printf("wait ret=%d status=0x%x\n", ret, status);
     }
     bool is_running()
     {

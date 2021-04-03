@@ -389,15 +389,13 @@ namespace Hakoniwa.Core.Simulation
             this.logger.GetSimTimeLogger().SetSimTime(1, ((double)prev_hakoniwa_time) / 1000000f);
             this.logger.GetSimTimeLogger().SetSimTime(i, ((double)theWorld.GetWorldTime()) / 1000000f);
             this.logger.GetSimTimeLogger().Next();
-#if false
             foreach (var connector in AssetConfigLoader.RefPduChannelConnector())
             {
                 if ((connector.GetName() == null) && (connector.Writer != null))
                 {
-                    connector.Writer.SendProtoBuffer();
+                    connector.Writer.Send();
                 }
             }
-#endif
             return canStep;
         }
     }

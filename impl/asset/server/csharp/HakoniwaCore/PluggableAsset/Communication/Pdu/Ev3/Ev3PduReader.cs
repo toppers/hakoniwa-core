@@ -9,7 +9,6 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
     {
         private PduConfig pdu_config;
         private byte[] buffer;
-        private int io_size = 1024;
         private string packet_header = "ETTX";
         private int packet_version = 0x1;
         private int packet_ext_off = 512;
@@ -19,8 +18,6 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
         public Ev3PduReader(string name)
         {
             this.name = name;
-            this.buffer = new byte[io_size];
-            Buffer.SetByte(this.buffer, 0, 0);
             this.pdu_config = new PduConfig(32);
             this.pdu_config.SetHeaderOffset("simulation_time", 8, 8);
             this.pdu_config.SetOffset("led", 0, 4);
@@ -82,7 +79,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
         }
         public void Recv(IIoReader reader)
         {
-            reader.Recv(ref this.buffer);
+            this.buffer = reader.Recv();
         }
 
         public string GetName()

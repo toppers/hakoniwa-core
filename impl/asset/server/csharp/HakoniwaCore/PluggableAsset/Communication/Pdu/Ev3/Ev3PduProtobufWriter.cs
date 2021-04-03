@@ -104,7 +104,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
 
         private byte[] GetDataBytes(string field_name)
         {
-            byte[] tmp_buf = new byte[this.pdu_config.GetSize("field_name")];
+            byte[] tmp_buf = new byte[this.pdu_config.GetSize(field_name)];
             Buffer.BlockCopy(tmp_buf, 0, this.buffer, pdu_config.GetOffset(field_name), tmp_buf.Length);
             return tmp_buf;
         }

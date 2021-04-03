@@ -24,17 +24,26 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Udp
         public void Initialize(IIoReaderConfig config)
         {
             udp_config = config as UdpConfig;
-            this.buffer = new byte[udp_config.IoSize];
-            Buffer.SetByte(this.buffer, 0, 0);
+            //this.buffer = new byte[udp_config.IoSize];
+            //Buffer.SetByte(this.buffer, 0, 0);
             thread = new Thread(new ThreadStart(ThreadMethod));
             thread.Start();
         }
 
-        public void Recv(ref byte[] buf)
+        public byte[] Recv()
         {
             lock (this.lockObj)
             {
-                Buffer.BlockCopy(this.buffer, 0, buf, 0, this.buffer.Length);
+                if (this.buffer == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    byte[] tmp_buf = new byte[this.buffer.Length];
+                    Buffer.BlockCopy(this.buffer, 0, tmp_buf, 0, buffer.Length);
+                    return tmp_buf;
+                }
             }
         }
 
@@ -47,13 +56,10 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Udp
             {
                 IPEndPoint remoteEP = null;
                 byte[] data = client.Receive(ref remoteEP);
-                if (data.Length != buffer.Length)
-                {
-                    throw new IndexOutOfRangeException();
-                }
                 lock (this.lockObj)
                 {
-                    Buffer.BlockCopy(data, 0, buffer, 0, data.Length);
+                    //Buffer.BlockCopy(data, 0, buffer, 0, data.Length);
+                    this.buffer = data;
                 }
             }
         }

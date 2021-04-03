@@ -41,7 +41,7 @@ message Ev3PduActuator {
   message Header {
     string name = 1;
     uint32 version = 2;
-    uint64 hakoniwa_time = 3;
+    uint64 asset_time = 3;
     uint32 ext_off = 4;
     uint32 ext_size = 5;
   }

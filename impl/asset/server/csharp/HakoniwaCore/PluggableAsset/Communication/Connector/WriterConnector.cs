@@ -32,7 +32,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Connector
             this.src_pdu.Send(this.dst_channel.GetWriter());
         }
 #if false
-        public void SendProtoBuffer()
+        public void SendPdu()
         {
             this.src_pdu.SendProtoBuffer(this.dst_channel.GetWriter());
         }

@@ -36,9 +36,10 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Mmap
             }
         }
 
-        public void Recv(ref byte[] buf)
+        public byte[] Recv()
         {
-            accessor.ReadArray<byte>(0, buf, 0, buf.Length);
+            //TODO
+            return null;
         }
     }
 }

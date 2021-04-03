@@ -11,7 +11,6 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
     {
         private PduConfig pdu_config;
         private byte[] buffer;
-        private byte[] protobuf_buffer;
         private Ev3PduActuator packet;
         private string name;
         private int io_size = 1024;
@@ -24,7 +23,6 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
         {
             this.name = name;
             this.buffer = new byte[io_size];
-            this.protobuf_buffer = new byte[io_size * 4];
             Buffer.SetByte(this.buffer, 0, 0);
             this.pdu_config = new PduConfig(32);
             this.pdu_config.SetHeaderOffset("header", 0, 4);
@@ -92,23 +90,27 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
         }
         public void Recv(IIoReader reader)
         {
-            reader.Recv(ref this.protobuf_buffer);
-            this.ProtoBufConvert();
+            byte [] protbuf = reader.Recv();
+            if (protbuf == null)
+            {
+                return;
+            }
+            this.ProtoBufConvert(protbuf);
         }
-        private void ProtoBufConvert()
+        private void ProtoBufConvert(byte [] protobuf)
         {
             var parser = new MessageParser<Ev3PduActuator>(() => new Ev3PduActuator());
-            this.packet = parser.ParseFrom(new MemoryStream(this.protobuf_buffer));
+            this.packet = parser.ParseFrom(new MemoryStream(protobuf));
             this.SetHeaderData("header", this.packet.Header.Name);
             this.SetHeaderData("version", this.packet.Header.Version);
-            this.SetHeaderData("hakoniwa_time", (long)this.packet.Header.HakoniwaTime);
+            this.SetHeaderData("simulation_time", (long)this.packet.Header.AssetTime);
             this.SetHeaderData("ext_off", this.packet.Header.ExtOff);
             this.SetHeaderData("ext_size", this.packet.Header.ExtSize);
 
             this.SetData("led", this.packet.Body.Leds.ToByteArray());
-            this.SetData("motopr_power_a", this.packet.Body.Motors[0].Power);
-            this.SetData("motopr_power_b", this.packet.Body.Motors[1].Power);
-            this.SetData("motopr_power_c", this.packet.Body.Motors[2].Power);
+            this.SetData("motor_power_a", this.packet.Body.Motors[0].Power);
+            this.SetData("motor_power_b", this.packet.Body.Motors[1].Power);
+            this.SetData("motor_power_c", this.packet.Body.Motors[2].Power);
 
             this.SetData("motor_stop_a", this.packet.Body.Motors[0].Stop);
             this.SetData("motor_stop_b", this.packet.Body.Motors[1].Stop);

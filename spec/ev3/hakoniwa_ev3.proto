@@ -50,7 +50,7 @@ message Ev3PduActuator {
     bytes leds = 1;
     
   	message Motor {
-	    uint32 power = 1;
+	    int32 power = 1;
 	    uint32 stop = 2;
 	    uint32 reset_angle = 3;
   	}

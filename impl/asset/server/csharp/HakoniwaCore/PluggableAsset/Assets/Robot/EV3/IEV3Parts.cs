@@ -7,7 +7,8 @@ namespace Hakoniwa.PluggableAsset.Assets.Robot.EV3
         string GetMotorB();
         string GetMotorC();
         string GetLed();
-        string GetColorSensor();
+        string GetColorSensor0();
+        string GetColorSensor1();
         string getUltraSonicSensor();
         string getTouchSensor0();
         string getTouchSensor1();

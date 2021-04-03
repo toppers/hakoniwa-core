@@ -15,9 +15,11 @@
 		<PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
 		<PackageReference Include="System.Memory" Version="4.5.3" />
 		<Protobuf Include="..\..\..\..\..\spec\*.proto" HakoniwaCoreService="Both" />
+		<Protobuf Include="..\..\..\..\..\spec\ev3\*.proto" HakoniwaCoreService="Both" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Remove="..\..\..\..\..\spec\hakoniwa_core.proto" />
+		<None Remove="..\..\..\..\..\spec\\ev3\hakoniwa_core.proto" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Core\Simulation\State\" />

@@ -37,6 +37,17 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
             }
             throw new FieldAccessException("ERROR: Invalid offset:" + name);
         }
+        public int GetSize(string name)
+        {
+            foreach (PduFieldType e in fields)
+            {
+                if (e.name == name)
+                {
+                    return e.size;
+                }
+            }
+            throw new FieldAccessException("ERROR: Invalid offset:" + name);
+        }
         public void SetOffset(string name, int off, int size)
         {
             foreach (PduFieldType e in fields)

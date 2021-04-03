@@ -174,6 +174,10 @@ namespace Hakoniwa.PluggableAsset
                 {
                     ipdu = new Ev3PduWriter(pdu.name);
                 }
+                else if (pdu.class_name.Equals("Ev3PduProtobufWriter"))
+                {
+                    ipdu = new Ev3PduProtobufWriter(pdu.name);
+                }
                 if (ipdu == null)
                 {
                     throw new InvalidDataException("ERROR: can not found classname=" + pdu.class_name);
@@ -187,6 +191,10 @@ namespace Hakoniwa.PluggableAsset
                 if (pdu.class_name.Equals("Ev3PduReader"))
                 {
                     ipdu = new Ev3PduReader(pdu.name);
+                }
+                else if (pdu.class_name.Equals("Ev3PduProtobufReader"))
+                {
+                    ipdu = new Ev3PduProtobufReader(pdu.name);
                 }
                 if (ipdu == null)
                 {

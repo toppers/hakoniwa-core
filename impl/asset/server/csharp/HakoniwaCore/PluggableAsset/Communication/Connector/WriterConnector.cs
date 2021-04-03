@@ -31,7 +31,12 @@ namespace Hakoniwa.PluggableAsset.Communication.Connector
         {
             this.src_pdu.Send(this.dst_channel.GetWriter());
         }
-
+#if false
+        public void SendProtoBuffer()
+        {
+            this.src_pdu.SendProtoBuffer(this.dst_channel.GetWriter());
+        }
+#endif
         public IPduWriter GetPdu()
         {
             return this.src_pdu;

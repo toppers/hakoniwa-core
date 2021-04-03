@@ -14,5 +14,10 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
         void SetData(string field_name, ulong value);
         void SetData(string field_name, double value);
         void Send(IIoWriter writer);
+
+#if false
+        void SendProtoBuffer(IIoWriter writer);
+#endif
+
     }
 }

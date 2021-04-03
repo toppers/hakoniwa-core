@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package hakoniwa;
+
+message Ev3PduSensor {
+  message Header {
+    string name = 1;
+    uint32 version = 2;
+    uint64 hakoniwa_time = 3;
+    uint32 ext_off = 4;
+    uint32 ext_size = 5;
+  }
+  Header header = 1;
+  message Body {
+  	message ColorSensor {
+	    uint32 color = 1;
+	    uint32 reflect = 2;
+	    uint32 rgb_r = 3;
+	    uint32 rgb_g = 4;
+	    uint32 rgb_b = 5;
+  	}
+  	message TouchSensor {
+  		uint32 value = 1;
+  	}
+    bytes buttons = 1;
+  	repeated ColorSensor color_sensors = 2;
+    repeated TouchSensor touch_sensors = 3;
+    int32 gyro_degree = 4;
+    int32 gyro_degree_rate = 5;
+    uint32 sensor_ultrasonic = 6;
+    uint32 motor_angle_a = 7;
+    uint32 motor_angle_b = 8;
+    uint32 motor_angle_c = 9;
+    double gps_lat = 10;
+    double gps_lon = 11;
+  }
+  Body body = 2;
+}
+
+message Ev3PduActuator {
+  message Header {
+    string name = 1;
+    uint32 version = 2;
+    uint64 hakoniwa_time = 3;
+    uint32 ext_off = 4;
+    uint32 ext_size = 5;
+  }
+  Header header = 1;
+  message Body {
+    bytes leds = 1;
+    
+  	message Motor {
+	    uint32 power = 1;
+	    uint32 stop = 2;
+	    uint32 reset_angle = 3;
+  	}
+  	repeated Motor motors = 2;
+  	uint32 gyro_reset = 3;
+  }
+  Body body = 2;
+}

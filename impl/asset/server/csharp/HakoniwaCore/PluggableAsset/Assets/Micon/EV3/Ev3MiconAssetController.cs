@@ -47,7 +47,7 @@ namespace Hakoniwa.PluggableAsset.Assets.Micon.EV3
 
         public void SendPdu()
         {
-            this.connector.Writer.Send();
+            this.connector.Writer.SendWriterPdu();
         }
     }
 }

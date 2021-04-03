@@ -18,28 +18,44 @@ namespace Hakoniwa.PluggableAsset.Communication.Connector
             connectors.Add(entry);
             return entry;
         }
-        private IPduWriter src_pdu;
+        public static WriterConnector Create(IPduReader p, WriterChannel c)
+        {
+            var entry = new WriterConnector(p, c);
+            connectors.Add(entry);
+            return entry;
+        }
+        private IPduWriter w_pdu;
+        private IPduReader r_pdu;
         private WriterChannel dst_channel;
 
         private WriterConnector(IPduWriter p, WriterChannel c)
         {
-            this.src_pdu = p;
+            this.w_pdu = p;
+            this.dst_channel = c;
+        }
+        private WriterConnector(IPduReader p, WriterChannel c)
+        {
+            this.r_pdu = p;
             this.dst_channel = c;
         }
 
-        public void Send()
+        public void SendWriterPdu()
         {
-            this.src_pdu.Send(this.dst_channel.GetWriter());
+            if (this.w_pdu != null)
+            {
+                this.w_pdu.Send(this.dst_channel.GetWriter());
+            }
         }
-#if false
-        public void SendPdu()
+        public void SendReaderPdu()
         {
-            this.src_pdu.SendProtoBuffer(this.dst_channel.GetWriter());
+            if (this.r_pdu != null)
+            {
+                this.r_pdu.Send(this.dst_channel.GetWriter());
+            }
         }
-#endif
         public IPduWriter GetPdu()
         {
-            return this.src_pdu;
+            return this.w_pdu;
         }
     }
 }

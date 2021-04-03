@@ -11,6 +11,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
     {
         private PduConfig pdu_config;
         private byte[] buffer;
+        private byte[] protbuf;
         private Ev3PduActuator packet;
         private string name;
         private int io_size = 1024;
@@ -90,12 +91,20 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
         }
         public void Recv(IIoReader reader)
         {
-            byte [] protbuf = reader.Recv();
-            if (protbuf == null)
+            this.protbuf = reader.Recv();
+            if (this.protbuf == null)
             {
                 return;
             }
             this.ProtoBufConvert(protbuf);
+        }
+        public void Send(IIoWriter writer)
+        {
+            if (this.protbuf == null)
+            {
+                return;
+            }
+            writer.Flush(ref this.protbuf);
         }
         private void ProtoBufConvert(byte [] protobuf)
         {

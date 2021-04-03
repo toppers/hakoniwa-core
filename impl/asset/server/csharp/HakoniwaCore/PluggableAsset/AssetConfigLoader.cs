@@ -250,14 +250,24 @@ namespace Hakoniwa.PluggableAsset
                 {
                     throw new InvalidDataException("ERROR: can not found connector method_name=" + connector.method_name);
                 }
-                var pdu = AssetConfigLoader.GetIpduWriter(connector.pdu_name);
-                if (pdu == null)
+                var w_pdu = AssetConfigLoader.GetIpduWriter(connector.pdu_name);
+                var r_pdu = AssetConfigLoader.GetIpduReader(connector.pdu_name);
+                if ((w_pdu == null) && (r_pdu == null))
                 {
                     throw new InvalidDataException("ERROR: can not found connector pdu_name=" + connector.pdu_name);
                 }
-                var real_connector = WriterConnector.Create(pdu, new WriterChannel(method));
-                real_connector.Name = connector.name;
-                AssetConfigLoader.writer_connectors.Add(real_connector);
+                if (w_pdu != null)
+                {
+                    var real_connector = WriterConnector.Create(w_pdu, new WriterChannel(method));
+                    real_connector.Name = connector.name;
+                    AssetConfigLoader.writer_connectors.Add(real_connector);
+                }
+                else
+                {
+                    var real_connector = WriterConnector.Create(r_pdu, new WriterChannel(method));
+                    real_connector.Name = connector.name;
+                    AssetConfigLoader.writer_connectors.Add(real_connector);
+                }
             }
             //pdu channel connectors configs
             foreach (var connector in core_config.pdu_channel_connectors)

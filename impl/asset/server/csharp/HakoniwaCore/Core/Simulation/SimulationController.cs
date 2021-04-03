@@ -393,7 +393,8 @@ namespace Hakoniwa.Core.Simulation
             {
                 if ((connector.GetName() == null) && (connector.Writer != null))
                 {
-                    connector.Writer.Send();
+                    connector.Writer.SendWriterPdu();
+                    connector.Writer.SendReaderPdu();
                 }
             }
             return canStep;

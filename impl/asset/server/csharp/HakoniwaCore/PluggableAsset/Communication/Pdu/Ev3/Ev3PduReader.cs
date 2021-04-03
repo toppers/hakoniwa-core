@@ -81,6 +81,13 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
         {
             this.buffer = reader.Recv();
         }
+        public void Send(IIoWriter writer)
+        {
+            if (this.buffer != null)
+            {
+                writer.Flush(ref this.buffer);
+            }
+        }
 
         public string GetName()
         {

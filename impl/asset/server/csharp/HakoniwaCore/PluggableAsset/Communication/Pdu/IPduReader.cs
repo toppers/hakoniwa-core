@@ -15,5 +15,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
         void GetData(string field_name, out double value);
         void Recv(IIoReader reader);
 
+        void Send(IIoWriter writer);
+
     }
 }

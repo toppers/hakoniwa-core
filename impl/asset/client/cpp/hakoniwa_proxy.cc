@@ -95,6 +95,9 @@ int main(int argc, char** argv)
       hakoniwa_core_asset_event_feedback(ctrl.asset, ev.type, Ercd_NG);
     }
   }
+  if (ctrl.process.is_running()) {
+    ctrl.process.terminate();
+  }
   err = hakoniwa_core_asset_unregister(ctrl.asset);
   printf("INFO Unregister Asset %s result=%d\n", ctrl.asset->name, err);
   return 0;

@@ -11,5 +11,5 @@ then
         sleep 3
 fi
 
-sudo docker run -v ${HAKONIWA_TOP_DIR}:/root/workspace/hakoniwa \
+sudo docker run -v ${HAKONIWA_TOP_DIR}:/root/hakoniwa-core \
 		-it --rm --net host --name hakoniwa-core ${DOCKER_IMAGE} 

@@ -1,0 +1,73 @@
+{
+        "core_ipaddr": "172.21.80.1",
+        "core_portno": 50051,
+        "inside_assets": [
+	       	{
+	        	"name": "RoboModel",
+	        	"pdu_writer_names":  [
+	        		"MiconSensorPdu",
+		        ],
+	        	"pdu_reader_names":  [
+	        		"MiconActuatorPdu",
+		        ],
+        	}
+        ],
+        "outside_assets":  [
+	       	{
+	        	"name": "Athrill",
+	        	"class_name": "Ev3MiconAssetController",
+        	}
+        ],
+        "pdu_writers":  [
+	       	{
+	        	"name": "MiconSensorPdu",
+	        	"class_name": "Hakoniwa.PluggableAsset.Communication.Pdu.Micon.SimpleMiconPduWriter",
+	        	"path": "..\\..\\..\\..\\..\\AssetPdu\\MiconPdu\\bin\\Debug\\netstandard2.0\\MiconPdu.dll",
+        	}
+        ],
+        "pdu_readers":  [
+	       	{
+	        	"name": "MiconActuatorPdu",
+	        	"class_name": "Hakoniwa.PluggableAsset.Communication.Pdu.Micon.SimpleMiconPduReader",
+	        	"path": "..\\..\\..\\..\\..\\AssetPdu\\MiconPdu\\bin\\Debug\\netstandard2.0\\MiconPdu.dll",
+        	}
+        ],
+        "udp_methods":  [
+	       	{
+	        	"method_name": "UdpMethod1",
+	        	"ipaddr": "172.21.85.89",
+	        	"portno": 54002,
+	        	"iosize": 1024,
+	        	"is_read": false,
+        	},
+	       	{
+	        	"method_name": "UdpMethod2",
+	        	"ipaddr": "172.21.80.1",
+	        	"portno": 54001,
+	        	"iosize": 1024,
+	        	"is_read": true,
+        	}
+        ],
+        "mmap_methods": null,
+        "reader_connectors":  [
+	       	{
+	        	"name": "reader_connector1",
+	        	"pdu_name": "MiconActuatorPdu",
+	        	"method_name": "UdpMethod2",
+        	}
+        ],
+        "writer_connectors":  [
+	       	{
+	        	"name": "writer_connector1",
+	        	"pdu_name": "MiconSensorPdu",
+	        	"method_name": "UdpMethod1",
+        	}
+        ],
+        "pdu_channel_connectors":  [
+	       	{
+	        	"outside_asset_name": "Athrill",
+	        	"reader_connector_name": "reader_connector1",
+	        	"writer_connector_name": "writer_connector1",
+        	}
+        ],
+}

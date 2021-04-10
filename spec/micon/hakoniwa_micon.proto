@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package hakoniwa;
+
+message MiconPduSensor {
+  message Header {
+    string name = 1;
+    uint32 version = 2;
+    uint64 hakoniwa_time = 3;
+  }
+  Header header = 1;
+}
+
+message MiconPduActuator {
+  message Header {
+    string name = 1;
+    uint32 version = 2;
+    uint64 asset_time = 3;
+  }
+  Header header = 1;
+}

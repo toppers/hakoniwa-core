@@ -41,6 +41,7 @@ namespace Hakoniwa.PluggableAsset
     {
         public string name;
         public string class_name;
+        public string path;
     }
 
     [System.Serializable]
@@ -48,6 +49,7 @@ namespace Hakoniwa.PluggableAsset
     {
         public string name;
         public string class_name;
+        public string path;
     }
 
     [System.Serializable]

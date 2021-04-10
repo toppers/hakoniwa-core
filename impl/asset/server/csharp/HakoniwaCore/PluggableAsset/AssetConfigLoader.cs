@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Text;
 
 namespace Hakoniwa.PluggableAsset
@@ -178,6 +179,21 @@ namespace Hakoniwa.PluggableAsset
                 {
                     ipdu = new Ev3PduProtobufWriter(pdu.name);
                 }
+                else if (pdu.path != null)
+                {
+                    var asm = Assembly.LoadFrom(pdu.path);
+                    if (asm == null)
+                    {
+                        throw new InvalidDataException("ERROR: can not found path=" + pdu.path);
+                    }
+                    var typeInfo = asm.GetType(pdu.class_name);
+                    if (typeInfo == null)
+                    {
+                        throw new InvalidDataException("ERROR: can not found class=" + pdu.class_name);
+                    }
+                    ipdu = Activator.CreateInstance(typeInfo, pdu.name) as IPduWriter;
+                    SimpleLogger.Get().Log(Level.INFO, "pdu writer loaded:" + pdu.class_name);
+                }
                 if (ipdu == null)
                 {
                     throw new InvalidDataException("ERROR: can not found classname=" + pdu.class_name);
@@ -195,6 +211,21 @@ namespace Hakoniwa.PluggableAsset
                 else if (pdu.class_name.Equals("Ev3PduProtobufReader"))
                 {
                     ipdu = new Ev3PduProtobufReader(pdu.name);
+                }
+                else if (pdu.path != null)
+                {
+                    var asm = Assembly.LoadFrom(pdu.path);
+                    if (asm == null)
+                    {
+                        throw new InvalidDataException("ERROR: can not found path=" + pdu.path);
+                    }
+                    var typeInfo = asm.GetType(pdu.class_name);
+                    if (typeInfo == null)
+                    {
+                        throw new InvalidDataException("ERROR: can not found class=" + pdu.class_name);
+                    }
+                    ipdu = Activator.CreateInstance(typeInfo, pdu.name) as IPduReader;
+                    SimpleLogger.Get().Log(Level.INFO, "pdu reader loaded:" + pdu.class_name);
                 }
                 if (ipdu == null)
                 {

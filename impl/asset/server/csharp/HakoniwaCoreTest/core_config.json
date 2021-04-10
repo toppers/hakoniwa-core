@@ -22,14 +22,14 @@
 	       	{
 	        	"name": "MiconSensorPdu",
 	        	"class_name": "Hakoniwa.PluggableAsset.Communication.Pdu.Micon.SimpleMiconPduWriter",
-	        	"path": "..\\..\\..\\..\\..\\AssetPdu\\MiconPdu\\bin\\Debug\\netstandard2.0\\MiconPdu.dll",
+	        	"path": "..\\..\\..\\..\\AssetPdu\\MiconPdu\\bin\\Debug\\netstandard2.0\\MiconPdu.dll",
         	}
         ],
         "pdu_readers":  [
 	       	{
 	        	"name": "MiconActuatorPdu",
 	        	"class_name": "Hakoniwa.PluggableAsset.Communication.Pdu.Micon.SimpleMiconPduReader",
-	        	"path": "..\\..\\..\\..\\..\\AssetPdu\\MiconPdu\\bin\\Debug\\netstandard2.0\\MiconPdu.dll",
+	        	"path": "..\\..\\..\\..\\AssetPdu\\MiconPdu\\bin\\Debug\\netstandard2.0\\MiconPdu.dll",
         	}
         ],
         "udp_methods":  [

@@ -21,7 +21,9 @@ namespace HakoniwaCoreTest
             Console.WriteLine("Press any key to shutdown the server...");
             Console.ReadKey();
 
+            Console.WriteLine("Shutdown START");
             RpcServer.ShutdownServer();
+            Console.WriteLine("Shutdown END");
         }
     }
 }

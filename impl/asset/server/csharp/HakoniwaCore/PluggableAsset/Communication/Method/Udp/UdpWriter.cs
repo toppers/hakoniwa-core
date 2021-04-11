@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hakoniwa.Core.Utils.Logger;
+using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
@@ -19,6 +20,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Udp
         public void Flush(ref byte[] buf)
         {
             //Debug.Log("UdpSend:" + buf.Length);
+            //SimpleLogger.Get().Log(Level.DEBUG, "flush ipaddr=" + udp_config.IpAddr +" port="+ udp_config.Portno + " len=" + buf.Length);
             client.Send(buf, buf.Length);
         }
 

@@ -322,6 +322,8 @@ namespace Hakoniwa.Core.Simulation
                         {
                             this.StopFeedback(asset.GetName(), false);
                         }
+                        SimpleLogger.Get().Log(Level.ERROR, "OutSideAsset dead:" + asset.GetName());
+
                         this.asset_mgr.Unregister(asset.GetName());
                     }
                 }
@@ -353,6 +355,7 @@ namespace Hakoniwa.Core.Simulation
              * Hakoniwa Time Sync
              ********************/
             bool canStep = theWorld.CanStep(this.outside_asset_list);
+            //SimpleLogger.Get().Log(Level.DEBUG, "canStep=" + canStep);
             if (canStep)
             {
                 /********************

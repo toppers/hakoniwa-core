@@ -1,4 +1,5 @@
-﻿using Hakoniwa.PluggableAsset;
+﻿using Hakoniwa.Core.Utils.Logger;
+using Hakoniwa.PluggableAsset;
 using Hakoniwa.PluggableAsset.Assets;
 using System;
 using System.Collections.Generic;
@@ -115,13 +116,16 @@ namespace Hakoniwa.Core.Asset
          */
         public bool RegisterOutsideAsset(string name)
         {
+            SimpleLogger.Get().Log(Level.INFO, "RegisterOutsideAsset :"  + name);
             if (IsExist(name))
             {
+                SimpleLogger.Get().Log(Level.ERROR, "RegisterOutsideAsset already exist:" + name);
                 return false;
             }
             var controller = AssetConfigLoader.GetOutsideAsset(name);
             if (controller == null)
             {
+                SimpleLogger.Get().Log(Level.ERROR, "RegisterOutsideAsset not found controller:" + name);
                 return false;
             }
 
@@ -129,6 +133,7 @@ namespace Hakoniwa.Core.Asset
             asset.SetController(controller);
             asset_list.Add(asset);
             controller.Initialize();
+            SimpleLogger.Get().Log(Level.INFO, "RegisterOutsideAsset Success:" + name);
             return true;
         }
         public bool RegisterInsideAsset(string name)
@@ -147,6 +152,7 @@ namespace Hakoniwa.Core.Asset
             var asset = new RegisteredAsset(name, AssetType.Inside);
             asset.SetController(controller);
             asset_list.Add(asset);
+            SimpleLogger.Get().Log(Level.INFO, "RegisterInsideAsset Success:" + name);
             return true;
         }
         public void Unregister(string name)
@@ -163,6 +169,7 @@ namespace Hakoniwa.Core.Asset
             if (entry != null)
             {
                 asset_list.Remove(entry);
+                SimpleLogger.Get().Log(Level.INFO, "Unregister Success:" + name);
             }
             return;
         }

@@ -1,4 +1,5 @@
 ﻿using Google.Protobuf;
+using Hakoniwa.Core.Utils.Logger;
 using Hakoniwa.PluggableAsset.Communication.Method;
 using System;
 using System.Collections.Generic;
@@ -52,10 +53,12 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Micon
         {
             if (this.packet == null)
             {
+                //SimpleLogger.Get().Log(Level.DEBUG, "IsValid=false");
                 return false;
             }
             else
             {
+                //SimpleLogger.Get().Log(Level.DEBUG, "IsValid:this.packet.Header.Version=" + this.packet.Header.Version);
                 return (this.packet.Header.Version == 0x1);
             }
         }
@@ -63,8 +66,11 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Micon
         public void Recv(IIoReader reader)
         {
             var buf = reader.Recv();
-            var parser = new MessageParser<MiconPduActuator>(() => new MiconPduActuator());
-            this.packet = parser.ParseFrom(new MemoryStream(buf));
+            if (buf != null)
+            {
+                var parser = new MessageParser<MiconPduActuator>(() => new MiconPduActuator());
+                this.packet = parser.ParseFrom(new MemoryStream(buf));
+            }
         }
 
         public void Send(IIoWriter writer)

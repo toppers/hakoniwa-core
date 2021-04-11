@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hakoniwa.Core.Utils.Logger;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
@@ -42,6 +43,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Udp
                 {
                     byte[] tmp_buf = new byte[this.buffer.Length];
                     Buffer.BlockCopy(this.buffer, 0, tmp_buf, 0, buffer.Length);
+                    //SimpleLogger.Get().Log(Level.DEBUG, "recv:" + buffer.Length);
                     return tmp_buf;
                 }
             }

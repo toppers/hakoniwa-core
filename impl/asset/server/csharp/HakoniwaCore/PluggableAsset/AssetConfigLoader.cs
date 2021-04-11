@@ -253,6 +253,7 @@ namespace Hakoniwa.PluggableAsset
                     real_method.Initialize(config);
                     real_method.Name = method.method_name;
                     AssetConfigLoader.io_writers.Add(real_method);
+                    SimpleLogger.Get().Log(Level.INFO, "UdpMethod : " + real_method.Name + ": " + config.IpAddr + ": " + config.Portno);
                 }
             }
 
@@ -313,31 +314,34 @@ namespace Hakoniwa.PluggableAsset
                 real_connector.Writer = writer;
                 real_connector.Reader = reader;
                 AssetConfigLoader.pdu_channel_connectors.Add(real_connector);
+                SimpleLogger.Get().Log(Level.INFO, "PduChannelConnector :" + connector.writer_connector_name);
             }
             //inside asset configs
-            foreach (var asset in core_config.inside_assets)
+            if (core_config.inside_assets != null)
             {
-                var connector = PduIoConnector.Create(asset.name);
-                foreach (var name in asset.pdu_writer_names)
+                foreach (var asset in core_config.inside_assets)
                 {
-                    var pdu = AssetConfigLoader.GetIpduWriter(name);
-                    if (pdu == null)
+                    var connector = PduIoConnector.Create(asset.name);
+                    foreach (var name in asset.pdu_writer_names)
                     {
-                        throw new InvalidDataException("ERROR: can not found inside asset pdu writer=" + name);
+                        var pdu = AssetConfigLoader.GetIpduWriter(name);
+                        if (pdu == null)
+                        {
+                            throw new InvalidDataException("ERROR: can not found inside asset pdu writer=" + name);
+                        }
+                        connector.AddWriter(pdu);
                     }
-                    connector.AddWriter(pdu);
-                }
-                foreach (var name in asset.pdu_reader_names)
-                {
-                    var pdu = AssetConfigLoader.GetIpduReader(name);
-                    if (pdu == null)
+                    foreach (var name in asset.pdu_reader_names)
                     {
-                        throw new InvalidDataException("ERROR: can not found inside asset pdu reader=" + name);
+                        var pdu = AssetConfigLoader.GetIpduReader(name);
+                        if (pdu == null)
+                        {
+                            throw new InvalidDataException("ERROR: can not found inside asset pdu reader=" + name);
+                        }
+                        connector.AddReader(pdu);
                     }
-                    connector.AddReader(pdu);
                 }
             }
-
             //outside asset configs
             foreach (var asset in core_config.outside_assets)
             {
@@ -350,6 +354,7 @@ namespace Hakoniwa.PluggableAsset
                 {
                     throw new InvalidDataException("ERROR: can not found classname=" + asset.class_name);
                 }
+                SimpleLogger.Get().Log(Level.INFO, "OutSideAsset :" + asset.name);
                 AssetConfigLoader.AddOutsideAsset(controller);
             }
         }

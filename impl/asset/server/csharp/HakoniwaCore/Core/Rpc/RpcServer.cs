@@ -54,6 +54,7 @@ namespace Hakoniwa.Core.Rpc
             }
             if (RpcServer.GetSimulator().asset_mgr.RegisterOutsideAsset(request.Name))
             {
+                SimpleLogger.Get().Log(Level.INFO, "Register Success: " + request.Name);
                 return Task.FromResult(new NormalReply
                 {
                     Ercd = ErrorCode.Ok
@@ -61,6 +62,7 @@ namespace Hakoniwa.Core.Rpc
             }
             else
             {
+                SimpleLogger.Get().Log(Level.INFO, "Register Failed: " + request.Name);
                 return Task.FromResult(new NormalReply
                 {
                     Ercd = ErrorCode.Exist
@@ -182,8 +184,10 @@ namespace Hakoniwa.Core.Rpc
             if (!RpcServer.GetSimulator().asset_mgr.IsExist(request.Name))
             {
                 //未登録のアセットからの要求
+                SimpleLogger.Get().Log(Level.ERROR, "AssetNotificationStart: unkown asset request:" + request.Name);
                 return;
             }
+            SimpleLogger.Get().Log(Level.INFO, "AssetNotificationStart:" + request.Name);
             while (true)
             {
                 AssetNotification req = null;

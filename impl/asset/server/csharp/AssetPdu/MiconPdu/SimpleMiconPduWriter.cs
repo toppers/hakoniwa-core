@@ -56,7 +56,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Micon
 
         public void SetHeaderData(string field_name, long value)
         {
-            if (field_name.Equals("hakonwia_time"))
+            if (field_name.Equals("hakoniwa_time"))
             {
                 this.packet.Header.HakoniwaTime = (ulong)value;
             }

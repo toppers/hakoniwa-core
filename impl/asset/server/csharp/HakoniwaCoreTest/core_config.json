@@ -1,17 +1,8 @@
 {
         "core_ipaddr": "172.21.80.1",
         "core_portno": 50051,
-        "inside_assets": [
-	       	{
-	        	"name": "RoboModel",
-	        	"pdu_writer_names":  [
-	        		"MiconSensorPdu",
-		        ],
-	        	"pdu_reader_names":  [
-	        		"MiconActuatorPdu",
-		        ],
-        	}
-        ],
+        "asset_timeout": 3,
+        "inside_assets": null,
         "outside_assets":  [
 	       	{
 	        	"name": "Athrill",
@@ -46,7 +37,21 @@
 	        	"portno": 54001,
 	        	"iosize": 1024,
 	        	"is_read": true,
-        	}
+        	},
+	       	{
+	        	"method_name": "UdpMethod3",
+	        	"ipaddr": "172.21.85.89",
+	        	"portno": 54003,
+	        	"iosize": 1024,
+	        	"is_read": false,
+        	},
+	       	{
+	        	"method_name": "UdpMethod4",
+	        	"ipaddr": "172.21.85.89",
+	        	"portno": 54004,
+	        	"iosize": 1024,
+	        	"is_read": false,
+        	},
         ],
         "mmap_methods": null,
         "reader_connectors":  [
@@ -61,6 +66,16 @@
 	        	"name": "writer_connector1",
 	        	"pdu_name": "MiconSensorPdu",
 	        	"method_name": "UdpMethod1",
+        	},
+	       	{
+	        	"name": "writer_connector2",
+	        	"pdu_name": "MiconSensorPdu",
+	        	"method_name": "UdpMethod3",
+        	},
+	       	{
+	        	"name": "writer_connector3",
+	        	"pdu_name": "MiconActuatorPdu",
+	        	"method_name": "UdpMethod4",
         	}
         ],
         "pdu_channel_connectors":  [
@@ -68,6 +83,16 @@
 	        	"outside_asset_name": "Athrill",
 	        	"reader_connector_name": "reader_connector1",
 	        	"writer_connector_name": "writer_connector1",
+        	},
+	       	{
+	        	"outside_asset_name": null,
+	        	"reader_connector_name": null,
+	        	"writer_connector_name": "writer_connector2",
+        	},
+	       	{
+	        	"outside_asset_name": null,
+	        	"reader_connector_name": null,
+	        	"writer_connector_name": "writer_connector3",
         	}
         ],
 }

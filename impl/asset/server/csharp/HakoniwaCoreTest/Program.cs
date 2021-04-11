@@ -11,15 +11,10 @@ namespace HakoniwaCoreTest
         static void Main(string[] args)
         {
             string filepath = @"..\..\..\core_config.json";
-            AssetConfigLoader.Load(filepath);
-            string ipaddr = AssetConfigLoader.core_config.core_ipaddr;
-            int portno = AssetConfigLoader.core_config.core_portno;
 
-            Console.WriteLine("ipaddr=" + ipaddr + " portno=" + portno.ToString());
-            RpcServer.StartServer(ipaddr, portno);
+            var controller = new WorldController(filepath);
 
-            Console.WriteLine("Press any key to shutdown the server...");
-            Console.ReadKey();
+            controller.Execute();
 
             Console.WriteLine("Shutdown START");
             RpcServer.ShutdownServer();

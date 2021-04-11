@@ -1,4 +1,5 @@
 ﻿using Hakoniwa.Core.Asset;
+using Hakoniwa.Core.Utils.Logger;
 using Hakoniwa.PluggableAsset.Assets;
 using System;
 using System.Collections.Generic;
@@ -50,8 +51,8 @@ namespace Hakoniwa.Core.Simulation.Time
             foreach (var outside_asset in assets)
             {
                 long diff = outside_asset.GetSimTime() - this.world_time;
-                //Debug.Log("micon=" + outside_asset.GetSimTime());
-                //Debug.Log("world_time=" + world_time);
+                //SimpleLogger.Get().Log(Level.DEBUG, "micon=" + outside_asset.GetSimTime());
+                //SimpleLogger.Get().Log(Level.DEBUG, "world_time=" + world_time);
                 if (diff <= -this.max_delay_time)
                 {
                     canStep = false;

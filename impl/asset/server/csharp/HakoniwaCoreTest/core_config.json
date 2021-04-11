@@ -2,97 +2,107 @@
         "core_ipaddr": "172.21.80.1",
         "core_portno": 50051,
         "asset_timeout": 3,
+        "SymTimeMeasureFilePath": "C:\\project\\oss\\hakoniwa-core\\impl\\asset\\server\\csharp\\HakoniwaCoreTest\\core.csv",
         "inside_assets": null,
         "outside_assets":  [
 	       	{
-	        	"name": "Athrill",
+	        	"name": "Athrill_1",
+	        	"class_name": "Ev3MiconAssetController",
+        	},
+	       	{
+	        	"name": "Athrill_2",
 	        	"class_name": "Ev3MiconAssetController",
         	}
         ],
         "pdu_writers":  [
 	       	{
-	        	"name": "MiconSensorPdu",
+	        	"name": "MiconSensorPdu-1",
+	        	"class_name": "Hakoniwa.PluggableAsset.Communication.Pdu.Micon.SimpleMiconPduWriter",
+	        	"path": "..\\..\\..\\..\\AssetPdu\\MiconPdu\\bin\\Debug\\netstandard2.0\\MiconPdu.dll",
+        	},
+	       	{
+	        	"name": "MiconSensorPdu-2",
 	        	"class_name": "Hakoniwa.PluggableAsset.Communication.Pdu.Micon.SimpleMiconPduWriter",
 	        	"path": "..\\..\\..\\..\\AssetPdu\\MiconPdu\\bin\\Debug\\netstandard2.0\\MiconPdu.dll",
         	}
         ],
         "pdu_readers":  [
 	       	{
-	        	"name": "MiconActuatorPdu",
+	        	"name": "MiconActuatorPdu-1",
+	        	"class_name": "Hakoniwa.PluggableAsset.Communication.Pdu.Micon.SimpleMiconPduReader",
+	        	"path": "..\\..\\..\\..\\AssetPdu\\MiconPdu\\bin\\Debug\\netstandard2.0\\MiconPdu.dll",
+        	},
+	       	{
+	        	"name": "MiconActuatorPdu-2",
 	        	"class_name": "Hakoniwa.PluggableAsset.Communication.Pdu.Micon.SimpleMiconPduReader",
 	        	"path": "..\\..\\..\\..\\AssetPdu\\MiconPdu\\bin\\Debug\\netstandard2.0\\MiconPdu.dll",
         	}
         ],
         "udp_methods":  [
 	       	{
-	        	"method_name": "UdpMethod1",
+	        	"method_name": "UdpMethod_write1",
 	        	"ipaddr": "172.21.85.89",
 	        	"portno": 54002,
 	        	"iosize": 1024,
 	        	"is_read": false,
         	},
 	       	{
-	        	"method_name": "UdpMethod2",
+	        	"method_name": "UdpMethod_write2",
+	        	"ipaddr": "172.21.85.89",
+	        	"portno": 54012,
+	        	"iosize": 1024,
+	        	"is_read": false,
+        	},
+	       	{
+	        	"method_name": "UdpMethod_read1",
 	        	"ipaddr": "172.21.80.1",
 	        	"portno": 54001,
 	        	"iosize": 1024,
 	        	"is_read": true,
         	},
 	       	{
-	        	"method_name": "UdpMethod3",
-	        	"ipaddr": "172.21.85.89",
-	        	"portno": 54003,
+	        	"method_name": "UdpMethod_read2",
+	        	"ipaddr": "172.21.80.1",
+	        	"portno": 54011,
 	        	"iosize": 1024,
-	        	"is_read": false,
-        	},
-	       	{
-	        	"method_name": "UdpMethod4",
-	        	"ipaddr": "172.21.85.89",
-	        	"portno": 54004,
-	        	"iosize": 1024,
-	        	"is_read": false,
+	        	"is_read": true,
         	},
         ],
         "mmap_methods": null,
         "reader_connectors":  [
 	       	{
 	        	"name": "reader_connector1",
-	        	"pdu_name": "MiconActuatorPdu",
-	        	"method_name": "UdpMethod2",
+	        	"pdu_name": "MiconActuatorPdu-1",
+	        	"method_name": "UdpMethod_read1",
+        	},
+	       	{
+	        	"name": "reader_connector2",
+	        	"pdu_name": "MiconActuatorPdu-2",
+	        	"method_name": "UdpMethod_read2",
         	}
         ],
         "writer_connectors":  [
 	       	{
 	        	"name": "writer_connector1",
-	        	"pdu_name": "MiconSensorPdu",
-	        	"method_name": "UdpMethod1",
+	        	"pdu_name": "MiconSensorPdu-1",
+	        	"method_name": "UdpMethod_write1",
         	},
 	       	{
 	        	"name": "writer_connector2",
-	        	"pdu_name": "MiconSensorPdu",
-	        	"method_name": "UdpMethod3",
+	        	"pdu_name": "MiconSensorPdu-2",
+	        	"method_name": "UdpMethod_write2",
         	},
-	       	{
-	        	"name": "writer_connector3",
-	        	"pdu_name": "MiconActuatorPdu",
-	        	"method_name": "UdpMethod4",
-        	}
         ],
         "pdu_channel_connectors":  [
 	       	{
-	        	"outside_asset_name": "Athrill",
+	        	"outside_asset_name": "Athrill_1",
 	        	"reader_connector_name": "reader_connector1",
 	        	"writer_connector_name": "writer_connector1",
         	},
 	       	{
-	        	"outside_asset_name": null,
-	        	"reader_connector_name": null,
+	        	"outside_asset_name": "Athrill_2",
+	        	"reader_connector_name": "reader_connector2",
 	        	"writer_connector_name": "writer_connector2",
-        	},
-	       	{
-	        	"outside_asset_name": null,
-	        	"reader_connector_name": null,
-	        	"writer_connector_name": "writer_connector3",
         	}
         ],
 }

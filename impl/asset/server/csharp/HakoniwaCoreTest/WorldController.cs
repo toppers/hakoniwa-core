@@ -1,6 +1,7 @@
 ﻿using Hakoniwa.Core.Rpc;
 using Hakoniwa.Core.Simulation;
 using Hakoniwa.Core.Simulation.Environment;
+using Hakoniwa.Core.Utils;
 using Hakoniwa.Core.Utils.Logger;
 using Hakoniwa.PluggableAsset;
 using System;
@@ -12,8 +13,8 @@ namespace HakoniwaCoreTest
 {
     class WorldController : IInsideWorldSimulatior, IEnvironmentOperation
     {
-        public long deltaTime = 10000; /* usec */
-        public long maxDelayTime = 20000; /* usec */
+        public long deltaTime = 10 * 1000; /* usec */
+        public long maxDelayTime = 20* 1000; /* usec */
         private SimulationController simulator = SimulationController.Get();
 
         public WorldController(string filepath)
@@ -32,16 +33,17 @@ namespace HakoniwaCoreTest
             simulator.SetSimulationWorldTime(this.maxDelayTime, this.deltaTime); /* 10msec */
             simulator.SetInsideWorldSimulator(this);
         }
-
         public void Execute()
         {
             while (true)
             {
                 try
                 {
-                    this.simulator.Execute();
-                    //TODO sync
-                    Thread.Sleep((int)(this.deltaTime/1000));
+                    bool ret = this.simulator.Execute();
+                    if (ret == false)
+                    {
+                        Thread.Sleep(1);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -53,8 +55,7 @@ namespace HakoniwaCoreTest
 
         public void DoSimulation()
         {
-            //nothing to do
-            return;
+            Thread.Sleep(1);
         }
 
         public void Restore()

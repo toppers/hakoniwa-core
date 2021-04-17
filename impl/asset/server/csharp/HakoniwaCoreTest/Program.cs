@@ -10,7 +10,7 @@ namespace HakoniwaCoreTest
     {
         static void Main(string[] args)
         {
-            string filepath = @"..\..\..\core_config.json";
+            string filepath = @".\core_config.json";
 
             var controller = new WorldController(filepath);
 

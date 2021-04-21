@@ -35,14 +35,27 @@ namespace HakoniwaCoreTest
         }
         public void Execute()
         {
+            long count = 10;
             while (true)
             {
                 try
                 {
-                    bool ret = this.simulator.Execute();
-                    if (ret == false)
+                    long realcount = 0;
+                    var t1 = UtilTime.GetUnixTime();
+                    while (realcount < count)
                     {
-                        Thread.Sleep(1);
+                        if (this.simulator.Execute())
+                        {
+                            realcount++;
+                        }
+                    }
+                    long interval = realcount * this.deltaTime;
+                    var t2 = UtilTime.GetUnixTime();
+                    var diff = t2 - t1;
+                    if (diff < interval)
+                    {
+                        //Console.WriteLine("sleep " + ((int)(interval - diff) / 1000) +" msec diff=" + diff);
+                        Thread.Sleep((int)(interval - diff)/1000);
                     }
                 }
                 catch (Exception e)
@@ -55,7 +68,7 @@ namespace HakoniwaCoreTest
 
         public void DoSimulation()
         {
-            Thread.Sleep(1);
+            //Thread.Sleep(1);
         }
 
         public void Restore()

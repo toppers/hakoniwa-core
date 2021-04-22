@@ -41,8 +41,7 @@ namespace Hakoniwa.Core.Simulation
 
         public HakoniwaSimulationResult result = HakoniwaSimulationResult.Success;
 
-        public AssetManager asset_mgr = new AssetManager();
-        public RequestManager req_mgr = new RequestManager();
+        private AssetManager asset_mgr = new AssetManager();
         List<IOutsideAssetController> outside_asset_list = null;
         List<IInsideAssetController> inside_asset_list = null;
 
@@ -58,6 +57,15 @@ namespace Hakoniwa.Core.Simulation
             this.theWorld.SetMaxDelayTime(20000); //TODO
             this.theWorld.SetDeltaTime(1); //TODO
         }
+
+        internal bool RegisterOutsideAsset(string name)
+        {
+            lock (this.lockObj)
+            {
+                return this.asset_mgr.RegisterOutsideAsset(name);
+            }
+        }
+
         public void SetInsideWorldSimulator(IInsideWorldSimulatior isim)
         {
             this.inside_simulator = isim;
@@ -81,6 +89,15 @@ namespace Hakoniwa.Core.Simulation
             this.theWorld.Restore();
             this.sim_env.Restore();
         }
+
+        internal void Unregister(string name)
+        {
+            lock (this.lockObj)
+            {
+                this.asset_mgr.Unregister(name);
+            }
+        }
+
         private bool reset_request = false;
         public bool ResetRequest()
         {
@@ -195,6 +212,14 @@ namespace Hakoniwa.Core.Simulation
             }
         }
 
+        internal bool IsExist(string name)
+        {
+            lock (this.lockObj)
+            {
+                return this.asset_mgr.IsExist(name);
+            }
+        }
+
         public bool StartFeedback(string name, bool isStarted)
         {
             lock (this.lockObj)
@@ -224,6 +249,15 @@ namespace Hakoniwa.Core.Simulation
                 }
             }
         }
+
+        internal AssetEvent GetEvent(string name)
+        {
+            lock (this.lockObj)
+            {
+                return this.asset_mgr.GetEvent(name);
+            }
+        }
+
         public bool Stop()
         {
             lock (this.lockObj)
@@ -273,6 +307,23 @@ namespace Hakoniwa.Core.Simulation
                 }
             }
         }
+
+        internal List<AssetEntry> GetAssetList()
+        {
+            lock (this.lockObj)
+            {
+                return this.asset_mgr.GetAssetList();
+            }
+        }
+
+        internal void UpdateTime(string name)
+        {
+            lock (this.lockObj)
+            {
+                this.asset_mgr.UpdateTime(name);
+            }
+        }
+
         public bool Terminate()
         {
             lock (this.lockObj)

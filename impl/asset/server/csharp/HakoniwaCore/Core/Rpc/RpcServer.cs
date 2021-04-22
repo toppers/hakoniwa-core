@@ -52,7 +52,7 @@ namespace Hakoniwa.Core.Rpc
                 }); ;
 
             }
-            if (RpcServer.GetSimulator().asset_mgr.RegisterOutsideAsset(request.Name))
+            if (RpcServer.GetSimulator().RegisterOutsideAsset(request.Name))
             {
                 SimpleLogger.Get().Log(Level.INFO, "Register Success: " + request.Name);
                 return Task.FromResult(new NormalReply
@@ -80,7 +80,7 @@ namespace Hakoniwa.Core.Rpc
                 }); ;
 
             }
-            RpcServer.GetSimulator().asset_mgr.Unregister(request.Name);
+            RpcServer.GetSimulator().Unregister(request.Name);
             return Task.FromResult(new NormalReply
             {
                 Ercd = ErrorCode.Ok
@@ -181,7 +181,7 @@ namespace Hakoniwa.Core.Rpc
         public override async Task AssetNotificationStart(AssetInfo request, IServerStreamWriter<AssetNotification> responseStream, ServerCallContext context)
         {
             //Asset 存在チェック
-            if (!RpcServer.GetSimulator().asset_mgr.IsExist(request.Name))
+            if (!RpcServer.GetSimulator().IsExist(request.Name))
             {
                 //未登録のアセットからの要求
                 SimpleLogger.Get().Log(Level.ERROR, "AssetNotificationStart: unkown asset request:" + request.Name);
@@ -192,7 +192,7 @@ namespace Hakoniwa.Core.Rpc
             {
                 AssetNotification req = null;
                 //アセットイベントチェック
-                AssetEvent aev = RpcServer.GetSimulator().asset_mgr.GetEvent(request.Name);
+                AssetEvent aev = RpcServer.GetSimulator().GetEvent(request.Name);
                 if (aev == null)
                 {
                     await Task.Delay(1000);
@@ -218,7 +218,7 @@ namespace Hakoniwa.Core.Rpc
         public override Task<NormalReply> AssetNotificationFeedback(AssetNotificationReply feedback, ServerCallContext context)
         {
             //SimpleLogger.Get().Log(Level.INFO, "AssetNotificationFeedback:" + feedback.Event + " Asset=" + feedback.Asset.Name + " ercd=" + feedback.Ercd);
-            if (!RpcServer.GetSimulator().asset_mgr.IsExist(feedback.Asset.Name))
+            if (!RpcServer.GetSimulator().IsExist(feedback.Asset.Name))
             {
                 //未登録のアセットからの要求
                 return Task.FromResult(new NormalReply
@@ -238,7 +238,7 @@ namespace Hakoniwa.Core.Rpc
                     RpcServer.GetSimulator().StopFeedback(feedback.Asset.Name, isOk);
                     break;
                 case AssetNotificationEvent.Heartbeat:
-                    RpcServer.GetSimulator().asset_mgr.UpdateTime(feedback.Asset.Name);
+                    RpcServer.GetSimulator().UpdateTime(feedback.Asset.Name);
                     break;
                 default:
                     //TODO
@@ -251,7 +251,7 @@ namespace Hakoniwa.Core.Rpc
         }
         public override Task<AssetInfoList> GetAssetList(Empty empty, ServerCallContext context)
         {
-            List<AssetEntry> list = RpcServer.GetSimulator().asset_mgr.GetAssetList();
+            List<AssetEntry> list = RpcServer.GetSimulator().GetAssetList();
             AssetInfoList ret_list = new AssetInfoList();
             foreach (var entry in list)
             {

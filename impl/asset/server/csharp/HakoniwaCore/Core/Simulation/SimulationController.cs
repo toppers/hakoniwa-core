@@ -65,6 +65,20 @@ namespace Hakoniwa.Core.Simulation
                 return this.asset_mgr.RegisterOutsideAsset(name);
             }
         }
+        public bool RegisterInsideAsset(string name)
+        {
+            lock (this.lockObj)
+            {
+                return this.asset_mgr.RegisterInsideAsset(name);
+            }
+        }
+        public int RefOutsideAssetListCount()
+        {
+            lock (this.lockObj)
+            {
+                return this.asset_mgr.RefOutsideAssetList().Count;
+            }
+        }
 
         public void SetInsideWorldSimulator(IInsideWorldSimulatior isim)
         {

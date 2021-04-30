@@ -2,10 +2,10 @@
     "core_ipaddr": "{{RESOLVE_IPADDR}}",
     "core_portno": 50051,
     "asset_timeout": 3,
-        "SymTimeMeasureFilePath": ".\\core.csv",
+        "SymTimeMeasureFilePath": "{{SYMTIME_MEASURE_FILEPATH}}",
         "inside_assets": null,
     "outside_assets": [
-        {
+        	{
 	        	"name": "Athrill_1",
 	        	"class_name": "Ev3MiconAssetController",
         	},
@@ -20,10 +20,34 @@
 	       	{
 	        	"name": "Athrill_4",
 	        	"class_name": "Ev3MiconAssetController",
-	        }
+	        },
+	       	{
+	        	"name": "Athrill_5",
+	        	"class_name": "Ev3MiconAssetController",
+	        },
+        	{
+	        	"name": "Athrill_6",
+	        	"class_name": "Ev3MiconAssetController",
+        	},
+	       	{
+	        	"name": "Athrill_7",
+	        	"class_name": "Ev3MiconAssetController",
+	        },
+	       	{
+	        	"name": "Athrill_8",
+	        	"class_name": "Ev3MiconAssetController",
+	        },
+	       	{
+	        	"name": "Athrill_9",
+	        	"class_name": "Ev3MiconAssetController",
+	        },
+	       	{
+	        	"name": "Athrill_10",
+	        	"class_name": "Ev3MiconAssetController",
+	        },
     ],
     "pdu_writers": [
-        {
+        	{
 	        	"name": "MiconSensorPdu-1",
 	        	"class_name": "Hakoniwa.PluggableAsset.Communication.Pdu.Micon.SimpleMiconPduWriter",
 	        	"path": "..\\..\\..\\..\\AssetPdu\\MiconPdu\\bin\\Debug\\netstandard2.0\\MiconPdu.dll",
@@ -42,10 +66,40 @@
 	        	"name": "MiconSensorPdu-4",
 	        	"class_name": "Hakoniwa.PluggableAsset.Communication.Pdu.Micon.SimpleMiconPduWriter",
 	        	"path": "..\\..\\..\\..\\AssetPdu\\MiconPdu\\bin\\Debug\\netstandard2.0\\MiconPdu.dll",
-        	}
+        	},
+	       	{
+	        	"name": "MiconSensorPdu-5",
+	        	"class_name": "Hakoniwa.PluggableAsset.Communication.Pdu.Micon.SimpleMiconPduWriter",
+	        	"path": "..\\..\\..\\..\\AssetPdu\\MiconPdu\\bin\\Debug\\netstandard2.0\\MiconPdu.dll",
+        	},
+        	{
+	        	"name": "MiconSensorPdu-6",
+	        	"class_name": "Hakoniwa.PluggableAsset.Communication.Pdu.Micon.SimpleMiconPduWriter",
+	        	"path": "..\\..\\..\\..\\AssetPdu\\MiconPdu\\bin\\Debug\\netstandard2.0\\MiconPdu.dll",
+        	},
+	       	{
+	        	"name": "MiconSensorPdu-7",
+	        	"class_name": "Hakoniwa.PluggableAsset.Communication.Pdu.Micon.SimpleMiconPduWriter",
+	        	"path": "..\\..\\..\\..\\AssetPdu\\MiconPdu\\bin\\Debug\\netstandard2.0\\MiconPdu.dll",
+        	},
+	       	{
+	        	"name": "MiconSensorPdu-8",
+	        	"class_name": "Hakoniwa.PluggableAsset.Communication.Pdu.Micon.SimpleMiconPduWriter",
+	        	"path": "..\\..\\..\\..\\AssetPdu\\MiconPdu\\bin\\Debug\\netstandard2.0\\MiconPdu.dll",
+        	},
+	       	{
+	        	"name": "MiconSensorPdu-9",
+	        	"class_name": "Hakoniwa.PluggableAsset.Communication.Pdu.Micon.SimpleMiconPduWriter",
+	        	"path": "..\\..\\..\\..\\AssetPdu\\MiconPdu\\bin\\Debug\\netstandard2.0\\MiconPdu.dll",
+        	},
+	       	{
+	        	"name": "MiconSensorPdu-10",
+	        	"class_name": "Hakoniwa.PluggableAsset.Communication.Pdu.Micon.SimpleMiconPduWriter",
+	        	"path": "..\\..\\..\\..\\AssetPdu\\MiconPdu\\bin\\Debug\\netstandard2.0\\MiconPdu.dll",
+        	},
     ],
     "pdu_readers": [
-        {
+        	{
 	        	"name": "MiconActuatorPdu-1",
 	        	"class_name": "Hakoniwa.PluggableAsset.Communication.Pdu.Micon.SimpleMiconPduReader",
 	        	"path": "..\\..\\..\\..\\AssetPdu\\MiconPdu\\bin\\Debug\\netstandard2.0\\MiconPdu.dll",
@@ -64,63 +118,177 @@
 	        	"name": "MiconActuatorPdu-4",
 	        	"class_name": "Hakoniwa.PluggableAsset.Communication.Pdu.Micon.SimpleMiconPduReader",
 	        	"path": "..\\..\\..\\..\\AssetPdu\\MiconPdu\\bin\\Debug\\netstandard2.0\\MiconPdu.dll",
-	        }
+	        },
+	       	{
+	        	"name": "MiconActuatorPdu-5",
+	        	"class_name": "Hakoniwa.PluggableAsset.Communication.Pdu.Micon.SimpleMiconPduReader",
+	        	"path": "..\\..\\..\\..\\AssetPdu\\MiconPdu\\bin\\Debug\\netstandard2.0\\MiconPdu.dll",
+	        },
+        	{
+	        	"name": "MiconActuatorPdu-6",
+	        	"class_name": "Hakoniwa.PluggableAsset.Communication.Pdu.Micon.SimpleMiconPduReader",
+	        	"path": "..\\..\\..\\..\\AssetPdu\\MiconPdu\\bin\\Debug\\netstandard2.0\\MiconPdu.dll",
+        	},
+	       	{
+	        	"name": "MiconActuatorPdu-7",
+	        	"class_name": "Hakoniwa.PluggableAsset.Communication.Pdu.Micon.SimpleMiconPduReader",
+	        	"path": "..\\..\\..\\..\\AssetPdu\\MiconPdu\\bin\\Debug\\netstandard2.0\\MiconPdu.dll",
+	        },
+	       	{
+	        	"name": "MiconActuatorPdu-8",
+	        	"class_name": "Hakoniwa.PluggableAsset.Communication.Pdu.Micon.SimpleMiconPduReader",
+	        	"path": "..\\..\\..\\..\\AssetPdu\\MiconPdu\\bin\\Debug\\netstandard2.0\\MiconPdu.dll",
+	        },
+	       	{
+	        	"name": "MiconActuatorPdu-9",
+	        	"class_name": "Hakoniwa.PluggableAsset.Communication.Pdu.Micon.SimpleMiconPduReader",
+	        	"path": "..\\..\\..\\..\\AssetPdu\\MiconPdu\\bin\\Debug\\netstandard2.0\\MiconPdu.dll",
+	        },
+	       	{
+	        	"name": "MiconActuatorPdu-10",
+	        	"class_name": "Hakoniwa.PluggableAsset.Communication.Pdu.Micon.SimpleMiconPduReader",
+	        	"path": "..\\..\\..\\..\\AssetPdu\\MiconPdu\\bin\\Debug\\netstandard2.0\\MiconPdu.dll",
+	        },
     ],
     "udp_methods": [
         {
-            "method_name": "UdpMethod_write1",
+            		"method_name": "UdpMethod_write1",
 	        	"ipaddr": "{{IFCONFIG_IPADDR}}",
-        	    "portno": 54002,
-        	    "iosize": 1024,
+        	    	"portno": 54002,
+        	    	"iosize": 1024,
 	        	"is_read": false,
         },
         {
-            "method_name": "UdpMethod_write2",
+            		"method_name": "UdpMethod_write2",
 	        	"ipaddr": "{{IFCONFIG_IPADDR}}",
 	        	"portno": 54012,
-        	    "iosize": 1024,
+        	    	"iosize": 1024,
 	        	"is_read": false,
         },
         {
-            "method_name": "UdpMethod_write3",
+            		"method_name": "UdpMethod_write3",
 	        	"ipaddr": "{{IFCONFIG_IPADDR}}",
 	        	"portno": 54022,
-        	    "iosize": 1024,
+        	    	"iosize": 1024,
 	        	"is_read": false,
         },
         {
-            "method_name": "UdpMethod_write4",
+            		"method_name": "UdpMethod_write4",
 	        	"ipaddr": "{{IFCONFIG_IPADDR}}",
 	        	"portno": 54032,
-        	    "iosize": 1024,
+        	    	"iosize": 1024,
 	        	"is_read": false,
         },
         {
-            "method_name": "UdpMethod_read1",
+            		"method_name": "UdpMethod_write5",
+	        	"ipaddr": "{{IFCONFIG_IPADDR}}",
+	        	"portno": 54042,
+        	    	"iosize": 1024,
+	        	"is_read": false,
+        },
+        {
+            		"method_name": "UdpMethod_write6",
+	        	"ipaddr": "{{IFCONFIG_IPADDR}}",
+        	    	"portno": 54052,
+        	    	"iosize": 1024,
+	        	"is_read": false,
+        },
+        {
+            		"method_name": "UdpMethod_write7",
+	        	"ipaddr": "{{IFCONFIG_IPADDR}}",
+	        	"portno": 54062,
+        	    	"iosize": 1024,
+	        	"is_read": false,
+        },
+        {
+            		"method_name": "UdpMethod_write8",
+	        	"ipaddr": "{{IFCONFIG_IPADDR}}",
+	        	"portno": 54072,
+        	    	"iosize": 1024,
+	        	"is_read": false,
+        },
+        {
+            		"method_name": "UdpMethod_write9",
+	        	"ipaddr": "{{IFCONFIG_IPADDR}}",
+	        	"portno": 54082,
+        	    	"iosize": 1024,
+	        	"is_read": false,
+        },
+        {
+            		"method_name": "UdpMethod_write10",
+	        	"ipaddr": "{{IFCONFIG_IPADDR}}",
+	        	"portno": 54092,
+        	    	"iosize": 1024,
+	        	"is_read": false,
+        },
+        {
+            		"method_name": "UdpMethod_read1",
 	        	"ipaddr": "{{RESOLVE_IPADDR}}",
 	        	"portno": 54001,
-        	    "iosize": 1024,
+        	    	"iosize": 1024,
 	        	"is_read": true,
         },
         {
 	        	"method_name": "UdpMethod_read2",
 	        	"ipaddr": "{{RESOLVE_IPADDR}}",
 	        	"portno": 54011,
-    	        "iosize": 1024,
+    	        	"iosize": 1024,
 	        	"is_read": true,
        	},
         {
 	        	"method_name": "UdpMethod_read3",
 	        	"ipaddr": "{{RESOLVE_IPADDR}}",
 	        	"portno": 54021,
-	            "iosize": 1024,
+	            	"iosize": 1024,
 	        	"is_read": true,
        	},
         {
 	        	"method_name": "UdpMethod_read4",
 	        	"ipaddr": "{{RESOLVE_IPADDR}}",
 	        	"portno": 54031,
-	            "iosize": 1024,
+	            	"iosize": 1024,
+	        	"is_read": true,
+       	},
+        {
+	        	"method_name": "UdpMethod_read5",
+	        	"ipaddr": "{{RESOLVE_IPADDR}}",
+	        	"portno": 54041,
+	            	"iosize": 1024,
+	        	"is_read": true,
+       	},
+        {
+            		"method_name": "UdpMethod_read6",
+	        	"ipaddr": "{{RESOLVE_IPADDR}}",
+	        	"portno": 54051,
+        	    	"iosize": 1024,
+	        	"is_read": true,
+        },
+        {
+	        	"method_name": "UdpMethod_read7",
+	        	"ipaddr": "{{RESOLVE_IPADDR}}",
+	        	"portno": 54061,
+    	        	"iosize": 1024,
+	        	"is_read": true,
+       	},
+        {
+	        	"method_name": "UdpMethod_read8",
+	        	"ipaddr": "{{RESOLVE_IPADDR}}",
+	        	"portno": 54071,
+	            	"iosize": 1024,
+	        	"is_read": true,
+       	},
+        {
+	        	"method_name": "UdpMethod_read9",
+	        	"ipaddr": "{{RESOLVE_IPADDR}}",
+	        	"portno": 54081,
+	            	"iosize": 1024,
+	        	"is_read": true,
+       	},
+        {
+	        	"method_name": "UdpMethod_read10",
+	        	"ipaddr": "{{RESOLVE_IPADDR}}",
+	        	"portno": 54091,
+	            	"iosize": 1024,
 	        	"is_read": true,
        	},
     ],
@@ -145,7 +313,37 @@
 	        	"name": "reader_connector4",
 	        	"pdu_name": "MiconActuatorPdu-4",
 	        	"method_name": "UdpMethod_read4",
-        	}
+        	},
+	       	{
+	        	"name": "reader_connector5",
+	        	"pdu_name": "MiconActuatorPdu-5",
+	        	"method_name": "UdpMethod_read5",
+        	},
+	       	{
+	        	"name": "reader_connector6",
+	        	"pdu_name": "MiconActuatorPdu-6",
+	        	"method_name": "UdpMethod_read6",
+        	},
+	       	{
+	        	"name": "reader_connector7",
+	        	"pdu_name": "MiconActuatorPdu-7",
+	        	"method_name": "UdpMethod_read7",
+        	},
+	       	{
+	        	"name": "reader_connector8",
+	        	"pdu_name": "MiconActuatorPdu-8",
+	        	"method_name": "UdpMethod_read8",
+        	},
+	       	{
+	        	"name": "reader_connector9",
+	        	"pdu_name": "MiconActuatorPdu-9",
+	        	"method_name": "UdpMethod_read9",
+        	},
+	       	{
+	        	"name": "reader_connector10",
+	        	"pdu_name": "MiconActuatorPdu-10",
+	        	"method_name": "UdpMethod_read10",
+        	},
         ],
     "writer_connectors":  [
 	       	{
@@ -168,6 +366,36 @@
 	        	"pdu_name": "MiconSensorPdu-4",
 	        	"method_name": "UdpMethod_write4",
         	},
+	       	{
+	        	"name": "writer_connector5",
+	        	"pdu_name": "MiconSensorPdu-5",
+	        	"method_name": "UdpMethod_write5",
+        	},
+	       	{
+	        	"name": "writer_connector6",
+	        	"pdu_name": "MiconSensorPdu-6",
+	        	"method_name": "UdpMethod_write6",
+        	},
+	       	{
+	        	"name": "writer_connector7",
+	        	"pdu_name": "MiconSensorPdu-7",
+	        	"method_name": "UdpMethod_write7",
+        	},
+	       	{
+	        	"name": "writer_connector8",
+	        	"pdu_name": "MiconSensorPdu-8",
+	        	"method_name": "UdpMethod_write8",
+        	},
+	       	{
+	        	"name": "writer_connector9",
+	        	"pdu_name": "MiconSensorPdu-9",
+	        	"method_name": "UdpMethod_write9",
+        	},
+	       	{
+	        	"name": "writer_connector10",
+	        	"pdu_name": "MiconSensorPdu-10",
+	        	"method_name": "UdpMethod_write10",
+        	},
     ],    
     "pdu_channel_connectors":  [
 	       	{
@@ -189,6 +417,36 @@
 	        	"outside_asset_name": "Athrill_4",
 	        	"reader_connector_name": "reader_connector4",
 	        	"writer_connector_name": "writer_connector4",
-        	}
+        	},
+	       	{
+	        	"outside_asset_name": "Athrill_5",
+	        	"reader_connector_name": "reader_connector5",
+	        	"writer_connector_name": "writer_connector5",
+        	},
+	       	{
+	        	"outside_asset_name": "Athrill_6",
+	        	"reader_connector_name": "reader_connector6",
+	        	"writer_connector_name": "writer_connector6",
+        	},
+	       	{
+	        	"outside_asset_name": "Athrill_7",
+	        	"reader_connector_name": "reader_connector7",
+	        	"writer_connector_name": "writer_connector7",
+        	},
+	       	{
+	        	"outside_asset_name": "Athrill_8",
+	        	"reader_connector_name": "reader_connector8",
+	        	"writer_connector_name": "writer_connector8",
+        	},
+	       	{
+	        	"outside_asset_name": "Athrill_9",
+	        	"reader_connector_name": "reader_connector9",
+	        	"writer_connector_name": "writer_connector9",
+        	},
+	       	{
+	        	"outside_asset_name": "Athrill_10",
+	        	"reader_connector_name": "reader_connector10",
+	        	"writer_connector_name": "writer_connector10",
+        	},
         ],
 }

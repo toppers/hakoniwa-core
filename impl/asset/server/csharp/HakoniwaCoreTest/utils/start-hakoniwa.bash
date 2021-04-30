@@ -9,10 +9,11 @@ fi
 HAKONIWA_PRJ=${1}
 ETH=${2}
 HAKONIWA_CFG_TMPL=utils/config_proxy_udp_json.mo
+SYMTIME_MEASURE_FILEPATH=".\\core.csv"
 if [ $# -eq 3 ]
 then
 	TMPDIR=$(cd ${3} && pwd)
-	DIR=`echo "${TMPDIR}/unity.csv" | sed 's/\/mnt\/c\//C:\\\\\\\\/g' | sed 's/\//\\\\\\\\/g'`
+	DIR=`echo "${TMPDIR}/core.csv" | sed 's/\/mnt\/c\//C:\\\\\\\\/g' | sed 's/\//\\\\\\\\/g'`
 	export SYMTIME_MEASURE_FILEPATH=${DIR}
 fi
 

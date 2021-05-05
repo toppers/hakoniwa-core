@@ -21,7 +21,14 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Udp
         {
             //Debug.Log("UdpSend:" + buf.Length);
             //SimpleLogger.Get().Log(Level.DEBUG, "flush ipaddr=" + udp_config.IpAddr +" port="+ udp_config.Portno + " len=" + buf.Length);
-            client.Send(buf, buf.Length);
+            try
+            {
+                client.Send(buf, buf.Length);
+            }
+            catch (Exception e)
+            {
+                ;
+            }
         }
 
         public void Initialize(IIoWriterConfig config)

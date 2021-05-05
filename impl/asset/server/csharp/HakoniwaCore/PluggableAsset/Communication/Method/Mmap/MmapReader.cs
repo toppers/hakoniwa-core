@@ -9,11 +9,11 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Mmap
 {
     class MmapReader : IIoReader
     {
-        private MmapReaderConfig mmap_config;
+        private MmapConfig mmap_config;
         private MemoryMappedFile mappedFile;
         private UnmanagedMemoryAccessor accessor;
 
-        public string Name { get; private set; }
+        public string Name { get; internal set; }
 
         public string GetName()
         {
@@ -22,7 +22,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Mmap
 
         public void Initialize(IIoReaderConfig config)
         {
-            mmap_config = config as MmapReaderConfig;
+            mmap_config = config as MmapConfig;
             if (!System.IO.File.Exists(mmap_config.filepath))
             {
                 throw new InvalidOperationException("filepath is invalid:" + mmap_config.filepath);
@@ -38,8 +38,9 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Mmap
 
         public byte[] Recv()
         {
-            //TODO
-            return null;
+            byte[] buffer = new byte[this.mmap_config.io_size];
+            this.accessor.ReadArray<byte>(0, buffer, 0, buffer.Length);
+            return buffer;
         }
     }
 }

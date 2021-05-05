@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Text;
+using Hakoniwa.Core.Utils.Logger;
 
 namespace Hakoniwa.PluggableAsset.Communication.Method.Mmap
 {
     class MmapWriter : IIoWriter
     {
-        private MmapWriterConfig mmap_config;
+        private MmapConfig mmap_config;
         private MemoryMappedFile mappedFile;
         private UnmanagedMemoryAccessor accessor;
 
-        public string Name { get; private set; }
+        public string Name { get; internal set; }
 
         public string GetName()
         {
@@ -20,12 +21,13 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Mmap
         }
         public void Flush(ref byte[] buf)
         {
+            SimpleLogger.Get().Log(Level.INFO, "MmapWrite:file=" + mmap_config.filepath + " len=" + buf.Length);
             accessor.WriteArray<byte>(0, buf, 0, buf.Length);
         }
 
         public void Initialize(IIoWriterConfig config)
         {
-            mmap_config = config as MmapWriterConfig;
+            mmap_config = config as MmapConfig;
             if (!System.IO.File.Exists(mmap_config.filepath))
             {
                 throw new InvalidOperationException("filepath is invalid:" + mmap_config.filepath);

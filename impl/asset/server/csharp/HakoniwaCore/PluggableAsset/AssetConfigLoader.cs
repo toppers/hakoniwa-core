@@ -4,6 +4,7 @@ using Hakoniwa.PluggableAsset.Assets.Micon.EV3;
 using Hakoniwa.PluggableAsset.Communication.Channel;
 using Hakoniwa.PluggableAsset.Communication.Connector;
 using Hakoniwa.PluggableAsset.Communication.Method;
+using Hakoniwa.PluggableAsset.Communication.Method.Mmap;
 using Hakoniwa.PluggableAsset.Communication.Method.Udp;
 using Hakoniwa.PluggableAsset.Communication.Pdu;
 using Hakoniwa.PluggableAsset.Communication.Pdu.Ev3;
@@ -254,6 +255,27 @@ namespace Hakoniwa.PluggableAsset
                     real_method.Name = method.method_name;
                     AssetConfigLoader.io_writers.Add(real_method);
                     SimpleLogger.Get().Log(Level.INFO, "UdpMethod : " + real_method.Name + ": " + config.IpAddr + ": " + config.Portno);
+                }
+            }
+            //mmap method configs
+            foreach (var method in core_config.mmap_methods)
+            {
+                var config = new MmapConfig();
+                config.io_size = method.iosize;
+                config.filepath = method.filepath;
+                if (method.is_read)
+                {
+                    var real_method = new MmapReader();
+                    real_method.Initialize(config);
+                    real_method.Name = method.method_name;
+                    AssetConfigLoader.io_readers.Add(real_method);
+                }
+                else
+                {
+                    var real_method = new MmapWriter();
+                    real_method.Initialize(config);
+                    real_method.Name = method.method_name;
+                    AssetConfigLoader.io_writers.Add(real_method);
                 }
             }
 

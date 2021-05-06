@@ -234,50 +234,57 @@ namespace Hakoniwa.PluggableAsset
                 }
                 AssetConfigLoader.pdu_readers.Add(ipdu);
             }
-            //udp method configs
-            foreach (var method in core_config.udp_methods)
+            if (core_config.udp_methods != null)
             {
-                var config = new UdpConfig();
-                config.IoSize = method.iosize;
-                config.IpAddr = method.ipaddr;
-                config.Portno = method.portno;
-                if (method.is_read)
+                //udp method configs
+                foreach (var method in core_config.udp_methods)
                 {
-                    var real_method = new UdpReader();
-                    real_method.Initialize(config);
-                    real_method.Name = method.method_name;
-                    AssetConfigLoader.io_readers.Add(real_method);
-                }
-                else
-                {
-                    var real_method = new UdpWriter();
-                    real_method.Initialize(config);
-                    real_method.Name = method.method_name;
-                    AssetConfigLoader.io_writers.Add(real_method);
-                    SimpleLogger.Get().Log(Level.INFO, "UdpMethod : " + real_method.Name + ": " + config.IpAddr + ": " + config.Portno);
+                    var config = new UdpConfig();
+                    config.IoSize = method.iosize;
+                    config.IpAddr = method.ipaddr;
+                    config.Portno = method.portno;
+                    if (method.is_read)
+                    {
+                        var real_method = new UdpReader();
+                        real_method.Initialize(config);
+                        real_method.Name = method.method_name;
+                        AssetConfigLoader.io_readers.Add(real_method);
+                    }
+                    else
+                    {
+                        var real_method = new UdpWriter();
+                        real_method.Initialize(config);
+                        real_method.Name = method.method_name;
+                        AssetConfigLoader.io_writers.Add(real_method);
+                        SimpleLogger.Get().Log(Level.INFO, "UdpMethod : " + real_method.Name + ": " + config.IpAddr + ": " + config.Portno);
+                    }
                 }
             }
-            //mmap method configs
-            foreach (var method in core_config.mmap_methods)
+            if (core_config.mmap_methods != null)
             {
-                var config = new MmapConfig();
-                config.io_size = method.iosize;
-                config.filepath = method.filepath;
-                if (method.is_read)
+                //mmap method configs
+                foreach (var method in core_config.mmap_methods)
                 {
-                    var real_method = new MmapReader();
-                    real_method.Initialize(config);
-                    real_method.Name = method.method_name;
-                    AssetConfigLoader.io_readers.Add(real_method);
-                }
-                else
-                {
-                    var real_method = new MmapWriter();
-                    real_method.Initialize(config);
-                    real_method.Name = method.method_name;
-                    AssetConfigLoader.io_writers.Add(real_method);
+                    var config = new MmapConfig();
+                    config.io_size = method.iosize;
+                    config.filepath = method.filepath;
+                    if (method.is_read)
+                    {
+                        var real_method = new MmapReader();
+                        real_method.Initialize(config);
+                        real_method.Name = method.method_name;
+                        AssetConfigLoader.io_readers.Add(real_method);
+                    }
+                    else
+                    {
+                        var real_method = new MmapWriter();
+                        real_method.Initialize(config);
+                        real_method.Name = method.method_name;
+                        AssetConfigLoader.io_writers.Add(real_method);
+                    }
                 }
             }
+
 
             //reader connectors configs
             foreach (var connector in core_config.reader_connectors)

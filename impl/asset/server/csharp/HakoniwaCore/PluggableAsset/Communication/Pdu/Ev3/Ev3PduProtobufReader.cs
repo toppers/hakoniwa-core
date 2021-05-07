@@ -1,4 +1,5 @@
 ﻿using Google.Protobuf;
+using Hakoniwa.Core.Utils.Logger;
 using Hakoniwa.PluggableAsset.Communication.Method;
 using System;
 using System.Collections.Generic;
@@ -234,9 +235,16 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
         }
         public byte[] GetDataBytes(string field_name)
         {
-            byte[] tmp_buf = new byte[this.pdu_config.GetSize(field_name)];
-            Buffer.BlockCopy(tmp_buf, 0, this.buffer, pdu_config.GetOffset(field_name), tmp_buf.Length);
-            return tmp_buf;
+            if (field_name != null)
+            {
+                byte[] tmp_buf = new byte[this.pdu_config.GetSize(field_name)];
+                Buffer.BlockCopy(this.buffer, pdu_config.GetOffset(field_name), tmp_buf, 0, tmp_buf.Length);
+                return tmp_buf;
+            }
+            else
+            {
+                return this.buffer;
+            }
         }
 
         public double GetDataDouble(string field_name)

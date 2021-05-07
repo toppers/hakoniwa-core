@@ -21,7 +21,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Mmap
         }
         public void Flush(ref byte[] buf)
         {
-            SimpleLogger.Get().Log(Level.INFO, "MmapWrite:file=" + mmap_config.filepath + " len=" + buf.Length);
+            //SimpleLogger.Get().Log(Level.INFO, "MmapWrite:file=" + mmap_config.filepath + " len=" + buf.Length);
             accessor.WriteArray<byte>(0, buf, 0, buf.Length);
         }
 

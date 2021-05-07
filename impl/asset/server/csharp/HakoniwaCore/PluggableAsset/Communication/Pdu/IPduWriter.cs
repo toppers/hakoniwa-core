@@ -15,9 +15,12 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
         void SetData(string field_name, double value);
         void Send(IIoWriter writer);
 
-#if false
-        void SendProtoBuffer(IIoWriter writer);
-#endif
+        long GetHeaderData(string field_name);
+        double GetDataDouble(string field_name);
+        UInt32 GetDataUInt32(string field_name);
+        Int32 GetDataInt32(string field_name);
+        byte[] GetDataBytes(string field_name);
+
 
     }
 }

@@ -33,11 +33,14 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
             this.pdu_config.SetOffset("gyro_reset", 52, 4);
         }
 
-        public void GetData(string field_name, out int value)
+        public void GetData(string field_name, out Int32 value)
         {
             value = BitConverter.ToInt32(this.buffer, pdu_config.GetOffset(field_name));
         }
-
+        public void GetData(string field_name, out UInt32 value)
+        {
+            value = BitConverter.ToUInt32(this.buffer, pdu_config.GetOffset(field_name));
+        }
         public void GetData(string field_name, out ulong value)
         {
             value = BitConverter.ToUInt64(this.buffer, pdu_config.GetOffset(field_name));
@@ -97,6 +100,34 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
         public long GetHeaderData(string field_name)
         {
             return BitConverter.ToInt64(this.buffer, pdu_config.GetHeaderOffset(field_name));
+        }
+
+        public byte[] GetDataBytes(string field_name)
+        {
+            byte[] tmp_buf = new byte[this.pdu_config.GetSize(field_name)];
+            Buffer.BlockCopy(tmp_buf, 0, this.buffer, pdu_config.GetOffset(field_name), tmp_buf.Length);
+            return tmp_buf;
+        }
+
+        public double GetDataDouble(string field_name)
+        {
+            double ret = 0;
+            this.GetData(field_name, out ret);
+            return ret;
+        }
+
+        public UInt32 GetDataUInt32(string field_name)
+        {
+            UInt32 ret;
+            this.GetData(field_name, out ret);
+            return ret;
+        }
+
+        public Int32 GetDataInt32(string field_name)
+        {
+            Int32 ret = 0;
+            this.GetData(field_name, out ret);
+            return ret;
         }
     }
 }

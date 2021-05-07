@@ -27,6 +27,7 @@ namespace Hakoniwa.PluggableAsset
         public string name;
         public string [] pdu_writer_names;
         public string [] pdu_reader_names;
+        public string core_class_name;
     }
 
     [System.Serializable]

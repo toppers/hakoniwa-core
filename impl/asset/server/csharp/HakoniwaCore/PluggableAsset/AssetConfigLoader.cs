@@ -1,6 +1,7 @@
 ﻿using Hakoniwa.Core.Utils.Logger;
 using Hakoniwa.PluggableAsset.Assets;
 using Hakoniwa.PluggableAsset.Assets.Micon.EV3;
+using Hakoniwa.PluggableAsset.Assets.Robot.EV3;
 using Hakoniwa.PluggableAsset.Communication.Channel;
 using Hakoniwa.PluggableAsset.Communication.Connector;
 using Hakoniwa.PluggableAsset.Communication.Method;
@@ -368,6 +369,20 @@ namespace Hakoniwa.PluggableAsset
                             throw new InvalidDataException("ERROR: can not found inside asset pdu reader=" + name);
                         }
                         connector.AddReader(pdu);
+                    }
+                    if (asset.core_class_name != null)
+                    {
+                        IInsideAssetController controller = null;
+                        if (asset.core_class_name.Equals("Ev3ProtobufConverter"))
+                        {
+                            controller = new Ev3ProtobufConverter(asset.name);
+                        }
+                        if (controller == null)
+                        {
+                            throw new InvalidDataException("ERROR: can not found classname=" + asset.core_class_name);
+                        }
+                        SimpleLogger.Get().Log(Level.INFO, "InSideAsset :" + asset.name);
+                        AssetConfigLoader.AddInsideAsset(controller);
                     }
                 }
             }

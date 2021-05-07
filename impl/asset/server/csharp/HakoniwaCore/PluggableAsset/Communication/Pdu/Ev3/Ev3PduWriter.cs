@@ -46,11 +46,11 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
             this.pdu_config.SetOffset("sensor_rgb_b0", 24, 4);
 
 
-            this.pdu_config.SetOffset("sensor_color1", 128, 4);
-            this.pdu_config.SetOffset("sensor_reflect1", 132, 4);
-            this.pdu_config.SetOffset("sensor_rgb_r1", 136, 4);
-            this.pdu_config.SetOffset("sensor_rgb_g1", 140, 4);
-            this.pdu_config.SetOffset("sensor_rgb_b1", 144, 4);
+            this.pdu_config.SetOffset("sensor_color1", 132, 4);
+            this.pdu_config.SetOffset("sensor_reflect1", 136, 4);
+            this.pdu_config.SetOffset("sensor_rgb_r1", 140, 4);
+            this.pdu_config.SetOffset("sensor_rgb_g1", 144, 4);
+            this.pdu_config.SetOffset("sensor_rgb_b1", 148, 4);
 
 
             this.pdu_config.SetOffset("sensor_gyroscope", 28, 16);//TODO

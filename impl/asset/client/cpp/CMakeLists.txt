@@ -59,7 +59,7 @@ else()
 endif()
 
 # Proto file
-get_filename_component(hakoniwa_proto "/root/hakoniwa-core/spec/hakoniwa_core.proto" ABSOLUTE)
+get_filename_component(hakoniwa_proto "../../../../spec/hakoniwa_core.proto" ABSOLUTE)
 get_filename_component(hakoniwa_proto_path "${hakoniwa_proto}" PATH)
 
 # Generated sources

@@ -27,7 +27,8 @@ namespace Hakoniwa.PluggableAsset.Communication.Connector
 
         public void Recv()
         {
-            this.dst_pdu.Recv(this.src_channel.GetReaer());
+            var tmp = this.src_channel.GetReaer().Recv();
+            this.dst_pdu.Set(tmp);
         }
 
         public IPduReader GetPdu()

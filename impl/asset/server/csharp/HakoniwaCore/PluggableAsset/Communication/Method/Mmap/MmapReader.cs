@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hakoniwa.PluggableAsset.Communication.Pdu;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -36,11 +37,11 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Mmap
             }
         }
 
-        public byte[] Recv()
+        public IPduCommData Recv()
         {
             byte[] buffer = new byte[this.mmap_config.io_size];
             this.accessor.ReadArray<byte>(0, buffer, 0, buffer.Length);
-            return buffer;
+            return new PduCommBinaryData(buffer);
         }
     }
 }

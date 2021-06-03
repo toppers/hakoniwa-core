@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hakoniwa.PluggableAsset.Communication.Pdu;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -9,6 +10,6 @@ namespace Hakoniwa.PluggableAsset.Communication.Method
         void Initialize(IIoReaderConfig config);
 
         string GetName();
-        byte[] Recv();
+        IPduCommData Recv();
     }
 }

@@ -8,18 +8,24 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
     class Ev3PduReader : IPduReader
     {
         private PduConfig pdu_config;
-        private byte[] buffer;
         private string packet_header = "ETTX";
         private int packet_version = 0x1;
         private int packet_ext_off = 512;
         private int packet_ext_size = 512;
         private string name;
+        private Pdu pdu;
+        private IPduReaderConverter converter = null;
 
         public Ev3PduReader(string name)
         {
             this.name = name;
             this.pdu_config = new PduConfig(32);
+            this.pdu_config.SetHeaderOffset("header", 0, 4);
+            this.pdu_config.SetHeaderOffset("version", 4, 4);
             this.pdu_config.SetHeaderOffset("simulation_time", 8, 8);
+            this.pdu_config.SetHeaderOffset("ext_off", 24, 4);
+            this.pdu_config.SetHeaderOffset("ext_size", 28, 4);
+
             this.pdu_config.SetOffset("led", 0, 4);
             this.pdu_config.SetOffset("motor_power_a", 4, 4);
             this.pdu_config.SetOffset("motor_power_b", 8, 4);
@@ -31,29 +37,17 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
             this.pdu_config.SetOffset("motor_reset_angle_b", 40, 4);
             this.pdu_config.SetOffset("motor_reset_angle_c", 44, 4);
             this.pdu_config.SetOffset("gyro_reset", 52, 4);
-        }
-
-        public void GetData(string field_name, out Int32 value)
-        {
-            value = BitConverter.ToInt32(this.buffer, pdu_config.GetOffset(field_name));
-        }
-        public void GetData(string field_name, out UInt32 value)
-        {
-            value = BitConverter.ToUInt32(this.buffer, pdu_config.GetOffset(field_name));
-        }
-        public void GetData(string field_name, out ulong value)
-        {
-            value = BitConverter.ToUInt64(this.buffer, pdu_config.GetOffset(field_name));
-        }
-
-        public void GetData(string field_name, out double value)
-        {
-            value = BitConverter.ToDouble(this.buffer, pdu_config.GetOffset(field_name));
+            this.pdu = new Pdu(this.pdu_config, 1024);
         }
 
         public bool IsValidData()
         {
-            return IsValidPacket(ref this.buffer);
+            if (this.pdu.GetBuffer() == null)
+            {
+                return false;
+            }
+            byte[] buf = this.pdu.GetBuffer();
+            return IsValidPacket(ref buf);
         }
         private bool IsValidPacket(ref byte[] data)
         {
@@ -80,61 +74,60 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
             }
             return true;
         }
-        public void Recv(IIoReader reader)
-        {
-            this.buffer = reader.Recv();
-        }
-        public void Send(IIoWriter writer)
-        {
-            if (this.buffer != null)
-            {
-                writer.Flush(ref this.buffer);
-            }
-        }
 
         public string GetName()
         {
             return name;
         }
 
-        public long GetHeaderData(string field_name)
+        public IPduReadOperation GetReadOps()
         {
-            return BitConverter.ToInt64(this.buffer, pdu_config.GetHeaderOffset(field_name));
+            return this.pdu.GetPduReadOps();
+        }
+        public IPduWriteOperation GetWriteOps()
+        {
+            return this.pdu.GetPduWriteOps();
+        }
+        public void SetConverter(IPduReaderConverter cnv)
+        {
+            this.converter = cnv;
         }
 
-        public byte[] GetDataBytes(string field_name)
+        public void Set(IPduCommData data)
         {
-            if (field_name != null)
+            PduCommBinaryData binary = null;
+            if (data == null)
             {
-                byte[] tmp_buf = new byte[this.pdu_config.GetSize(field_name)];
-                Buffer.BlockCopy(this.buffer, pdu_config.GetOffset(field_name), tmp_buf, 0, tmp_buf.Length);
-                return tmp_buf;
+                return;
+            }
+
+            if (data.GetType() == typeof(PduCommBinaryData))
+            {
+                binary = (PduCommBinaryData)data;
+            }
+            if (binary == null)
+            {
+                throw new ArgumentException("Invalid data type:" + data.GetType());
+            }
+            if (this.converter == null)
+            {
+                this.pdu.SetBuffer(binary.GetData());
             }
             else
             {
-                return this.buffer;
+                this.converter.ConvertToPduData(binary, this);
             }
         }
-
-        public double GetDataDouble(string field_name)
+        public IPduCommData Get()
         {
-            double ret = 0;
-            this.GetData(field_name, out ret);
-            return ret;
-        }
-
-        public UInt32 GetDataUInt32(string field_name)
-        {
-            UInt32 ret;
-            this.GetData(field_name, out ret);
-            return ret;
-        }
-
-        public Int32 GetDataInt32(string field_name)
-        {
-            Int32 ret = 0;
-            this.GetData(field_name, out ret);
-            return ret;
+            if (this.converter == null)
+            {
+                return new PduCommBinaryData(this.pdu.GetBuffer());
+            }
+            else
+            {
+                return this.converter.ConvertToIoData(this);
+            }
         }
     }
 }

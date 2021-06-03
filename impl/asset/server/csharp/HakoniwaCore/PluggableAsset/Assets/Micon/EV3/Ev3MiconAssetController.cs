@@ -22,7 +22,7 @@ namespace Hakoniwa.PluggableAsset.Assets.Micon.EV3
 
         public long GetSimTime()
         {
-            return this.connector.Reader.GetPdu().GetHeaderData("simulation_time");
+            return this.connector.Reader.GetPdu().GetReadOps().GetHeaderData("simulation_time");
         }
 
         public void Initialize()
@@ -37,7 +37,7 @@ namespace Hakoniwa.PluggableAsset.Assets.Micon.EV3
 
         public void PutHakoniwaTime(long time)
         {
-            this.connector.Writer.GetPdu().SetHeaderData("hakoniwa_time", time);
+            this.connector.Writer.GetPdu().GetWriteOps().SetHeaderData("hakoniwa_time", time);
         }
 
         public void RecvPdu()

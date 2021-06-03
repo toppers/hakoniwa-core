@@ -43,14 +43,14 @@ namespace Hakoniwa.PluggableAsset.Communication.Connector
         {
             if (this.w_pdu != null)
             {
-                this.w_pdu.Send(this.dst_channel.GetWriter());
+                this.dst_channel.GetWriter().Flush(this.w_pdu.Get());
             }
         }
         public void SendReaderPdu()
         {
             if (this.r_pdu != null)
             {
-                this.r_pdu.Send(this.dst_channel.GetWriter());
+                this.dst_channel.GetWriter().Flush(this.r_pdu.Get());
             }
         }
         public IPduWriter GetPdu()

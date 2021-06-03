@@ -177,10 +177,6 @@ namespace Hakoniwa.PluggableAsset
                 {
                     ipdu = new Ev3PduWriter(pdu.name);
                 }
-                else if (pdu.class_name.Equals("Ev3PduProtobufWriter"))
-                {
-                    ipdu = new Ev3PduProtobufWriter(pdu.name);
-                }
                 else if (pdu.path != null)
                 {
                     var asm = Assembly.LoadFrom(pdu.path);
@@ -200,6 +196,10 @@ namespace Hakoniwa.PluggableAsset
                 {
                     throw new InvalidDataException("ERROR: can not found classname=" + pdu.class_name);
                 }
+                if (pdu.conv_class_name != null && pdu.conv_class_name.Equals("Ev3PduWriterProtobufConverter")) {
+                    ipdu.SetConverter(new Ev3PduWriterProtobufConverter());
+                }
+
                 AssetConfigLoader.pdu_writers.Add(ipdu);
             }
             //reader pdu configs
@@ -209,10 +209,6 @@ namespace Hakoniwa.PluggableAsset
                 if (pdu.class_name.Equals("Ev3PduReader"))
                 {
                     ipdu = new Ev3PduReader(pdu.name);
-                }
-                else if (pdu.class_name.Equals("Ev3PduProtobufReader"))
-                {
-                    ipdu = new Ev3PduProtobufReader(pdu.name);
                 }
                 else if (pdu.path != null)
                 {
@@ -232,6 +228,9 @@ namespace Hakoniwa.PluggableAsset
                 if (ipdu == null)
                 {
                     throw new InvalidDataException("ERROR: can not found classname=" + pdu.class_name);
+                }
+                if (pdu.conv_class_name != null && pdu.conv_class_name.Equals("Ev3PduReaderProtobufConverter")) {
+                    ipdu.SetConverter(new Ev3PduReaderProtobufConverter());
                 }
                 AssetConfigLoader.pdu_readers.Add(ipdu);
             }
@@ -369,20 +368,6 @@ namespace Hakoniwa.PluggableAsset
                             throw new InvalidDataException("ERROR: can not found inside asset pdu reader=" + name);
                         }
                         connector.AddReader(pdu);
-                    }
-                    if (asset.core_class_name != null)
-                    {
-                        IInsideAssetController controller = null;
-                        if (asset.core_class_name.Equals("Ev3ProtobufConverter"))
-                        {
-                            controller = new Ev3ProtobufConverter(asset.name);
-                        }
-                        if (controller == null)
-                        {
-                            throw new InvalidDataException("ERROR: can not found classname=" + asset.core_class_name);
-                        }
-                        SimpleLogger.Get().Log(Level.INFO, "InSideAsset :" + asset.name);
-                        AssetConfigLoader.AddInsideAsset(controller);
                     }
                 }
             }

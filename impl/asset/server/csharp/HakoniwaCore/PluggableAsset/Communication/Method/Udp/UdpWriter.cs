@@ -37,9 +37,8 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Udp
             {
                 client.Send(buf, buf.Length);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                ;
             }
         }
 

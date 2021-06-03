@@ -10,6 +10,6 @@ namespace Hakoniwa.PluggableAsset.Communication.Method
         void Initialize(IIoReaderConfig config);
 
         string GetName();
-        IPduCommData Recv();
+        IPduCommData Recv(string io_key);
     }
 }

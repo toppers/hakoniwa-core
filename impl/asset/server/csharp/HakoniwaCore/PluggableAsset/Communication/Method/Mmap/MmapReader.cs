@@ -37,7 +37,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Mmap
             }
         }
 
-        public IPduCommData Recv()
+        public IPduCommData Recv(string io_key)
         {
             byte[] buffer = new byte[this.mmap_config.io_size];
             this.accessor.ReadArray<byte>(0, buffer, 0, buffer.Length);

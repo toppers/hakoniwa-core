@@ -129,5 +129,10 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
                 return this.converter.ConvertToIoData(this);
             }
         }
+
+        public string GetIoKey()
+        {
+            return this.name;
+        }
     }
 }

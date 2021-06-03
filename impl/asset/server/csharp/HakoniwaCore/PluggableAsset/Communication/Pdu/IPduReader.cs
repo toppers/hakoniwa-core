@@ -11,6 +11,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
         bool IsValidData();
         void SetConverter(IPduReaderConverter cnv);
         void Set(IPduCommData data);
+        string GetIoKey();
         IPduCommData Get();
         IPduReadOperation GetReadOps();
         IPduWriteOperation GetWriteOps();

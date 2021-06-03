@@ -32,8 +32,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Udp
             thread.Start();
         }
 
-
-        IPduCommData IIoReader.Recv()
+        public IPduCommData Recv(string io_key)
         {
             lock (this.lockObj)
             {

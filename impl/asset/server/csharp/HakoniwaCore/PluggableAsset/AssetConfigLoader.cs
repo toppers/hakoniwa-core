@@ -156,6 +156,42 @@ namespace Hakoniwa.PluggableAsset
             }
             return null;
         }
+
+        private static object ClassLoader(string path, string class_name, string arg1)
+        {
+            Type typeinfo = null;
+            SimpleLogger.Get().Log(Level.INFO, "path=" + path + " class_name=" + class_name + " arg1=" + arg1);
+            if (path == null)
+            {
+                try
+                {
+                    typeinfo = Type.GetType(class_name);
+                    SimpleLogger.Get().Log(Level.INFO, "load typeinfo" + typeinfo);
+                } catch (Exception)
+                {
+                    throw new InvalidDataException("ERROR: can not found class_name=" + class_name);
+                }
+            }
+            else
+            {
+                var asm = Assembly.LoadFrom(path);
+                typeinfo = asm.GetType(class_name);
+                if (typeinfo == null)
+                {
+                    throw new InvalidDataException("ERROR: can not found class=" + class_name);
+                }
+            }
+            if (arg1 == null)
+            {
+                SimpleLogger.Get().Log(Level.INFO, "activate class_name=" + class_name);
+                return Activator.CreateInstance(typeinfo);
+            }
+            else
+            {
+                return Activator.CreateInstance(typeinfo, arg1);
+
+            }
+        }
         public static void Load(string filepath)
         {
             try
@@ -173,64 +209,32 @@ namespace Hakoniwa.PluggableAsset
             foreach (var pdu in core_config.pdu_writers)
             {
                 IPduWriter ipdu = null;
-                if (pdu.class_name.Equals("Ev3PduWriter"))
-                {
-                    ipdu = new Ev3PduWriter(pdu.name);
-                }
-                else if (pdu.path != null)
-                {
-                    var asm = Assembly.LoadFrom(pdu.path);
-                    if (asm == null)
-                    {
-                        throw new InvalidDataException("ERROR: can not found path=" + pdu.path);
-                    }
-                    var typeInfo = asm.GetType(pdu.class_name);
-                    if (typeInfo == null)
-                    {
-                        throw new InvalidDataException("ERROR: can not found class=" + pdu.class_name);
-                    }
-                    ipdu = Activator.CreateInstance(typeInfo, pdu.name) as IPduWriter;
-                    SimpleLogger.Get().Log(Level.INFO, "pdu writer loaded:" + pdu.class_name);
-                }
+                ipdu = AssetConfigLoader.ClassLoader(pdu.path, pdu.class_name, pdu.name) as IPduWriter;
+                SimpleLogger.Get().Log(Level.INFO, "pdu writer loaded:" + pdu.class_name);
                 if (ipdu == null)
                 {
                     throw new InvalidDataException("ERROR: can not found classname=" + pdu.class_name);
                 }
-                if (pdu.conv_class_name != null && pdu.conv_class_name.Equals("Ev3PduWriterProtobufConverter")) {
-                    ipdu.SetConverter(new Ev3PduWriterProtobufConverter());
+                if (pdu.conv_class_name != null)
+                {
+                    IPduWriterConverter conv = AssetConfigLoader.ClassLoader(null, pdu.conv_class_name, null) as IPduWriterConverter;
+                    ipdu.SetConverter(conv);
                 }
-
                 AssetConfigLoader.pdu_writers.Add(ipdu);
             }
             //reader pdu configs
             foreach (var pdu in core_config.pdu_readers)
             {
                 IPduReader ipdu = null;
-                if (pdu.class_name.Equals("Ev3PduReader"))
-                {
-                    ipdu = new Ev3PduReader(pdu.name);
-                }
-                else if (pdu.path != null)
-                {
-                    var asm = Assembly.LoadFrom(pdu.path);
-                    if (asm == null)
-                    {
-                        throw new InvalidDataException("ERROR: can not found path=" + pdu.path);
-                    }
-                    var typeInfo = asm.GetType(pdu.class_name);
-                    if (typeInfo == null)
-                    {
-                        throw new InvalidDataException("ERROR: can not found class=" + pdu.class_name);
-                    }
-                    ipdu = Activator.CreateInstance(typeInfo, pdu.name) as IPduReader;
-                    SimpleLogger.Get().Log(Level.INFO, "pdu reader loaded:" + pdu.class_name);
-                }
+                ipdu = AssetConfigLoader.ClassLoader(pdu.path, pdu.class_name, pdu.name) as IPduReader;
+                SimpleLogger.Get().Log(Level.INFO, "pdu reader loaded:" + pdu.class_name);
                 if (ipdu == null)
                 {
                     throw new InvalidDataException("ERROR: can not found classname=" + pdu.class_name);
                 }
-                if (pdu.conv_class_name != null && pdu.conv_class_name.Equals("Ev3PduReaderProtobufConverter")) {
-                    ipdu.SetConverter(new Ev3PduReaderProtobufConverter());
+                if (pdu.conv_class_name != null) {
+                    IPduReaderConverter conv = AssetConfigLoader.ClassLoader(pdu.conv_path, pdu.conv_class_name, null) as IPduReaderConverter;
+                    ipdu.SetConverter(conv);
                 }
                 AssetConfigLoader.pdu_readers.Add(ipdu);
             }
@@ -375,9 +379,9 @@ namespace Hakoniwa.PluggableAsset
             foreach (var asset in core_config.outside_assets)
             {
                 IOutsideAssetController controller = null;
-                if (asset.class_name.Equals("Ev3MiconAssetController"))
+                if (asset.class_name != null)
                 {
-                    controller = new Ev3MiconAssetController(asset.name);
+                    controller = AssetConfigLoader.ClassLoader(null, asset.class_name, asset.name) as IOutsideAssetController;
                 }
                 if (controller == null)
                 {

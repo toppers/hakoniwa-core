@@ -15,6 +15,8 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.ROS
         public RosTopicWriter(RosTopicConfig config)
         {
             this.ros_config = config;
+            this.Name = config.name;
+            this.io = config.ros_topic_io;
         }
 
         public string GetName()

@@ -6,15 +6,17 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.ROS
 {
     public class RosTopicPduWriter : IPduWriter
     {
+        private string name;
         private string topic_name;
         private string topic_msg_type;
         private Pdu pdu;
         private IPduWriterConverter converter = null;
 
-        public RosTopicPduWriter(Pdu arg_pdu, string name, string msg_type)
+        public RosTopicPduWriter(Pdu arg_pdu, string name, string tname, string msg_type)
         {
+            this.name = name;
             this.pdu = arg_pdu;
-            this.topic_name = name;
+            this.topic_name = tname;
             this.topic_msg_type = msg_type;
         }
 
@@ -31,6 +33,10 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.ROS
         }
 
         public string GetName()
+        {
+            return this.name;
+        }
+        public string GetTopicName()
         {
             return this.topic_name;
         }

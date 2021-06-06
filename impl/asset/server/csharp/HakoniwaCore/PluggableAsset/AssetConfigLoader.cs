@@ -101,6 +101,10 @@ namespace Hakoniwa.PluggableAsset
         }
         private static IIoWriter GetIoWriter(string name)
         {
+            if (io_writers == null)
+            {
+                return null;
+            }
             foreach (var e in io_writers)
             {
                 if (e.GetName().Equals(name))
@@ -277,7 +281,7 @@ namespace Hakoniwa.PluggableAsset
                 SimpleLogger.Get().Log(Level.INFO, "type:" + e.type + " field:" + e.name + " off=" + off);
                 off += size;
             }
-            Pdu pdu = new Pdu(pdu_config, size);
+            Pdu pdu = new Pdu(pdu_config, off);
             pdu.SetName(config.pdu_config_name);
             AssetConfigLoader.pdus.Add(pdu);
         }
@@ -328,7 +332,7 @@ namespace Hakoniwa.PluggableAsset
                     }
                     RosTopicMessageConfig cfg = AssetConfigLoader.GetRosTopic(pdu.topic_message_name);
                     Type typeinfo = AssetConfigLoader.GetType(pdu.path, pdu.class_name);
-                    ipdu = Activator.CreateInstance(typeinfo, topic, cfg.topic_message_name, cfg.topic_type_name) as IPduWriter;
+                    ipdu = Activator.CreateInstance(typeinfo, topic, pdu.name, cfg.topic_message_name, cfg.topic_type_name) as IPduWriter;
                     if (pdu.conv_class_name != null)
                     {
                         IPduWriterConverter conv = AssetConfigLoader.ClassLoader(null, pdu.conv_class_name, null) as IPduWriterConverter;

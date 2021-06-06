@@ -32,6 +32,34 @@ namespace Hakoniwa.PluggableAsset
         private static List<ReaderConnector> reader_connectors = new List<ReaderConnector>();
         private static List<PduChannelConnector> pdu_channel_connectors = new List<PduChannelConnector>();
         private static List<PduIoConnector> pdu_io_connectors = new List<PduIoConnector>();
+        private static List<Pdu> pdus = new List<Pdu>();
+
+        public static Pdu GetPdu(string name)
+        {
+            foreach (var e in pdus)
+            {
+                if (e.GetName().Equals(name))
+                {
+                    return e;
+                }
+            }
+            return null;
+        }
+        public static RosTopicMessageConfig GetRosTopic(string config_name)
+        {
+            if (core_config.ros_topics == null)
+            {
+                throw new ArgumentException("Can not found ros_topics");
+            }
+            foreach(var e in core_config.ros_topics)
+            {
+                if (e.topic_message_name.Equals(config_name))
+                {
+                    return e;
+                }
+            }
+            return null;
+        }
 
         private static PduChannelConnector GetPduChannelConnector(string name)
         {
@@ -158,10 +186,10 @@ namespace Hakoniwa.PluggableAsset
             return null;
         }
 
-        private static object ClassLoader(string path, string class_name, string arg1)
+        private static Type GetType(string path, string class_name)
         {
             Type typeinfo = null;
-            SimpleLogger.Get().Log(Level.INFO, "path=" + path + " class_name=" + class_name + " arg1=" + arg1);
+            SimpleLogger.Get().Log(Level.INFO, "path=" + path + " class_name=" + class_name);
             if (path == null)
             {
                 try
@@ -177,7 +205,8 @@ namespace Hakoniwa.PluggableAsset
                         }
                     }
                     SimpleLogger.Get().Log(Level.INFO, "load typeinfo" + typeinfo);
-                } catch (Exception)
+                }
+                catch (Exception)
                 {
                     throw new InvalidDataException("ERROR: can not found class_name=" + class_name);
                 }
@@ -191,6 +220,12 @@ namespace Hakoniwa.PluggableAsset
                     throw new InvalidDataException("ERROR: can not found class=" + class_name);
                 }
             }
+            return typeinfo;
+        }
+
+        private static object ClassLoader(string path, string class_name, string arg1)
+        {
+            Type typeinfo = AssetConfigLoader.GetType(path, class_name);
             if (arg1 == null)
             {
                 SimpleLogger.Get().Log(Level.INFO, "activate class_name=" + class_name);
@@ -201,6 +236,50 @@ namespace Hakoniwa.PluggableAsset
                 return Activator.CreateInstance(typeinfo, arg1);
 
             }
+        }
+        private static int GetTypeSize(string typename)
+        {
+            switch (typename)
+            {
+                case "float":
+                    return sizeof(float);
+                case "doulbe":
+                    return sizeof(double);
+                case "Int8":
+                    return sizeof(SByte);
+                case "UInt8":
+                    return sizeof(Byte);
+                case "Int16":
+                    return sizeof(Int16);
+                case "UInt16":
+                    return sizeof(UInt16);
+                case "Int32":
+                    return sizeof(Int32);
+                case "UInt32":
+                    return sizeof(UInt32);
+                case "Int64":
+                    return sizeof(Int64);
+                case "UInt64":
+                    return sizeof(UInt64);
+                default:
+                    throw new ArgumentException("Invalid typename:" + typename);
+            }
+        }
+        private static void LoadPdu(PduDataConfig config)
+        {
+            PduConfig pdu_config = new PduConfig(0);
+            int size = 0;
+            int off = 0;
+            foreach (var e in config.fields)
+            {
+                size = GetTypeSize(e.type);
+                pdu_config.SetOffset(e.name, off, size);
+                SimpleLogger.Get().Log(Level.INFO, "type:" + e.type + " field:" + e.name + " off=" + off);
+                off += size;
+            }
+            Pdu pdu = new Pdu(pdu_config, size);
+            pdu.SetName(config.pdu_config_name);
+            AssetConfigLoader.pdus.Add(pdu);
         }
         public static void Load(string filepath)
         {
@@ -215,22 +294,55 @@ namespace Hakoniwa.PluggableAsset
                 SimpleLogger.Get().Log(Level.ERROR, e);
                 throw e;
             }
+            if (core_config.pdu_configs != null)
+            {
+                foreach (var cfg in core_config.pdu_configs)
+                {
+                    AssetConfigLoader.LoadPdu(cfg);
+                }
+            }
             //writer pdu configs
             foreach (var pdu in core_config.pdu_writers)
             {
                 IPduWriter ipdu = null;
-                ipdu = AssetConfigLoader.ClassLoader(pdu.path, pdu.class_name, pdu.name) as IPduWriter;
-                SimpleLogger.Get().Log(Level.INFO, "pdu writer loaded:" + pdu.class_name);
-                if (ipdu == null)
+                if (pdu.topic_message_name == null)
                 {
-                    throw new InvalidDataException("ERROR: can not found classname=" + pdu.class_name);
+                    ipdu = AssetConfigLoader.ClassLoader(pdu.path, pdu.class_name, pdu.name) as IPduWriter;
+                    SimpleLogger.Get().Log(Level.INFO, "pdu writer loaded:" + pdu.class_name);
+                    if (ipdu == null)
+                    {
+                        throw new InvalidDataException("ERROR: can not found classname=" + pdu.class_name);
+                    }
+                    if (pdu.conv_class_name != null)
+                    {
+                        IPduWriterConverter conv = AssetConfigLoader.ClassLoader(null, pdu.conv_class_name, null) as IPduWriterConverter;
+                        ipdu.SetConverter(conv);
+                    }
                 }
-                if (pdu.conv_class_name != null)
+                else
                 {
-                    IPduWriterConverter conv = AssetConfigLoader.ClassLoader(null, pdu.conv_class_name, null) as IPduWriterConverter;
-                    ipdu.SetConverter(conv);
+                    Pdu topic = AssetConfigLoader.GetPdu(pdu.pdu_config_name);
+                    if (topic == null)
+                    {
+                        throw new InvalidDataException("ERROR: can not found pdu=" + pdu.name);
+                    }
+                    RosTopicMessageConfig cfg = AssetConfigLoader.GetRosTopic(pdu.topic_message_name);
+                    Type typeinfo = AssetConfigLoader.GetType(pdu.path, pdu.class_name);
+                    ipdu = Activator.CreateInstance(typeinfo, topic, cfg.topic_message_name, cfg.topic_type_name) as IPduWriter;
+                    if (pdu.conv_class_name != null)
+                    {
+                        IPduWriterConverter conv = AssetConfigLoader.ClassLoader(null, pdu.conv_class_name, null) as IPduWriterConverter;
+                        ipdu.SetConverter(conv);
+                    }
+                    else
+                    {
+                        throw new InvalidDataException("ERROR: can not found conv_class_name=" + pdu.conv_class_name);
+                    }
                 }
-                AssetConfigLoader.pdu_writers.Add(ipdu);
+                if (ipdu != null)
+                {
+                    AssetConfigLoader.pdu_writers.Add(ipdu);
+                }
             }
             //reader pdu configs
             foreach (var pdu in core_config.pdu_readers)

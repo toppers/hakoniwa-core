@@ -10,6 +10,16 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
         private byte[] buffer;
         private IPduReadOperation rdops;
         private IPduWriteOperation wrops;
+        private string name = null;
+
+        public void SetName(string arg_name)
+        {
+            this.name = arg_name;
+        }
+        public string GetName()
+        {
+            return this.name;
+        }
 
         public Pdu(PduConfig config, int size)
         {

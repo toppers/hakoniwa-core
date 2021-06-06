@@ -75,5 +75,10 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
         {
             return BitConverter.ToUInt16(this.buffer, pdu_config.GetOffset(field_name));
         }
+
+        public float GetDataFloat(string field_name)
+        {
+            return BitConverter.ToSingle(this.buffer, pdu_config.GetOffset(field_name));
+        }
     }
 }

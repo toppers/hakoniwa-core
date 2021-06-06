@@ -12,6 +12,11 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.ROS
         
         public string Name { get; internal set; }
 
+        public RosTopicWriter(RosTopicConfig config)
+        {
+            this.ros_config = config;
+        }
+
         public string GetName()
         {
             return this.Name;

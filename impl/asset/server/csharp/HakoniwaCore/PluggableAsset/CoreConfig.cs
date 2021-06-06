@@ -17,7 +17,7 @@ namespace Hakoniwa.PluggableAsset
         public PduReaderConfig[] pdu_readers;
         public UdpMethodConfig[] udp_methods;
         public MmapMethodConfig[] mmap_methods;
-        public RosTopicMethodConfig ros_topic_methods;
+        public RosTopicMethodConfig ros_topic_method;
         public ReaderConnectorConfig[] reader_connectors;
         public WriterConnectorConfig[] writer_connectors;
         public PduChannelConnectorConfig[] pdu_channel_connectors;
@@ -78,12 +78,12 @@ namespace Hakoniwa.PluggableAsset
     [System.Serializable]
     public class RosTopicMethodConfig
     {
-        public string topic_io_class_name;
-        public RosTopicConfig[] pubs;
-        public RosTopicConfig[] subs;
+        public string name;
+        public string class_name;
+        public string path;
     }
     [System.Serializable]
-    public class RosTopicConfig
+    public class RosTopicMessageConfig
     {
         public string topic_name;
         public string topic_type_name;

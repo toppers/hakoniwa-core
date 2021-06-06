@@ -6,6 +6,7 @@ using Hakoniwa.PluggableAsset.Communication.Channel;
 using Hakoniwa.PluggableAsset.Communication.Connector;
 using Hakoniwa.PluggableAsset.Communication.Method;
 using Hakoniwa.PluggableAsset.Communication.Method.Mmap;
+using Hakoniwa.PluggableAsset.Communication.Method.ROS;
 using Hakoniwa.PluggableAsset.Communication.Method.Udp;
 using Hakoniwa.PluggableAsset.Communication.Pdu;
 using Hakoniwa.PluggableAsset.Communication.Pdu.Ev3;
@@ -166,6 +167,15 @@ namespace Hakoniwa.PluggableAsset
                 try
                 {
                     typeinfo = Type.GetType(class_name);
+                    if (typeinfo == null)
+                    {
+                        //see:https://freelyapps.net/unityengine-types-can-no-longer-be-used/
+                        typeinfo = System.Reflection.Assembly.Load("Assembly-CSharp").GetType(class_name);
+                        if (typeinfo == null)
+                        {
+                            throw new InvalidDataException("ERROR: can not found class=" + class_name);
+                        }
+                    }
                     SimpleLogger.Get().Log(Level.INFO, "load typeinfo" + typeinfo);
                 } catch (Exception)
                 {
@@ -287,6 +297,22 @@ namespace Hakoniwa.PluggableAsset
                         AssetConfigLoader.io_writers.Add(real_method);
                     }
                 }
+            }
+            if (core_config.ros_topic_method != null)
+            {
+                IRosTopicIo ros_topic_io = AssetConfigLoader.ClassLoader(core_config.ros_topic_method.path, 
+                    core_config.ros_topic_method.class_name, null) as IRosTopicIo;
+                if (ros_topic_io == null)
+                {
+                    throw new InvalidDataException("ERROR: can not found classname=" + core_config.ros_topic_method.class_name);
+                }
+                SimpleLogger.Get().Log(Level.INFO, "ros topic io loaded:" + core_config.ros_topic_method.class_name);
+
+                RosTopicConfig config = new RosTopicConfig(core_config.ros_topic_method.name, ros_topic_io);
+                RosTopicWriter writer = new RosTopicWriter(config);
+                AssetConfigLoader.io_writers.Add(writer);
+
+                //TODO reader
             }
 
 

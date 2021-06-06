@@ -91,5 +91,11 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
             byte[] tmp_buf = System.Text.Encoding.ASCII.GetBytes(value);
             Buffer.BlockCopy(tmp_buf, 0, this.buffer, pdu_config.GetHeaderOffset(field_name), tmp_buf.Length);
         }
+
+        public void SetData(string field_name, float value)
+        {
+            byte[] tmp_buf = BitConverter.GetBytes(value);
+            Buffer.BlockCopy(tmp_buf, 0, this.buffer, pdu_config.GetOffset(field_name), tmp_buf.Length);
+        }
     }
 }

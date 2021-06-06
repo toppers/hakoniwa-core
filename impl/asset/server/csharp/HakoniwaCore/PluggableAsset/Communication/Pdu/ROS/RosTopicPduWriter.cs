@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Hakoniwa.PluggableAsset.Communication.Pdu.ROS
 {
-    class RosTopicPduWriter : IPduWriter
+    public class RosTopicPduWriter : IPduWriter
     {
         private string topic_name;
         private string topic_msg_type;
@@ -33,6 +33,10 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.ROS
         public string GetName()
         {
             return this.topic_name;
+        }
+        public string GetTypeName()
+        {
+            return this.topic_msg_type;
         }
 
         public IPduReadOperation GetReadOps()

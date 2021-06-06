@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Hakoniwa.PluggableAsset.Communication.Method.ROS
 {
-    interface IRosTopicIo
+    public interface IRosTopicIo
     {
         void Publish(IPduCommTypedData data);
         IPduCommTypedData Recv(string topic_name);

@@ -18,6 +18,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
         void SetData(string field_name, UInt64 value);
         void SetData(string field_name, Int64 value);
         void SetData(string field_name, double value);
+        void SetData(string field_name, float value);
         void SetData(string field_name, byte[] value);
     }
 }

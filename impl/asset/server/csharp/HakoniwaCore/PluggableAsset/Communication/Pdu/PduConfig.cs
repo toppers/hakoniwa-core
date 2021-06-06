@@ -16,7 +16,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
             this.size = size;
         }
     }
-    class PduConfig
+    public class PduConfig
     {
         private int base_offset;
         private List<PduFieldType> header_fields = new List<PduFieldType>();

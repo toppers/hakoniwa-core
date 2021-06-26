@@ -249,25 +249,25 @@ namespace Hakoniwa.PluggableAsset
         {
             switch (typename)
             {
-                case "float":
+                case "float32":
                     return sizeof(float);
-                case "doulbe":
+                case "float64":
                     return sizeof(double);
-                case "Int8":
+                case "int8":
                     return sizeof(SByte);
-                case "UInt8":
+                case "uint8":
                     return sizeof(Byte);
-                case "Int16":
+                case "int16":
                     return sizeof(Int16);
-                case "UInt16":
+                case "uint16":
                     return sizeof(UInt16);
-                case "Int32":
+                case "int32":
                     return sizeof(Int32);
-                case "UInt32":
+                case "uint32":
                     return sizeof(UInt32);
-                case "Int64":
+                case "int64":
                     return sizeof(Int64);
-                case "UInt64":
+                case "uint64":
                     return sizeof(UInt64);
                 default:
                     throw new ArgumentException("Invalid typename:" + typename);
@@ -557,19 +557,22 @@ namespace Hakoniwa.PluggableAsset
                 }
             }
             //outside asset configs
-            foreach (var asset in core_config.outside_assets)
+            if (core_config.outside_assets != null)
             {
-                IOutsideAssetController controller = null;
-                if (asset.class_name != null)
+                foreach (var asset in core_config.outside_assets)
                 {
-                    controller = AssetConfigLoader.ClassLoader(null, asset.class_name, asset.name) as IOutsideAssetController;
+                    IOutsideAssetController controller = null;
+                    if (asset.class_name != null)
+                    {
+                        controller = AssetConfigLoader.ClassLoader(null, asset.class_name, asset.name) as IOutsideAssetController;
+                    }
+                    if (controller == null)
+                    {
+                        throw new InvalidDataException("ERROR: can not found classname=" + asset.class_name);
+                    }
+                    SimpleLogger.Get().Log(Level.INFO, "OutSideAsset :" + asset.name);
+                    AssetConfigLoader.AddOutsideAsset(controller);
                 }
-                if (controller == null)
-                {
-                    throw new InvalidDataException("ERROR: can not found classname=" + asset.class_name);
-                }
-                SimpleLogger.Get().Log(Level.INFO, "OutSideAsset :" + asset.name);
-                AssetConfigLoader.AddOutsideAsset(controller);
             }
         }
     }

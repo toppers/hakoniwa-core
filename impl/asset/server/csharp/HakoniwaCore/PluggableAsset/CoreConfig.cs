@@ -60,6 +60,7 @@ namespace Hakoniwa.PluggableAsset
         public string conv_class_name;
         public string path;
         public string conv_path;
+        public string pdu_config_name;
         public string topic_message_name;
     }
 

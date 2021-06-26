@@ -90,6 +90,10 @@ namespace Hakoniwa.PluggableAsset
         }
         private static IIoReader GetIoReader(string name)
         {
+            if (io_readers == null)
+            {
+                return null;
+            }
             foreach (var e in io_readers)
             {
                 if (e.GetName().Equals(name))
@@ -352,17 +356,46 @@ namespace Hakoniwa.PluggableAsset
             foreach (var pdu in core_config.pdu_readers)
             {
                 IPduReader ipdu = null;
-                ipdu = AssetConfigLoader.ClassLoader(pdu.path, pdu.class_name, pdu.name) as IPduReader;
-                SimpleLogger.Get().Log(Level.INFO, "pdu reader loaded:" + pdu.class_name);
-                if (ipdu == null)
+                if (pdu.topic_message_name == null)
                 {
-                    throw new InvalidDataException("ERROR: can not found classname=" + pdu.class_name);
+                    ipdu = AssetConfigLoader.ClassLoader(pdu.path, pdu.class_name, pdu.name) as IPduReader;
+                    SimpleLogger.Get().Log(Level.INFO, "pdu writer loaded:" + pdu.class_name);
+                    if (ipdu == null)
+                    {
+                        throw new InvalidDataException("ERROR: can not found classname=" + pdu.class_name);
+                    }
+                    if (pdu.conv_class_name != null)
+                    {
+                        IPduReaderConverter conv = AssetConfigLoader.ClassLoader(pdu.conv_path, pdu.conv_class_name, null) as IPduReaderConverter;
+                        ipdu.SetConverter(conv);
+                    }
                 }
-                if (pdu.conv_class_name != null) {
-                    IPduReaderConverter conv = AssetConfigLoader.ClassLoader(pdu.conv_path, pdu.conv_class_name, null) as IPduReaderConverter;
-                    ipdu.SetConverter(conv);
+                else
+                {
+                    Pdu topic = AssetConfigLoader.GetPdu(pdu.pdu_config_name);
+                    if (topic == null)
+                    {
+                        throw new InvalidDataException("ERROR: can not found pdu=" + pdu.name);
+                    }
+                    SimpleLogger.Get().Log(Level.INFO, "ros topic pdu reader name = " + pdu.name);
+                    RosTopicMessageConfig cfg = AssetConfigLoader.GetRosTopic(pdu.topic_message_name);
+                    Type typeinfo = AssetConfigLoader.GetType(pdu.path, pdu.class_name);
+                    ipdu = Activator.CreateInstance(typeinfo, topic, pdu.name, cfg.topic_message_name, cfg.topic_type_name) as IPduReader;
+                    if (pdu.conv_class_name != null)
+                    {
+                        IPduReaderConverter conv = AssetConfigLoader.ClassLoader(null, pdu.conv_class_name, null) as IPduReaderConverter;
+                        ipdu.SetConverter(conv);
+                    }
+                    else
+                    {
+                        throw new InvalidDataException("ERROR: can not found conv_class_name=" + pdu.conv_class_name);
+                    }
                 }
-                AssetConfigLoader.pdu_readers.Add(ipdu);
+                if (ipdu != null)
+                {
+                    SimpleLogger.Get().Log(Level.INFO, "pdu reader name = " + ipdu.GetName());
+                    AssetConfigLoader.pdu_readers.Add(ipdu);
+                }
             }
             if (core_config.udp_methods != null)
             {
@@ -429,17 +462,23 @@ namespace Hakoniwa.PluggableAsset
                 AssetConfigLoader.io_writers.Add(writer);
 
                 //TODO reader
+                RosTopicReader reader = new RosTopicReader(config);
+                SimpleLogger.Get().Log(Level.INFO, "ros topic reader name=" + reader.GetName());
+                AssetConfigLoader.io_readers.Add(reader);
+
             }
 
 
             //reader connectors configs
             foreach (var connector in core_config.reader_connectors)
             {
+                SimpleLogger.Get().Log(Level.INFO, "reader connector method_name=" + connector.method_name);
                 var method = AssetConfigLoader.GetIoReader(connector.method_name);
                 if (method == null)
                 {
                     throw new InvalidDataException("ERROR: can not found connector method_name=" + connector.method_name);
                 }
+                SimpleLogger.Get().Log(Level.INFO, "reader connector pdu_name=" + connector.pdu_name);
                 var pdu = AssetConfigLoader.GetIpduReader(connector.pdu_name);
                 if (pdu == null)
                 {

@@ -4,18 +4,20 @@ using System.Text;
 
 namespace Hakoniwa.PluggableAsset.Communication.Pdu.ROS
 {
-    class RosTopicPduReader : IPduReader
+    public class RosTopicPduReader : IPduReader
     {
+        private string name;
         private string topic_name;
         private string topic_msg_type;
         private Pdu pdu;
         private IPduReaderConverter converter = null;
         private bool is_set = false;
 
-        public RosTopicPduReader(Pdu arg_pdu, string name, string msg_type)
+        public RosTopicPduReader(Pdu arg_pdu, string name, string tname, string msg_type)
         {
             this.pdu = arg_pdu;
-            this.topic_name = name;
+            this.name = name;
+            this.topic_name = tname;
             this.topic_msg_type = msg_type;
         }
 
@@ -35,10 +37,18 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.ROS
         {
             return this.topic_name;
         }
+        public string GetTopicName()
+        {
+            return this.topic_name;
+        }
+        public string GetTypeName()
+        {
+            return this.topic_msg_type;
+        }
 
         public string GetName()
         {
-            return this.topic_name;
+            return this.name;
         }
 
         public IPduReadOperation GetReadOps()
@@ -71,7 +81,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.ROS
             {
                 return;
             }
-            if (data.GetType() == typeof(IPduCommTypedData))
+            if (data is IPduCommTypedData)
             {
                 typedData = (IPduCommTypedData)data;
             }

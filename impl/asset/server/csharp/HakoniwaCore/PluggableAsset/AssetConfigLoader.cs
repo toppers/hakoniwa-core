@@ -6,6 +6,7 @@ using Hakoniwa.PluggableAsset.Communication.Channel;
 using Hakoniwa.PluggableAsset.Communication.Connector;
 using Hakoniwa.PluggableAsset.Communication.Method;
 using Hakoniwa.PluggableAsset.Communication.Method.Mmap;
+using Hakoniwa.PluggableAsset.Communication.Method.ROS;
 using Hakoniwa.PluggableAsset.Communication.Method.Udp;
 using Hakoniwa.PluggableAsset.Communication.Pdu;
 using Hakoniwa.PluggableAsset.Communication.Pdu.Ev3;
@@ -31,6 +32,35 @@ namespace Hakoniwa.PluggableAsset
         private static List<ReaderConnector> reader_connectors = new List<ReaderConnector>();
         private static List<PduChannelConnector> pdu_channel_connectors = new List<PduChannelConnector>();
         private static List<PduIoConnector> pdu_io_connectors = new List<PduIoConnector>();
+        private static List<Pdu> pdus = new List<Pdu>();
+
+        public static Pdu GetPdu(string name)
+        {
+            foreach (var e in pdus)
+            {
+                if (e.GetName().Equals(name))
+                {
+                    return e;
+                }
+            }
+            return null;
+        }
+
+        public static RosTopicMessageConfig GetRosTopic(string config_name)
+        {
+            if (core_config.ros_topics == null)
+            {
+                throw new ArgumentException("Can not found ros_topics");
+            }
+            foreach(var e in core_config.ros_topics)
+            {
+                if (e.topic_message_name.Equals(config_name))
+                {
+                    return e;
+                }
+            }
+            return null;
+        }
 
         private static PduChannelConnector GetPduChannelConnector(string name)
         {
@@ -61,6 +91,10 @@ namespace Hakoniwa.PluggableAsset
         }
         private static IIoReader GetIoReader(string name)
         {
+            if (io_readers == null)
+            {
+                return null;
+            }
             foreach (var e in io_readers)
             {
                 if (e.GetName().Equals(name))
@@ -72,6 +106,10 @@ namespace Hakoniwa.PluggableAsset
         }
         private static IIoWriter GetIoWriter(string name)
         {
+            if (io_writers == null)
+            {
+                return null;
+            }
             foreach (var e in io_writers)
             {
                 if (e.GetName().Equals(name))
@@ -156,6 +194,117 @@ namespace Hakoniwa.PluggableAsset
             }
             return null;
         }
+
+        private static Type GetType(string path, string class_name)
+        {
+            Type typeinfo = null;
+            SimpleLogger.Get().Log(Level.INFO, "path=" + path + " class_name=" + class_name);
+            if (path == null)
+            {
+                try
+                {
+                    typeinfo = Type.GetType(class_name);
+                    if (typeinfo == null)
+                    {
+                        //see:https://freelyapps.net/unityengine-types-can-no-longer-be-used/
+                        typeinfo = System.Reflection.Assembly.Load("Assembly-CSharp").GetType(class_name);
+                        if (typeinfo == null)
+                        {
+                            throw new InvalidDataException("ERROR: can not found class=" + class_name);
+                        }
+                    }
+                    SimpleLogger.Get().Log(Level.INFO, "load typeinfo" + typeinfo);
+                }
+                catch (Exception)
+                {
+                    throw new InvalidDataException("ERROR: can not found class_name=" + class_name);
+                }
+            }
+            else
+            {
+                var asm = Assembly.LoadFrom(path);
+                typeinfo = asm.GetType(class_name);
+                if (typeinfo == null)
+                {
+                    throw new InvalidDataException("ERROR: can not found class=" + class_name);
+                }
+            }
+            return typeinfo;
+        }
+
+        private static object ClassLoader(string path, string class_name, string arg1)
+        {
+            Type typeinfo = AssetConfigLoader.GetType(path, class_name);
+            if (arg1 == null)
+            {
+                SimpleLogger.Get().Log(Level.INFO, "activate class_name=" + class_name);
+                return Activator.CreateInstance(typeinfo);
+            }
+            else
+            {
+                return Activator.CreateInstance(typeinfo, arg1);
+
+            }
+        }
+        private static int GetTypeSize(string typename)
+        {
+            switch (typename)
+            {
+                case "float32":
+                    return sizeof(float);
+                case "float64":
+                    return sizeof(double);
+                case "int8":
+                    return sizeof(SByte);
+                case "uint8":
+                    return sizeof(Byte);
+                case "int16":
+                    return sizeof(Int16);
+                case "uint16":
+                    return sizeof(UInt16);
+                case "int32":
+                    return sizeof(Int32);
+                case "uint32":
+                    return sizeof(UInt32);
+                case "int64":
+                    return sizeof(Int64);
+                case "uint64":
+                    return sizeof(UInt64);
+                default:
+                    throw new ArgumentException("Invalid typename:" + typename);
+            }
+        }
+        private static void LoadPdu(PduDataConfig config)
+        {
+            PduConfig pdu_config = new PduConfig(0);
+            int size = 0;
+            int off = 0;
+            if (config.pdu_data_field_path != null)
+            {
+                string jsonString = File.ReadAllText(config.pdu_data_field_path);
+                var container = JsonConvert.DeserializeObject<PduDataFieldsConfig>(jsonString);
+                foreach (var e in container.fields)
+                {
+                    size = GetTypeSize(e.type);
+                    pdu_config.SetOffset(e.name, off, size);
+                    SimpleLogger.Get().Log(Level.INFO, "type:" + e.type + " field:" + e.name + " off=" + off);
+                    off += size;
+                }
+            }
+            else
+            {
+                foreach (var e in config.fields)
+                {
+                    size = GetTypeSize(e.type);
+                    pdu_config.SetOffset(e.name, off, size);
+                    SimpleLogger.Get().Log(Level.INFO, "type:" + e.type + " field:" + e.name + " off=" + off);
+                    off += size;
+                }
+            }
+            Pdu pdu = new Pdu(pdu_config, off);
+            pdu.SetName(config.pdu_config_name);
+            AssetConfigLoader.pdus.Add(pdu);
+        }
         public static void Load(string filepath)
         {
             try
@@ -169,71 +318,106 @@ namespace Hakoniwa.PluggableAsset
                 SimpleLogger.Get().Log(Level.ERROR, e);
                 throw e;
             }
+            if (core_config.pdu_configs != null)
+            {
+                foreach (var cfg in core_config.pdu_configs)
+                {
+                    AssetConfigLoader.LoadPdu(cfg);
+                }
+            }
+            if (core_config.ros_topics_path != null)
+            {
+                string jsonString = File.ReadAllText(core_config.ros_topics_path);
+                var container = JsonConvert.DeserializeObject<RosTopicMessageConfigContainer>(jsonString);
+                core_config.ros_topics = container.fields;
+            }
             //writer pdu configs
             foreach (var pdu in core_config.pdu_writers)
             {
                 IPduWriter ipdu = null;
-                if (pdu.class_name.Equals("Ev3PduWriter"))
+                if (pdu.topic_message_name == null)
                 {
-                    ipdu = new Ev3PduWriter(pdu.name);
-                }
-                else if (pdu.class_name.Equals("Ev3PduProtobufWriter"))
-                {
-                    ipdu = new Ev3PduProtobufWriter(pdu.name);
-                }
-                else if (pdu.path != null)
-                {
-                    var asm = Assembly.LoadFrom(pdu.path);
-                    if (asm == null)
-                    {
-                        throw new InvalidDataException("ERROR: can not found path=" + pdu.path);
-                    }
-                    var typeInfo = asm.GetType(pdu.class_name);
-                    if (typeInfo == null)
-                    {
-                        throw new InvalidDataException("ERROR: can not found class=" + pdu.class_name);
-                    }
-                    ipdu = Activator.CreateInstance(typeInfo, pdu.name) as IPduWriter;
+                    ipdu = AssetConfigLoader.ClassLoader(pdu.path, pdu.class_name, pdu.name) as IPduWriter;
                     SimpleLogger.Get().Log(Level.INFO, "pdu writer loaded:" + pdu.class_name);
+                    if (ipdu == null)
+                    {
+                        throw new InvalidDataException("ERROR: can not found classname=" + pdu.class_name);
+                    }
+                    if (pdu.conv_class_name != null)
+                    {
+                        IPduWriterConverter conv = AssetConfigLoader.ClassLoader(null, pdu.conv_class_name, null) as IPduWriterConverter;
+                        ipdu.SetConverter(conv);
+                    }
                 }
-                if (ipdu == null)
+                else
                 {
-                    throw new InvalidDataException("ERROR: can not found classname=" + pdu.class_name);
+                    Pdu topic = AssetConfigLoader.GetPdu(pdu.pdu_config_name);
+                    if (topic == null)
+                    {
+                        throw new InvalidDataException("ERROR: can not found pdu=" + pdu.name);
+                    }
+                    RosTopicMessageConfig cfg = AssetConfigLoader.GetRosTopic(pdu.topic_message_name);
+                    Type typeinfo = AssetConfigLoader.GetType(pdu.path, pdu.class_name);
+                    ipdu = Activator.CreateInstance(typeinfo, topic, pdu.name, cfg.topic_message_name, cfg.topic_type_name) as IPduWriter;
+                    if (pdu.conv_class_name != null)
+                    {
+                        IPduWriterConverter conv = AssetConfigLoader.ClassLoader(null, pdu.conv_class_name, null) as IPduWriterConverter;
+                        ipdu.SetConverter(conv);
+                    }
+                    else
+                    {
+                        throw new InvalidDataException("ERROR: can not found conv_class_name=" + pdu.conv_class_name);
+                    }
                 }
-                AssetConfigLoader.pdu_writers.Add(ipdu);
+                if (ipdu != null)
+                {
+                    AssetConfigLoader.pdu_writers.Add(ipdu);
+                }
             }
             //reader pdu configs
             foreach (var pdu in core_config.pdu_readers)
             {
                 IPduReader ipdu = null;
-                if (pdu.class_name.Equals("Ev3PduReader"))
+                if (pdu.topic_message_name == null)
                 {
-                    ipdu = new Ev3PduReader(pdu.name);
-                }
-                else if (pdu.class_name.Equals("Ev3PduProtobufReader"))
-                {
-                    ipdu = new Ev3PduProtobufReader(pdu.name);
-                }
-                else if (pdu.path != null)
-                {
-                    var asm = Assembly.LoadFrom(pdu.path);
-                    if (asm == null)
+                    ipdu = AssetConfigLoader.ClassLoader(pdu.path, pdu.class_name, pdu.name) as IPduReader;
+                    SimpleLogger.Get().Log(Level.INFO, "pdu writer loaded:" + pdu.class_name);
+                    if (ipdu == null)
                     {
-                        throw new InvalidDataException("ERROR: can not found path=" + pdu.path);
+                        throw new InvalidDataException("ERROR: can not found classname=" + pdu.class_name);
                     }
-                    var typeInfo = asm.GetType(pdu.class_name);
-                    if (typeInfo == null)
+                    if (pdu.conv_class_name != null)
                     {
-                        throw new InvalidDataException("ERROR: can not found class=" + pdu.class_name);
+                        IPduReaderConverter conv = AssetConfigLoader.ClassLoader(pdu.conv_path, pdu.conv_class_name, null) as IPduReaderConverter;
+                        ipdu.SetConverter(conv);
                     }
-                    ipdu = Activator.CreateInstance(typeInfo, pdu.name) as IPduReader;
-                    SimpleLogger.Get().Log(Level.INFO, "pdu reader loaded:" + pdu.class_name);
                 }
-                if (ipdu == null)
+                else
                 {
-                    throw new InvalidDataException("ERROR: can not found classname=" + pdu.class_name);
+                    Pdu topic = AssetConfigLoader.GetPdu(pdu.pdu_config_name);
+                    if (topic == null)
+                    {
+                        throw new InvalidDataException("ERROR: can not found pdu=" + pdu.name);
+                    }
+                    SimpleLogger.Get().Log(Level.INFO, "ros topic pdu reader name = " + pdu.name);
+                    RosTopicMessageConfig cfg = AssetConfigLoader.GetRosTopic(pdu.topic_message_name);
+                    Type typeinfo = AssetConfigLoader.GetType(pdu.path, pdu.class_name);
+                    ipdu = Activator.CreateInstance(typeinfo, topic, pdu.name, cfg.topic_message_name, cfg.topic_type_name) as IPduReader;
+                    if (pdu.conv_class_name != null)
+                    {
+                        IPduReaderConverter conv = AssetConfigLoader.ClassLoader(null, pdu.conv_class_name, null) as IPduReaderConverter;
+                        ipdu.SetConverter(conv);
+                    }
+                    else
+                    {
+                        throw new InvalidDataException("ERROR: can not found conv_class_name=" + pdu.conv_class_name);
+                    }
                 }
-                AssetConfigLoader.pdu_readers.Add(ipdu);
+                if (ipdu != null)
+                {
+                    SimpleLogger.Get().Log(Level.INFO, "pdu reader name = " + ipdu.GetName());
+                    AssetConfigLoader.pdu_readers.Add(ipdu);
+                }
             }
             if (core_config.udp_methods != null)
             {
@@ -285,16 +469,36 @@ namespace Hakoniwa.PluggableAsset
                     }
                 }
             }
+            if (core_config.ros_topic_method != null)
+            {
+                IRosTopicIo ros_topic_io = AssetConfigLoader.ClassLoader(core_config.ros_topic_method.path, 
+                    core_config.ros_topic_method.class_name, null) as IRosTopicIo;
+                if (ros_topic_io == null)
+                {
+                    throw new InvalidDataException("ERROR: can not found classname=" + core_config.ros_topic_method.class_name);
+                }
+                SimpleLogger.Get().Log(Level.INFO, "ros topic io loaded:" + core_config.ros_topic_method.class_name);
+
+                RosTopicConfig config = new RosTopicConfig(core_config.ros_topic_method.name, ros_topic_io);
+                RosTopicWriter writer = new RosTopicWriter(config);
+                AssetConfigLoader.io_writers.Add(writer);
+
+                RosTopicReader reader = new RosTopicReader(config);
+                SimpleLogger.Get().Log(Level.INFO, "ros topic reader name=" + reader.GetName());
+                AssetConfigLoader.io_readers.Add(reader);
+            }
 
 
             //reader connectors configs
             foreach (var connector in core_config.reader_connectors)
             {
+                SimpleLogger.Get().Log(Level.INFO, "reader connector method_name=" + connector.method_name);
                 var method = AssetConfigLoader.GetIoReader(connector.method_name);
                 if (method == null)
                 {
                     throw new InvalidDataException("ERROR: can not found connector method_name=" + connector.method_name);
                 }
+                SimpleLogger.Get().Log(Level.INFO, "reader connector pdu_name=" + connector.pdu_name);
                 var pdu = AssetConfigLoader.GetIpduReader(connector.pdu_name);
                 if (pdu == null)
                 {
@@ -370,36 +574,25 @@ namespace Hakoniwa.PluggableAsset
                         }
                         connector.AddReader(pdu);
                     }
-                    if (asset.core_class_name != null)
-                    {
-                        IInsideAssetController controller = null;
-                        if (asset.core_class_name.Equals("Ev3ProtobufConverter"))
-                        {
-                            controller = new Ev3ProtobufConverter(asset.name);
-                        }
-                        if (controller == null)
-                        {
-                            throw new InvalidDataException("ERROR: can not found classname=" + asset.core_class_name);
-                        }
-                        SimpleLogger.Get().Log(Level.INFO, "InSideAsset :" + asset.name);
-                        AssetConfigLoader.AddInsideAsset(controller);
-                    }
                 }
             }
             //outside asset configs
-            foreach (var asset in core_config.outside_assets)
+            if (core_config.outside_assets != null)
             {
-                IOutsideAssetController controller = null;
-                if (asset.class_name.Equals("Ev3MiconAssetController"))
+                foreach (var asset in core_config.outside_assets)
                 {
-                    controller = new Ev3MiconAssetController(asset.name);
+                    IOutsideAssetController controller = null;
+                    if (asset.class_name != null)
+                    {
+                        controller = AssetConfigLoader.ClassLoader(null, asset.class_name, asset.name) as IOutsideAssetController;
+                    }
+                    if (controller == null)
+                    {
+                        throw new InvalidDataException("ERROR: can not found classname=" + asset.class_name);
+                    }
+                    SimpleLogger.Get().Log(Level.INFO, "OutSideAsset :" + asset.name);
+                    AssetConfigLoader.AddOutsideAsset(controller);
                 }
-                if (controller == null)
-                {
-                    throw new InvalidDataException("ERROR: can not found classname=" + asset.class_name);
-                }
-                SimpleLogger.Get().Log(Level.INFO, "OutSideAsset :" + asset.name);
-                AssetConfigLoader.AddOutsideAsset(controller);
             }
         }
     }

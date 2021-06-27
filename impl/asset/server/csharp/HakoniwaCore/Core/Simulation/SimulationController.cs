@@ -427,6 +427,13 @@ namespace Hakoniwa.Core.Simulation
             {
                 asset.RecvPdu();
             }
+            foreach (var connector in AssetConfigLoader.RefPduChannelConnector())
+            {
+                if ((connector.GetName() == null) && (connector.Reader != null))
+                {
+                    connector.Reader.Recv();
+                }
+            }
 
             /********************
              * Hakoniwa Time Sync

@@ -1,4 +1,5 @@
 ﻿using Hakoniwa.Core.Utils.Logger;
+using Hakoniwa.PluggableAsset.Communication.Pdu;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -31,7 +32,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Udp
             thread.Start();
         }
 
-        public byte[] Recv()
+        public IPduCommData Recv(string io_key)
         {
             lock (this.lockObj)
             {
@@ -44,7 +45,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Udp
                     byte[] tmp_buf = new byte[this.buffer.Length];
                     Buffer.BlockCopy(this.buffer, 0, tmp_buf, 0, buffer.Length);
                     //SimpleLogger.Get().Log(Level.DEBUG, "recv:" + buffer.Length);
-                    return tmp_buf;
+                    return new PduCommBinaryData(tmp_buf);
                 }
             }
         }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hakoniwa.PluggableAsset.Communication.Pdu;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -8,6 +9,6 @@ namespace Hakoniwa.PluggableAsset.Communication.Method
     {
         string GetName();
         void Initialize(IIoWriterConfig config);
-        void Flush(ref byte[] buffer);
+        void Flush(IPduCommData data);
     }
 }

@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Text;
 using Hakoniwa.Core.Utils.Logger;
+using Hakoniwa.PluggableAsset.Communication.Pdu;
 
 namespace Hakoniwa.PluggableAsset.Communication.Method.Mmap
 {
@@ -19,8 +20,20 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Mmap
         {
             return this.Name;
         }
-        public void Flush(ref byte[] buf)
+        public void Flush(IPduCommData data)
         {
+            PduCommBinaryData binary = null;
+
+            if (data is PduCommBinaryData)
+            {
+                binary = (PduCommBinaryData)data;
+            }
+            if (data == null)
+            {
+                throw new ArgumentException("Invalid data type");
+            }
+            byte[] buf = binary.GetData();
+
             //SimpleLogger.Get().Log(Level.INFO, "MmapWrite:file=" + mmap_config.filepath + " len=" + buf.Length);
             accessor.WriteArray<byte>(0, buf, 0, buf.Length);
         }

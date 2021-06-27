@@ -15,8 +15,12 @@ namespace Hakoniwa.PluggableAsset
         public OutsideAssetConfig [] outside_assets;
         public PduWriterConfig[] pdu_writers;
         public PduReaderConfig[] pdu_readers;
+        public string ros_topics_path;
+        public RosTopicMessageConfig[] ros_topics;
+        public PduDataConfig[] pdu_configs;
         public UdpMethodConfig[] udp_methods;
         public MmapMethodConfig[] mmap_methods;
+        public RosTopicMethodConfig ros_topic_method;
         public ReaderConnectorConfig[] reader_connectors;
         public WriterConnectorConfig[] writer_connectors;
         public PduChannelConnectorConfig[] pdu_channel_connectors;
@@ -42,7 +46,11 @@ namespace Hakoniwa.PluggableAsset
     {
         public string name;
         public string class_name;
+        public string conv_class_name;
         public string path;
+        public string conv_path;
+        public string pdu_config_name;
+        public string topic_message_name;
     }
 
     [System.Serializable]
@@ -50,7 +58,11 @@ namespace Hakoniwa.PluggableAsset
     {
         public string name;
         public string class_name;
+        public string conv_class_name;
         public string path;
+        public string conv_path;
+        public string pdu_config_name;
+        public string topic_message_name;
     }
 
     [System.Serializable]
@@ -70,7 +82,32 @@ namespace Hakoniwa.PluggableAsset
         public int iosize;
         public bool is_read;
     }
-
+    [System.Serializable]
+    public class RosTopicMethodConfig
+    {
+        public string name;
+        public string class_name;
+        public string path;
+    }
+    [System.Serializable]
+    public class RosTopicMessageConfig
+    {
+        public string topic_message_name;
+        public string topic_type_name;
+    }
+    [System.Serializable]
+    public class PduDataConfig
+    {
+        public string pdu_config_name;
+        public PduDataFieldConfig[] fields;
+        public string pdu_data_field_path;
+    }
+    [System.Serializable]
+    public class PduDataFieldConfig
+    {
+        public string name;
+        public string type;
+    }
     [System.Serializable]
     public class ReaderConnectorConfig
     {
@@ -94,4 +131,14 @@ namespace Hakoniwa.PluggableAsset
         public string writer_connector_name;
     }
 
+    [System.Serializable]
+    public class PduDataFieldsConfig
+    {
+        public PduDataFieldConfig[] fields;
+    }
+    [System.Serializable]
+    public class RosTopicMessageConfigContainer
+    {
+        public RosTopicMessageConfig[] fields;
+    }
 }

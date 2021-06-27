@@ -1,4 +1,5 @@
 ﻿using Hakoniwa.Core.Utils.Logger;
+using Hakoniwa.PluggableAsset.Communication.Pdu;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
@@ -17,17 +18,27 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Udp
         {
             return this.Name;
         }
-        public void Flush(ref byte[] buf)
+        public void Flush(IPduCommData data)
         {
+            PduCommBinaryData binary = null;
+
+            if (data is PduCommBinaryData)
+            {
+                binary = (PduCommBinaryData)data;
+            }
+            if (data == null)
+            {
+                throw new ArgumentException("Invalid data type");
+            }
+            byte[] buf = binary.GetData();
             //Debug.Log("UdpSend:" + buf.Length);
             //SimpleLogger.Get().Log(Level.DEBUG, "flush ipaddr=" + udp_config.IpAddr +" port="+ udp_config.Portno + " len=" + buf.Length);
             try
             {
                 client.Send(buf, buf.Length);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                ;
             }
         }
 

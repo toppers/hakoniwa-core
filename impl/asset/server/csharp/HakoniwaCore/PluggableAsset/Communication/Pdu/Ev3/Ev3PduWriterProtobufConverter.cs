@@ -56,8 +56,8 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
                     MotorAngleA = src.GetReadOps().GetDataUInt32("motor_angle_a"),
                     MotorAngleB = src.GetReadOps().GetDataUInt32("motor_angle_b"),
                     MotorAngleC = src.GetReadOps().GetDataUInt32("motor_angle_c"),
-                    GpsLat = src.GetReadOps().GetDataDouble("gps_lat"),
-                    GpsLon = src.GetReadOps().GetDataDouble("gps_lon"),
+                    GpsLat = src.GetReadOps().GetDataFloat64("gps_lat"),
+                    GpsLon = src.GetReadOps().GetDataFloat64("gps_lon"),
                 },
             };
             //SimpleLogger.Get().Log(Level.INFO, "hakoniwa_time=" + protbuf.Header.HakoniwaTime);

@@ -37,7 +37,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
             return BitConverter.ToInt64(this.buffer, pdu_config.GetOffset(field_name));
         }
 
-        public double GetDataDouble(string field_name)
+        public double GetDataFloat64(string field_name)
         {
             return BitConverter.ToDouble(this.buffer, pdu_config.GetOffset(field_name));
         }
@@ -76,7 +76,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
             return BitConverter.ToUInt16(this.buffer, pdu_config.GetOffset(field_name));
         }
 
-        public float GetDataFloat(string field_name)
+        public float GetDataFloat32(string field_name)
         {
             return BitConverter.ToSingle(this.buffer, pdu_config.GetOffset(field_name));
         }

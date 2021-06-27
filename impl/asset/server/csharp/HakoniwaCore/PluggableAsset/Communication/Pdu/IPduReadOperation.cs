@@ -15,8 +15,8 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
         UInt32 GetDataUInt32(string field_name);
         UInt64 GetDataUInt64(string field_name);
         Int64 GetDataInt64(string field_name);
-        float GetDataFloat(string field_name);
-        double GetDataDouble(string field_name);
+        float GetDataFloat32(string field_name);
+        double GetDataFloat64(string field_name);
         byte[] GetDataBytes(string field_name);
     }
 }

@@ -45,6 +45,7 @@ namespace Hakoniwa.PluggableAsset
             }
             return null;
         }
+
         public static RosTopicMessageConfig GetRosTopic(string config_name)
         {
             if (core_config.ros_topics == null)
@@ -278,12 +279,27 @@ namespace Hakoniwa.PluggableAsset
             PduConfig pdu_config = new PduConfig(0);
             int size = 0;
             int off = 0;
-            foreach (var e in config.fields)
+            if (config.pdu_data_field_path != null)
             {
-                size = GetTypeSize(e.type);
-                pdu_config.SetOffset(e.name, off, size);
-                SimpleLogger.Get().Log(Level.INFO, "type:" + e.type + " field:" + e.name + " off=" + off);
-                off += size;
+                string jsonString = File.ReadAllText(config.pdu_data_field_path);
+                var container = JsonConvert.DeserializeObject<PduDataFieldsConfig>(jsonString);
+                foreach (var e in container.fields)
+                {
+                    size = GetTypeSize(e.type);
+                    pdu_config.SetOffset(e.name, off, size);
+                    SimpleLogger.Get().Log(Level.INFO, "type:" + e.type + " field:" + e.name + " off=" + off);
+                    off += size;
+                }
+            }
+            else
+            {
+                foreach (var e in config.fields)
+                {
+                    size = GetTypeSize(e.type);
+                    pdu_config.SetOffset(e.name, off, size);
+                    SimpleLogger.Get().Log(Level.INFO, "type:" + e.type + " field:" + e.name + " off=" + off);
+                    off += size;
+                }
             }
             Pdu pdu = new Pdu(pdu_config, off);
             pdu.SetName(config.pdu_config_name);
@@ -308,6 +324,12 @@ namespace Hakoniwa.PluggableAsset
                 {
                     AssetConfigLoader.LoadPdu(cfg);
                 }
+            }
+            if (core_config.ros_topics_path != null)
+            {
+                string jsonString = File.ReadAllText(core_config.ros_topics_path);
+                var container = JsonConvert.DeserializeObject<RosTopicMessageConfigContainer>(jsonString);
+                core_config.ros_topics = container.fields;
             }
             //writer pdu configs
             foreach (var pdu in core_config.pdu_writers)
@@ -461,11 +483,9 @@ namespace Hakoniwa.PluggableAsset
                 RosTopicWriter writer = new RosTopicWriter(config);
                 AssetConfigLoader.io_writers.Add(writer);
 
-                //TODO reader
                 RosTopicReader reader = new RosTopicReader(config);
                 SimpleLogger.Get().Log(Level.INFO, "ros topic reader name=" + reader.GetName());
                 AssetConfigLoader.io_readers.Add(reader);
-
             }
 
 

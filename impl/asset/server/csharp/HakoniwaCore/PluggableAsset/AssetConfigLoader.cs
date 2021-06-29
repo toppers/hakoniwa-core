@@ -145,10 +145,8 @@ namespace Hakoniwa.PluggableAsset
 
         public static PduDataConfig GetPduConfig(string arg_pdu_type_name)
         {
-            SimpleLogger.Get().Log(Level.DEBUG, "GetPduConfig():type=" + arg_pdu_type_name);
             foreach (var e in AssetConfigLoader.pdu_configs)
             {
-                SimpleLogger.Get().Log(Level.DEBUG, "GetPduConfig():e.type=" + e.pdu_type_name);
                 if (e.pdu_type_name.Equals(arg_pdu_type_name))
                 {
                     return e;

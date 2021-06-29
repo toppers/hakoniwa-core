@@ -33,6 +33,7 @@ namespace Hakoniwa.PluggableAsset
         private static List<PduChannelConnector> pdu_channel_connectors = new List<PduChannelConnector>();
         private static List<PduIoConnector> pdu_io_connectors = new List<PduIoConnector>();
         private static List<Pdu> pdus = new List<Pdu>();
+        private static List<PduDataConfig> pdu_configs;
 
         public static Pdu GetPdu(string name)
         {
@@ -141,6 +142,19 @@ namespace Hakoniwa.PluggableAsset
             }
             return null;
         }
+
+        internal static PduDataConfig GetPduConfig(string arg_pdu_type_name)
+        {
+            foreach (var e in core_config.pdu_configs)
+            {
+                if (e.pdu_type_name.Equals(arg_pdu_type_name))
+                {
+                    return e;
+                }
+            }
+            return null;
+        }
+
         private static WriterConnector GetWriterConnector(string name)
         {
             foreach (var e in writer_connectors)
@@ -246,63 +260,22 @@ namespace Hakoniwa.PluggableAsset
 
             }
         }
-        private static int GetTypeSize(string typename)
+        private static void LoadPduConfig(PduDataConfig config)
         {
-            switch (typename)
-            {
-                case "float32":
-                    return sizeof(float);
-                case "float64":
-                    return sizeof(double);
-                case "int8":
-                    return sizeof(SByte);
-                case "uint8":
-                    return sizeof(Byte);
-                case "int16":
-                    return sizeof(Int16);
-                case "uint16":
-                    return sizeof(UInt16);
-                case "int32":
-                    return sizeof(Int32);
-                case "uint32":
-                    return sizeof(UInt32);
-                case "int64":
-                    return sizeof(Int64);
-                case "uint64":
-                    return sizeof(UInt64);
-                default:
-                    throw new ArgumentException("Invalid typename:" + typename);
-            }
-        }
-        private static void LoadPdu(PduDataConfig config)
-        {
-            PduConfig pdu_config = new PduConfig(0);
-            int size = 0;
-            int off = 0;
+            PduDataFieldsConfig cfg = null;
             if (config.pdu_data_field_path != null)
             {
                 string jsonString = File.ReadAllText(config.pdu_data_field_path);
-                var container = JsonConvert.DeserializeObject<PduDataFieldsConfig>(jsonString);
-                foreach (var e in container.fields)
-                {
-                    size = GetTypeSize(e.type);
-                    pdu_config.SetOffset(e.name, off, size);
-                    SimpleLogger.Get().Log(Level.INFO, "type:" + e.type + " field:" + e.name + " off=" + off);
-                    off += size;
-                }
+                cfg = JsonConvert.DeserializeObject<PduDataFieldsConfig>(jsonString);
+                config.fields = cfg.fields;
             }
-            else
-            {
-                foreach (var e in config.fields)
-                {
-                    size = GetTypeSize(e.type);
-                    pdu_config.SetOffset(e.name, off, size);
-                    SimpleLogger.Get().Log(Level.INFO, "type:" + e.type + " field:" + e.name + " off=" + off);
-                    off += size;
-                }
-            }
-            Pdu pdu = new Pdu(pdu_config, off);
-            pdu.SetName(config.pdu_config_name);
+            AssetConfigLoader.pdu_configs.Add(config);
+        }
+        private static void LoadPdu(PduDataConfig config)
+        {
+            PduDataFieldsConfig cfg = new PduDataFieldsConfig();
+            cfg.fields = config.fields;
+            Pdu pdu = new Pdu(config.pdu_type_name, cfg);
             AssetConfigLoader.pdus.Add(pdu);
         }
         public static void Load(string filepath)
@@ -320,6 +293,10 @@ namespace Hakoniwa.PluggableAsset
             }
             if (core_config.pdu_configs != null)
             {
+                foreach (var cfg in core_config.pdu_configs)
+                {
+                    AssetConfigLoader.LoadPduConfig(cfg);
+                }
                 foreach (var cfg in core_config.pdu_configs)
                 {
                     AssetConfigLoader.LoadPdu(cfg);

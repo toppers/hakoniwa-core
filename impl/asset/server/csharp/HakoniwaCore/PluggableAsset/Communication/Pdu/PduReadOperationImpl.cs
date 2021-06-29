@@ -6,10 +6,10 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
 {
     class PduReadOperationImpl : IPduReadOperation
     {
-        private Pdu pdu;
+        private ObsoletePdu pdu;
         private PduConfig pdu_config;
         private byte[] buffer;
-        public PduReadOperationImpl(Pdu arg_pdu)
+        public PduReadOperationImpl(ObsoletePdu arg_pdu)
         {
             this.pdu = arg_pdu;
             this.pdu_config = this.pdu.GetConfig();
@@ -79,6 +79,76 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
         public float GetDataFloat32(string field_name)
         {
             return BitConverter.ToSingle(this.buffer, pdu_config.GetOffset(field_name));
+        }
+
+        public string GetDataString(string field_name)
+        {
+            throw new NotImplementedException();
+        }
+
+        public sbyte[] GetDataInt8Array(string field_name)
+        {
+            throw new NotImplementedException();
+        }
+
+        public byte[] GetDataUInt8Array(string field_name)
+        {
+            throw new NotImplementedException();
+        }
+
+        public short[] GetDataInt16Array(string field_name)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ushort[] GetDataUInt16Array(string field_name)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int[] GetDataInt32Array(string field_name)
+        {
+            throw new NotImplementedException();
+        }
+
+        public uint[] GetDataUInt32Array(string field_name)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ulong[] GetDataUInt64Array(string field_name)
+        {
+            throw new NotImplementedException();
+        }
+
+        public long[] GetDataInt64Array(string field_name)
+        {
+            throw new NotImplementedException();
+        }
+
+        public float[] GetDataFloat32Array(string field_name)
+        {
+            throw new NotImplementedException();
+        }
+
+        public double[] GetDataFloat64Array(string field_name)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string[] GetDataStringArray(string field_name)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Pdu Ref(string field_name)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Pdu[] Refs(string field_name)
+        {
+            throw new NotImplementedException();
         }
     }
 }

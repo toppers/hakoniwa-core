@@ -6,10 +6,10 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
 {
     class PduWriteOperationImpl : IPduWriteOperation
     {
-        private Pdu pdu;
+        private ObsoletePdu pdu;
         private PduConfig pdu_config;
         private byte[] buffer;
-        public PduWriteOperationImpl(Pdu arg_pdu)
+        public PduWriteOperationImpl(ObsoletePdu arg_pdu)
         {
             this.pdu = arg_pdu;
             this.pdu_config = this.pdu.GetConfig();
@@ -96,6 +96,71 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
         {
             byte[] tmp_buf = BitConverter.GetBytes(value);
             Buffer.BlockCopy(tmp_buf, 0, this.buffer, pdu_config.GetOffset(field_name), tmp_buf.Length);
+        }
+
+        public void SetData(string field_name, string value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetData(string field_name, sbyte[] value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetData(string field_name, ushort[] value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetData(string field_name, short[] value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetData(string field_name, uint[] value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetData(string field_name, int[] value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetData(string field_name, ulong[] value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetData(string field_name, long[] value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetData(string field_name, double[] value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetData(string field_name, float[] value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetData(string field_name, string[] value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetData(string field_name, Pdu pdu)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetData(string field_name, Pdu[] pdu)
+        {
+            throw new NotImplementedException();
         }
     }
 }

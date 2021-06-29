@@ -33,7 +33,7 @@ namespace Hakoniwa.PluggableAsset
         private static List<PduChannelConnector> pdu_channel_connectors = new List<PduChannelConnector>();
         private static List<PduIoConnector> pdu_io_connectors = new List<PduIoConnector>();
         private static List<Pdu> pdus = new List<Pdu>();
-        private static List<PduDataConfig> pdu_configs;
+        private static List<PduDataConfig> pdu_configs = new List<PduDataConfig>();
 
         public static Pdu GetPdu(string name)
         {
@@ -143,10 +143,12 @@ namespace Hakoniwa.PluggableAsset
             return null;
         }
 
-        internal static PduDataConfig GetPduConfig(string arg_pdu_type_name)
+        public static PduDataConfig GetPduConfig(string arg_pdu_type_name)
         {
-            foreach (var e in core_config.pdu_configs)
+            SimpleLogger.Get().Log(Level.DEBUG, "GetPduConfig():type=" + arg_pdu_type_name);
+            foreach (var e in AssetConfigLoader.pdu_configs)
             {
+                SimpleLogger.Get().Log(Level.DEBUG, "GetPduConfig():e.type=" + e.pdu_type_name);
                 if (e.pdu_type_name.Equals(arg_pdu_type_name))
                 {
                     return e;
@@ -269,6 +271,7 @@ namespace Hakoniwa.PluggableAsset
                 cfg = JsonConvert.DeserializeObject<PduDataFieldsConfig>(jsonString);
                 config.fields = cfg.fields;
             }
+            SimpleLogger.Get().Log(Level.DEBUG, "LoadPduConfig(): pdu_type_name=" + config.pdu_type_name);
             AssetConfigLoader.pdu_configs.Add(config);
         }
         private static void LoadPdu(PduDataConfig config)
@@ -276,6 +279,7 @@ namespace Hakoniwa.PluggableAsset
             PduDataFieldsConfig cfg = new PduDataFieldsConfig();
             cfg.fields = config.fields;
             Pdu pdu = new Pdu(config.pdu_type_name, cfg);
+            SimpleLogger.Get().Log(Level.DEBUG, "LoadPdu(): type=" + pdu.GetName() + " pdu_type_name=" + config.pdu_type_name);
             AssetConfigLoader.pdus.Add(pdu);
         }
         public static void Load(string filepath)
@@ -297,7 +301,7 @@ namespace Hakoniwa.PluggableAsset
                 {
                     AssetConfigLoader.LoadPduConfig(cfg);
                 }
-                foreach (var cfg in core_config.pdu_configs)
+                foreach (var cfg in AssetConfigLoader.pdu_configs)
                 {
                     AssetConfigLoader.LoadPdu(cfg);
                 }

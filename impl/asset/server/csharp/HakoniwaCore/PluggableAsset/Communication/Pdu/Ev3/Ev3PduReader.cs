@@ -13,7 +13,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
         private int packet_ext_off = 512;
         private int packet_ext_size = 512;
         private string name;
-        private Pdu pdu;
+        private ObsoletePdu pdu;
         private IPduReaderConverter converter = null;
 
         public Ev3PduReader(string name)
@@ -37,7 +37,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
             this.pdu_config.SetOffset("motor_reset_angle_b", 40, 4);
             this.pdu_config.SetOffset("motor_reset_angle_c", 44, 4);
             this.pdu_config.SetOffset("gyro_reset", 52, 4);
-            this.pdu = new Pdu(this.pdu_config, 1024);
+            this.pdu = new ObsoletePdu(this.pdu_config, 1024);
         }
 
         public bool IsValidData()
@@ -111,6 +111,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
             }
             if (this.converter == null)
             {
+                //TODO obsolete
                 this.pdu.SetBuffer(binary.GetData());
             }
             else

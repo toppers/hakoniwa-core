@@ -13,7 +13,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
         private PduConfig pdu_config;
         private byte[] buffer;
         private string name;
-        private Pdu pdu;
+        private ObsoletePdu pdu;
         private IPduWriterConverter converter = null;
 
         public Ev3PduWriter(string name)
@@ -46,7 +46,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
             this.pdu_config.SetOffset("gps_lat", 480, 8);
             this.pdu_config.SetOffset("gps_lon", 488, 8);
 
-            this.pdu = new Pdu(this.pdu_config, 1024);
+            this.pdu = new ObsoletePdu(this.pdu_config, 1024);
             this.buffer = pdu.GetBuffer();
             {
                 //header

@@ -98,7 +98,7 @@ namespace Hakoniwa.PluggableAsset
     [System.Serializable]
     public class PduDataConfig
     {
-        public string pdu_config_name;
+        public string pdu_type_name;
         public PduDataFieldConfig[] fields;
         public string pdu_data_field_path;
     }

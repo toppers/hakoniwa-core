@@ -1,4 +1,5 @@
-﻿using Hakoniwa.PluggableAsset.Communication.Pdu;
+﻿using Hakoniwa.Core.Utils.Logger;
+using Hakoniwa.PluggableAsset.Communication.Pdu;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -43,6 +44,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Connector
                     return false;
                 }
             }
+            SimpleLogger.Get().Log(Level.DEBUG, "PduIoConnector AddWriter: " + writer.GetName());
             this.pdu_writer.Add(writer);
             return true;
         }

@@ -350,6 +350,7 @@ namespace Hakoniwa.PluggableAsset
                 }
                 if (ipdu != null)
                 {
+                    SimpleLogger.Get().Log(Level.DEBUG, "pdu_writer: " + ipdu.GetName());
                     AssetConfigLoader.pdu_writers.Add(ipdu);
                 }
             }
@@ -542,6 +543,7 @@ namespace Hakoniwa.PluggableAsset
                         {
                             throw new InvalidDataException("ERROR: can not found inside asset pdu writer=" + name);
                         }
+                        SimpleLogger.Get().Log(Level.DEBUG, asset.name + " :pdu io connect add writer:" + pdu.GetName());
                         connector.AddWriter(pdu);
                     }
                     foreach (var name in asset.pdu_reader_names)
@@ -551,6 +553,7 @@ namespace Hakoniwa.PluggableAsset
                         {
                             throw new InvalidDataException("ERROR: can not found inside asset pdu reader=" + name);
                         }
+                        SimpleLogger.Get().Log(Level.DEBUG, asset.name + " pdu io connect add reader:" + pdu.GetName());
                         connector.AddReader(pdu);
                     }
                 }

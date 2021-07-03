@@ -128,6 +128,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
                     string array_type = GetArrayType(e.type);
                     if (IsPrimitiveType(array_type))
                     {
+                        SimpleLogger.Get().Log(Level.DEBUG, "PRIMITIVE ARRAY:" + e.name + " type=" + e.type);
                         this.SetArrayInitValue(array_type, e.name, GetArraySize(e.type));
                     }
                     else
@@ -137,17 +138,20 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
                         {
                             elms[i] = new Pdu(array_type);
                         }
-                        this.field_struct_array.Add(array_type, elms);
+                        SimpleLogger.Get().Log(Level.DEBUG, "STRUCT ARRAY:" + e.name + " type=" + e.type);
+                        this.field_struct_array.Add(e.name, elms);
                     }
                 }
                 else
                 {
                     if (IsPrimitiveType(e.type))
                     {
+                        SimpleLogger.Get().Log(Level.DEBUG, "PRIMITIVE:" + e.name + " type=" + e.type);
                         this.SetValue(e.type, e.name);
                     }
                     else
                     {
+                        SimpleLogger.Get().Log(Level.DEBUG, "STRUCT:" + e.name + " type=" + e.type);
                         this.field_struct.Add(e.name, new Pdu(e.type));
                     }
 

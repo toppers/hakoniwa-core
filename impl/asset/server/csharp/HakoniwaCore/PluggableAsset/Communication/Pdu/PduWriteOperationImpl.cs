@@ -162,5 +162,15 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
         {
             throw new NotImplementedException();
         }
+
+        public Pdu Ref(string field_name)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Pdu[] Refs(string field_name)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -708,6 +708,10 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
 
         public Pdu Ref(string field_name)
         {
+            if (field_name == null)
+            {
+                return this;
+            }
             if (!this.field_struct.ContainsKey(field_name))
             {
                 throw new ArgumentException("Invalid PDU access : field_name=" + field_name);

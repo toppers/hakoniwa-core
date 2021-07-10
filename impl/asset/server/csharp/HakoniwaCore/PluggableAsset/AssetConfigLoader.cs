@@ -316,7 +316,13 @@ namespace Hakoniwa.PluggableAsset
                 IPduWriter ipdu = null;
                 if (pdu.topic_message_name == null)
                 {
-                    ipdu = AssetConfigLoader.ClassLoader(pdu.path, pdu.class_name, pdu.name) as IPduWriter;
+                    Pdu pdu_data = AssetConfigLoader.GetPdu(pdu.pdu_config_name);
+                    if (pdu_data == null)
+                    {
+                        throw new InvalidDataException("ERROR: can not found pdu=" + pdu.name);
+                    }
+                    Type typeinfo = AssetConfigLoader.GetType(pdu.path, pdu.class_name);
+                    ipdu = Activator.CreateInstance(typeinfo, pdu_data, pdu.name) as IPduWriter;
                     SimpleLogger.Get().Log(Level.INFO, "pdu writer loaded:" + pdu.class_name);
                     if (ipdu == null)
                     {
@@ -360,7 +366,13 @@ namespace Hakoniwa.PluggableAsset
                 IPduReader ipdu = null;
                 if (pdu.topic_message_name == null)
                 {
-                    ipdu = AssetConfigLoader.ClassLoader(pdu.path, pdu.class_name, pdu.name) as IPduReader;
+                    Pdu pdu_data = AssetConfigLoader.GetPdu(pdu.pdu_config_name);
+                    if (pdu_data == null)
+                    {
+                        throw new InvalidDataException("ERROR: can not found pdu=" + pdu.name);
+                    }
+                    Type typeinfo = AssetConfigLoader.GetType(pdu.path, pdu.class_name);
+                    ipdu = Activator.CreateInstance(typeinfo, pdu_data, pdu.name) as IPduReader;
                     SimpleLogger.Get().Log(Level.INFO, "pdu writer loaded:" + pdu.class_name);
                     if (ipdu == null)
                     {

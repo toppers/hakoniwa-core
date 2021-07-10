@@ -28,7 +28,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Udp
             }
             if (data == null)
             {
-                throw new ArgumentException("Invalid data type");
+                return;
             }
             byte[] buf = binary.GetData();
             //Debug.Log("UdpSend:" + buf.Length);

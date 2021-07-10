@@ -69,6 +69,7 @@ namespace Hakoniwa.Core.Simulation.Time
             else
             {
                 this.wait_time += this.delta_time;
+                //SimpleLogger.Get().Log(Level.DEBUG, "wait_time=" + wait_time);
                 return false;
             }
         }

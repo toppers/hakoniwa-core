@@ -10,6 +10,49 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
 {
     class Ev3PduWriter : IPduWriter
     {
+        private string name;
+        private Pdu pdu;
+        private IPduWriterConverter converter = null;
+
+        public Ev3PduWriter(Pdu arg_pdu, string name)
+        {
+            this.name = name;
+            this.pdu = arg_pdu;
+        }
+        public IPduCommData Get()
+        {
+            if (this.converter == null)
+            {
+                throw new ArgumentException("Converter is not set");
+            }
+            else
+            {
+                return this.converter.ConvertToIoData(this);
+            }
+        }
+
+        public string GetName()
+        {
+            return this.name;
+        }
+        public IPduReadOperation GetReadOps()
+        {
+            return this.pdu.GetPduReadOps();
+        }
+
+        public IPduWriteOperation GetWriteOps()
+        {
+            return this.pdu.GetPduWriteOps();
+        }
+
+        public void SetConverter(IPduWriterConverter cnv)
+        {
+            this.converter = cnv;
+        }
+    }
+#if false
+    class Ev3PduWriter : IPduWriter
+    {
         private PduConfig pdu_config;
         private byte[] buffer;
         private string name;
@@ -100,4 +143,5 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
             this.converter = cnv;
         }
     }
+#endif
 }

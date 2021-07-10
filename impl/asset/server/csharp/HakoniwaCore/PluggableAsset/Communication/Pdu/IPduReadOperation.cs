@@ -6,8 +6,6 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
 {
     public interface IPduReadOperation
     {
-        //obsolete
-        Int64 GetHeaderData(string field_name);
         SByte GetDataInt8(string field_name);
         Byte GetDataUInt8(string field_name);
         Int16 GetDataInt16(string field_name);
@@ -19,9 +17,6 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
         float GetDataFloat32(string field_name);
         double GetDataFloat64(string field_name);
         string GetDataString(string field_name);
-
-        //obsolete
-        byte[] GetDataBytes(string field_name);
 
         SByte[] GetDataInt8Array(string field_name);
         Byte[] GetDataUInt8Array(string field_name);

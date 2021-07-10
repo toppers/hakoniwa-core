@@ -6,13 +6,6 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
 {
     public interface IPduWriteOperation
     {
-        //obsolete
-        void SetHeaderData(string field_name, string value);
-        //obsolete
-        void SetHeaderData(string field_name, Int32 value);
-        //obsolete
-        void SetHeaderData(string field_name, Int64 value);
-
         void SetData(string field_name, Byte value);
         void SetData(string field_name, SByte value);
         void SetData(string field_name, UInt16 value);

@@ -88,6 +88,7 @@ namespace Hakoniwa.PluggableAsset
         public string name;
         public string class_name;
         public string path;
+        public string parameters;
     }
     [System.Serializable]
     public class RosTopicMessageConfig

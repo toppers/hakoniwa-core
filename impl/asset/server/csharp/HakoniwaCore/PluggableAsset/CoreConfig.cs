@@ -95,6 +95,7 @@ namespace Hakoniwa.PluggableAsset
     {
         public string topic_message_name;
         public string topic_type_name;
+        public bool sub;
     }
     [System.Serializable]
     public class PduDataConfig

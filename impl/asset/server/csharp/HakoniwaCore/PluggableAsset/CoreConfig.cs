@@ -11,18 +11,26 @@ namespace Hakoniwa.PluggableAsset
         public int core_portno;
         public long asset_timeout;
         public string SymTimeMeasureFilePath;
+        public string inside_assets_path;
         public InsideAssetConfig []  inside_assets;
         public OutsideAssetConfig [] outside_assets;
+        public string pdu_writers_path;
         public PduWriterConfig[] pdu_writers;
+        public string pdu_readers_path;
         public PduReaderConfig[] pdu_readers;
         public string ros_topics_path;
         public RosTopicMessageConfig[] ros_topics;
+        public string pdu_configs_path;
         public PduDataConfig[] pdu_configs;
         public UdpMethodConfig[] udp_methods;
         public MmapMethodConfig[] mmap_methods;
+        public string ros_topic_method_path;
         public RosTopicMethodConfig ros_topic_method;
+        public string reader_connectors_path;
         public ReaderConnectorConfig[] reader_connectors;
+        public string writer_connectors_path;
         public WriterConnectorConfig[] writer_connectors;
+        public string pdu_channel_connectors_path;
         public PduChannelConnectorConfig[] pdu_channel_connectors;
     }
     [System.Serializable]
@@ -95,6 +103,7 @@ namespace Hakoniwa.PluggableAsset
     {
         public string topic_message_name;
         public string topic_type_name;
+        public string robot_name;
         public bool sub;
     }
     [System.Serializable]

@@ -280,18 +280,26 @@ namespace Hakoniwa.PluggableAsset
             SimpleLogger.Get().Log(Level.DEBUG, "LoadPdu(): type=" + pdu.GetName() + " pdu_type_name=" + config.pdu_type_name);
             AssetConfigLoader.pdus.Add(pdu);
         }
-        public static void Load(string filepath)
+        private static T LoadJsonFile<T>(string filepath)
         {
             try
             {
                 string jsonString = File.ReadAllText(filepath);
-                core_config = JsonConvert.DeserializeObject<CoreConfig>(jsonString);
+                var cfg = JsonConvert.DeserializeObject<T>(jsonString);
                 SimpleLogger.Get().Log(Level.INFO, "jsonstring=" + jsonString);
+                return cfg;
             }
             catch (Exception e)
             {
                 SimpleLogger.Get().Log(Level.ERROR, e);
                 throw e;
+            }
+        }
+        private static void LoadPduConfig(string filepath)
+        {
+            if (filepath != null)
+            {
+                core_config.pdu_configs = LoadJsonFile<PduDataConfig[]>(filepath);
             }
             if (core_config.pdu_configs != null)
             {
@@ -304,13 +312,14 @@ namespace Hakoniwa.PluggableAsset
                     AssetConfigLoader.LoadPdu(cfg);
                 }
             }
-            if (core_config.ros_topics_path != null)
+        }
+        private static void LoadPduWriters(string filepath)
+        {
+            if (filepath != null)
             {
-                string jsonString = File.ReadAllText(core_config.ros_topics_path);
-                var container = JsonConvert.DeserializeObject<RosTopicMessageConfigContainer>(jsonString);
-                core_config.ros_topics = container.fields;
+                core_config.pdu_writers = LoadJsonFile<PduWriterConfig[]>(filepath);
             }
-            //writer pdu configs
+
             foreach (var pdu in core_config.pdu_writers)
             {
                 IPduWriter ipdu = null;
@@ -360,7 +369,14 @@ namespace Hakoniwa.PluggableAsset
                     AssetConfigLoader.pdu_writers.Add(ipdu);
                 }
             }
-            //reader pdu configs
+        }
+        private static void LoadPduReaders(string filepath)
+        {
+            if (filepath != null)
+            {
+                core_config.pdu_readers = LoadJsonFile<PduReaderConfig[]>(filepath);
+            }
+
             foreach (var pdu in core_config.pdu_readers)
             {
                 IPduReader ipdu = null;
@@ -411,6 +427,163 @@ namespace Hakoniwa.PluggableAsset
                     AssetConfigLoader.pdu_readers.Add(ipdu);
                 }
             }
+        }
+        private static void LoadRosTopicMethod(string filepath)
+        {
+            if (filepath != null)
+            {
+                core_config.ros_topic_method = LoadJsonFile<RosTopicMethodConfig>(filepath);
+            }
+            if (core_config.ros_topic_method != null)
+            {
+                IRosTopicIo ros_topic_io = AssetConfigLoader.ClassLoader(core_config.ros_topic_method.path,
+                    core_config.ros_topic_method.class_name, null) as IRosTopicIo;
+                if (ros_topic_io == null)
+                {
+                    throw new InvalidDataException("ERROR: can not found classname=" + core_config.ros_topic_method.class_name);
+                }
+                SimpleLogger.Get().Log(Level.INFO, "ros topic io loaded:" + core_config.ros_topic_method.class_name);
+
+                RosTopicConfig config = new RosTopicConfig(core_config.ros_topic_method.name, ros_topic_io);
+                RosTopicWriter writer = new RosTopicWriter(config);
+                AssetConfigLoader.io_writers.Add(writer);
+
+                RosTopicReader reader = new RosTopicReader(config);
+                SimpleLogger.Get().Log(Level.INFO, "ros topic reader name=" + reader.GetName());
+                AssetConfigLoader.io_readers.Add(reader);
+            }
+        }
+        private static void LoadReaderConnectors(string filepath)
+        {
+            if (filepath != null)
+            {
+                core_config.reader_connectors = LoadJsonFile<ReaderConnectorConfig[]>(filepath);
+            }
+            foreach (var connector in core_config.reader_connectors)
+            {
+                SimpleLogger.Get().Log(Level.INFO, "reader connector method_name=" + connector.method_name);
+                var method = AssetConfigLoader.GetIoReader(connector.method_name);
+                if (method == null)
+                {
+                    throw new InvalidDataException("ERROR: can not found connector method_name=" + connector.method_name);
+                }
+                SimpleLogger.Get().Log(Level.INFO, "reader connector pdu_name=" + connector.pdu_name);
+                var pdu = AssetConfigLoader.GetIpduReader(connector.pdu_name);
+                if (pdu == null)
+                {
+                    throw new InvalidDataException("ERROR: can not found connector pdu_name=" + connector.pdu_name);
+                }
+                var real_connector = ReaderConnector.Create(pdu, new ReaderChannel(method));
+                real_connector.Name = connector.name;
+                AssetConfigLoader.reader_connectors.Add(real_connector);
+            }
+
+        }
+        private static void LoadWriterConnectors(string filepath)
+        {
+            if (filepath != null)
+            {
+                core_config.writer_connectors = LoadJsonFile<WriterConnectorConfig[]>(filepath);
+            }
+            foreach (var connector in core_config.writer_connectors)
+            {
+                var method = AssetConfigLoader.GetIoWriter(connector.method_name);
+                if (method == null)
+                {
+                    throw new InvalidDataException("ERROR: can not found connector method_name=" + connector.method_name);
+                }
+                var w_pdu = AssetConfigLoader.GetIpduWriter(connector.pdu_name);
+                var r_pdu = AssetConfigLoader.GetIpduReader(connector.pdu_name);
+                if ((w_pdu == null) && (r_pdu == null))
+                {
+                    throw new InvalidDataException("ERROR: can not found connector pdu_name=" + connector.pdu_name);
+                }
+                if (w_pdu != null)
+                {
+                    var real_connector = WriterConnector.Create(w_pdu, new WriterChannel(method));
+                    real_connector.Name = connector.name;
+                    AssetConfigLoader.writer_connectors.Add(real_connector);
+                }
+                else
+                {
+                    var real_connector = WriterConnector.Create(r_pdu, new WriterChannel(method));
+                    real_connector.Name = connector.name;
+                    AssetConfigLoader.writer_connectors.Add(real_connector);
+                }
+            }
+        }
+        private static void LoadPduChannelConnectors(string filepath)
+        {
+            if (filepath != null)
+            {
+                core_config.pdu_channel_connectors = LoadJsonFile<PduChannelConnectorConfig[]>(filepath);
+            }
+            foreach (var connector in core_config.pdu_channel_connectors)
+            {
+                var real_connector = PduChannelConnector.Create(connector.outside_asset_name);
+                var reader = AssetConfigLoader.GetReaderConnector(connector.reader_connector_name);
+                var writer = AssetConfigLoader.GetWriterConnector(connector.writer_connector_name);
+                if ((reader == null) && (writer == null))
+                {
+                    throw new InvalidDataException("ERROR: can not found pdu channel connector writer=" + connector.writer_connector_name + " reader=" + connector.reader_connector_name);
+                }
+                real_connector.Writer = writer;
+                real_connector.Reader = reader;
+                AssetConfigLoader.pdu_channel_connectors.Add(real_connector);
+                SimpleLogger.Get().Log(Level.INFO, "PduChannelConnector :" + connector.writer_connector_name);
+            }
+
+        }
+        private static void LoadInsideAssets(string filepath)
+        {
+            if (filepath != null)
+            {
+                core_config.inside_assets = LoadJsonFile<InsideAssetConfig[]>(filepath);
+            }
+            if (core_config.inside_assets != null)
+            {
+                foreach (var asset in core_config.inside_assets)
+                {
+                    var connector = PduIoConnector.Create(asset.name);
+                    foreach (var name in asset.pdu_writer_names)
+                    {
+                        var pdu = AssetConfigLoader.GetIpduWriter(name);
+                        if (pdu == null)
+                        {
+                            throw new InvalidDataException("ERROR: can not found inside asset pdu writer=" + name);
+                        }
+                        SimpleLogger.Get().Log(Level.DEBUG, asset.name + " :pdu io connect add writer:" + pdu.GetName());
+                        connector.AddWriter(pdu);
+                    }
+                    foreach (var name in asset.pdu_reader_names)
+                    {
+                        var pdu = AssetConfigLoader.GetIpduReader(name);
+                        if (pdu == null)
+                        {
+                            throw new InvalidDataException("ERROR: can not found inside asset pdu reader=" + name);
+                        }
+                        SimpleLogger.Get().Log(Level.DEBUG, asset.name + " pdu io connect add reader:" + pdu.GetName());
+                        connector.AddReader(pdu);
+                    }
+                }
+            }
+        }
+
+        public static void Load(string filepath)
+        {
+            core_config = LoadJsonFile<CoreConfig>(filepath);
+            LoadPduConfig(core_config.pdu_configs_path);
+            if (core_config.ros_topics_path != null)
+            {
+                string jsonString = File.ReadAllText(core_config.ros_topics_path);
+                var container = JsonConvert.DeserializeObject<RosTopicMessageConfigContainer>(jsonString);
+                core_config.ros_topics = container.fields;
+            }
+            //writer pdu configs
+            LoadPduWriters(core_config.pdu_writers_path);
+            //reader pdu configs
+            LoadPduReaders(core_config.pdu_readers_path);
+
             if (core_config.udp_methods != null)
             {
                 //udp method configs
@@ -461,115 +634,17 @@ namespace Hakoniwa.PluggableAsset
                     }
                 }
             }
-            if (core_config.ros_topic_method != null)
-            {
-                IRosTopicIo ros_topic_io = AssetConfigLoader.ClassLoader(core_config.ros_topic_method.path, 
-                    core_config.ros_topic_method.class_name, null) as IRosTopicIo;
-                if (ros_topic_io == null)
-                {
-                    throw new InvalidDataException("ERROR: can not found classname=" + core_config.ros_topic_method.class_name);
-                }
-                SimpleLogger.Get().Log(Level.INFO, "ros topic io loaded:" + core_config.ros_topic_method.class_name);
-
-                RosTopicConfig config = new RosTopicConfig(core_config.ros_topic_method.name, ros_topic_io);
-                RosTopicWriter writer = new RosTopicWriter(config);
-                AssetConfigLoader.io_writers.Add(writer);
-
-                RosTopicReader reader = new RosTopicReader(config);
-                SimpleLogger.Get().Log(Level.INFO, "ros topic reader name=" + reader.GetName());
-                AssetConfigLoader.io_readers.Add(reader);
-            }
-
-
+            LoadRosTopicMethod(core_config.ros_topic_method_path);
             //reader connectors configs
-            foreach (var connector in core_config.reader_connectors)
-            {
-                SimpleLogger.Get().Log(Level.INFO, "reader connector method_name=" + connector.method_name);
-                var method = AssetConfigLoader.GetIoReader(connector.method_name);
-                if (method == null)
-                {
-                    throw new InvalidDataException("ERROR: can not found connector method_name=" + connector.method_name);
-                }
-                SimpleLogger.Get().Log(Level.INFO, "reader connector pdu_name=" + connector.pdu_name);
-                var pdu = AssetConfigLoader.GetIpduReader(connector.pdu_name);
-                if (pdu == null)
-                {
-                    throw new InvalidDataException("ERROR: can not found connector pdu_name=" + connector.pdu_name);
-                }
-                var real_connector = ReaderConnector.Create(pdu, new ReaderChannel(method));
-                real_connector.Name = connector.name;
-                AssetConfigLoader.reader_connectors.Add(real_connector);
-            }
+            LoadReaderConnectors(core_config.reader_connectors_path);
             //writer connectors configs
-            foreach (var connector in core_config.writer_connectors)
-            {
-                var method = AssetConfigLoader.GetIoWriter(connector.method_name);
-                if (method == null)
-                {
-                    throw new InvalidDataException("ERROR: can not found connector method_name=" + connector.method_name);
-                }
-                var w_pdu = AssetConfigLoader.GetIpduWriter(connector.pdu_name);
-                var r_pdu = AssetConfigLoader.GetIpduReader(connector.pdu_name);
-                if ((w_pdu == null) && (r_pdu == null))
-                {
-                    throw new InvalidDataException("ERROR: can not found connector pdu_name=" + connector.pdu_name);
-                }
-                if (w_pdu != null)
-                {
-                    var real_connector = WriterConnector.Create(w_pdu, new WriterChannel(method));
-                    real_connector.Name = connector.name;
-                    AssetConfigLoader.writer_connectors.Add(real_connector);
-                }
-                else
-                {
-                    var real_connector = WriterConnector.Create(r_pdu, new WriterChannel(method));
-                    real_connector.Name = connector.name;
-                    AssetConfigLoader.writer_connectors.Add(real_connector);
-                }
-            }
+            LoadWriterConnectors(core_config.writer_connectors_path);
+
             //pdu channel connectors configs
-            foreach (var connector in core_config.pdu_channel_connectors)
-            {
-                var real_connector = PduChannelConnector.Create(connector.outside_asset_name);
-                var reader = AssetConfigLoader.GetReaderConnector(connector.reader_connector_name);
-                var writer = AssetConfigLoader.GetWriterConnector(connector.writer_connector_name);
-                if ((reader == null) && (writer == null))
-                {
-                    throw new InvalidDataException("ERROR: can not found pdu channel connector writer=" + connector.writer_connector_name + " reader="+connector.reader_connector_name);
-                }
-                real_connector.Writer = writer;
-                real_connector.Reader = reader;
-                AssetConfigLoader.pdu_channel_connectors.Add(real_connector);
-                SimpleLogger.Get().Log(Level.INFO, "PduChannelConnector :" + connector.writer_connector_name);
-            }
+            LoadPduChannelConnectors(core_config.pdu_channel_connectors_path);
             //inside asset configs
-            if (core_config.inside_assets != null)
-            {
-                foreach (var asset in core_config.inside_assets)
-                {
-                    var connector = PduIoConnector.Create(asset.name);
-                    foreach (var name in asset.pdu_writer_names)
-                    {
-                        var pdu = AssetConfigLoader.GetIpduWriter(name);
-                        if (pdu == null)
-                        {
-                            throw new InvalidDataException("ERROR: can not found inside asset pdu writer=" + name);
-                        }
-                        SimpleLogger.Get().Log(Level.DEBUG, asset.name + " :pdu io connect add writer:" + pdu.GetName());
-                        connector.AddWriter(pdu);
-                    }
-                    foreach (var name in asset.pdu_reader_names)
-                    {
-                        var pdu = AssetConfigLoader.GetIpduReader(name);
-                        if (pdu == null)
-                        {
-                            throw new InvalidDataException("ERROR: can not found inside asset pdu reader=" + name);
-                        }
-                        SimpleLogger.Get().Log(Level.DEBUG, asset.name + " pdu io connect add reader:" + pdu.GetName());
-                        connector.AddReader(pdu);
-                    }
-                }
-            }
+            LoadInsideAssets(core_config.inside_assets_path);
+
             //outside asset configs
             if (core_config.outside_assets != null)
             {

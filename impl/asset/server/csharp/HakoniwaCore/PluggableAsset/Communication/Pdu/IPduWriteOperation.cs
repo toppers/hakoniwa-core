@@ -31,6 +31,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
 
         void SetData(string field_name, Pdu pdu);
         void SetData(string field_name, Pdu[] pdu);
+        void InitializePduArray(string field_name, int array_size);
 
         Pdu Ref(string field_name);
         Pdu[] Refs(string field_name);

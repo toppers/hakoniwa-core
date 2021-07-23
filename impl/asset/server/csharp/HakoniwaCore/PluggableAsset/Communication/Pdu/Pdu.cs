@@ -47,7 +47,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
             if (value.Length == 0)
             {
                 //可変配列
-                return 0;
+                return 1;
             }
             return int.Parse(value);
         }
@@ -726,6 +726,21 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
                 throw new ArgumentException("Invalid PDU access : field_name=" + field_name);
             }
             return field_struct_array[field_name];
+        }
+
+        public void InitializePduArray(string field_name, int array_size)
+        {
+            if (!this.field_struct_array.ContainsKey(field_name))
+            {
+                throw new ArgumentException("Invalid PDU access : field_name=" + field_name);
+            }
+            Pdu org = field_struct_array[field_name][0];
+            field_struct_array[field_name] = new Pdu[array_size];
+            for (int i = 0; i < array_size; i++)
+            {
+                field_struct_array[field_name][i] = new Pdu(org.pdu_type_name);
+            }
+            SimpleLogger.Get().Log(Level.DEBUG, "STRUCT ARRAY:" + field_name + " type=" + org.pdu_type_name);
         }
     }
 }

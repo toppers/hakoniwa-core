@@ -265,20 +265,6 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
             return this;
         }
 
-        public void SetHeaderData(string field_name, string value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetHeaderData(string field_name, int value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetHeaderData(string field_name, long value)
-        {
-            throw new NotImplementedException();
-        }
 
         public void SetData(string field_name, byte value)
         {
@@ -378,6 +364,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
             {
                 throw new ArgumentException("Invalid PDU access : field_name=" + field_name + " value=" + value);
             }
+            //SimpleLogger.Get().Log(Level.DEBUG, "pdu_name=" + this.GetName() + " value=" + value);
             this.field_string[field_name] = value;
         }
 
@@ -498,10 +485,6 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
             this.field_struct_array[field_name] = pdu;
         }
 
-        public long GetHeaderData(string field_name)
-        {
-            throw new NotImplementedException();
-        }
 
         public sbyte GetDataInt8(string field_name)
         {
@@ -740,7 +723,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
             {
                 field_struct_array[field_name][i] = new Pdu(org.pdu_type_name);
             }
-            SimpleLogger.Get().Log(Level.DEBUG, "STRUCT ARRAY:" + field_name + " type=" + org.pdu_type_name);
+            SimpleLogger.Get().Log(Level.DEBUG, "Initialize STRUCT ARRAY:" + field_name + " type=" + org.pdu_type_name);
         }
     }
 }

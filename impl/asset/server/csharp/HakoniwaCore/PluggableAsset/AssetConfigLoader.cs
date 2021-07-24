@@ -32,20 +32,7 @@ namespace Hakoniwa.PluggableAsset
         private static List<ReaderConnector> reader_connectors = new List<ReaderConnector>();
         private static List<PduChannelConnector> pdu_channel_connectors = new List<PduChannelConnector>();
         private static List<PduIoConnector> pdu_io_connectors = new List<PduIoConnector>();
-        private static List<Pdu> pdus = new List<Pdu>();
         private static List<PduDataConfig> pdu_configs = new List<PduDataConfig>();
-
-        public static Pdu GetPdu(string name)
-        {
-            foreach (var e in pdus)
-            {
-                if (e.GetName().Equals(name))
-                {
-                    return e;
-                }
-            }
-            return null;
-        }
 
         public static RosTopicMessageConfig GetRosTopic(string config_name)
         {
@@ -272,14 +259,7 @@ namespace Hakoniwa.PluggableAsset
             SimpleLogger.Get().Log(Level.DEBUG, "LoadPduConfig(): pdu_type_name=" + config.pdu_type_name);
             AssetConfigLoader.pdu_configs.Add(config);
         }
-        private static void LoadPdu(PduDataConfig config)
-        {
-            PduDataFieldsConfig cfg = new PduDataFieldsConfig();
-            cfg.fields = config.fields;
-            Pdu pdu = new Pdu(config.pdu_type_name, cfg);
-            SimpleLogger.Get().Log(Level.DEBUG, "LoadPdu(): type=" + pdu.GetName() + " pdu_type_name=" + config.pdu_type_name);
-            AssetConfigLoader.pdus.Add(pdu);
-        }
+
         private static T LoadJsonFile<T>(string filepath)
         {
             try
@@ -307,10 +287,6 @@ namespace Hakoniwa.PluggableAsset
                 {
                     AssetConfigLoader.LoadPduConfig(cfg);
                 }
-                foreach (var cfg in AssetConfigLoader.pdu_configs)
-                {
-                    AssetConfigLoader.LoadPdu(cfg);
-                }
             }
         }
         private static void LoadPduWriters(string filepath)
@@ -325,7 +301,7 @@ namespace Hakoniwa.PluggableAsset
                 IPduWriter ipdu = null;
                 if (pdu.topic_message_name == null)
                 {
-                    Pdu pdu_data = AssetConfigLoader.GetPdu(pdu.pdu_config_name);
+                    Pdu pdu_data = new Pdu(pdu.pdu_config_name);
                     if (pdu_data == null)
                     {
                         throw new InvalidDataException("ERROR: can not found pdu=" + pdu.name);
@@ -345,7 +321,7 @@ namespace Hakoniwa.PluggableAsset
                 }
                 else
                 {
-                    Pdu topic = AssetConfigLoader.GetPdu(pdu.pdu_config_name);
+                    Pdu topic = new Pdu(pdu.pdu_config_name);
                     if (topic == null)
                     {
                         throw new InvalidDataException("ERROR: can not found pdu=" + pdu.name);
@@ -382,7 +358,7 @@ namespace Hakoniwa.PluggableAsset
                 IPduReader ipdu = null;
                 if (pdu.topic_message_name == null)
                 {
-                    Pdu pdu_data = AssetConfigLoader.GetPdu(pdu.pdu_config_name);
+                    Pdu pdu_data = new Pdu(pdu.pdu_config_name);
                     if (pdu_data == null)
                     {
                         throw new InvalidDataException("ERROR: can not found pdu=" + pdu.name);
@@ -402,7 +378,7 @@ namespace Hakoniwa.PluggableAsset
                 }
                 else
                 {
-                    Pdu topic = AssetConfigLoader.GetPdu(pdu.pdu_config_name);
+                    Pdu topic = new Pdu(pdu.pdu_config_name);
                     if (topic == null)
                     {
                         throw new InvalidDataException("ERROR: can not found pdu=" + pdu.name);

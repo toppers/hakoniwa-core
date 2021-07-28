@@ -249,7 +249,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
                     this.field_float64_array.Add(name, new double[array_size]);
                     break;
                 case "string":
-                    this.field_string.Add(name, "");
+                    this.field_string_array.Add(name, new string[array_size]);
                     break;
                 default:
                     break;

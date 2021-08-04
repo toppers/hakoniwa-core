@@ -1,4 +1,4 @@
-FROM ubuntu:20.04 as hakoniwa-core
+FROM ubuntu:20.04 as hakoniwa-client-builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -32,7 +32,7 @@ RUN	wget -q -O cmake-linux.sh https://github.com/Kitware/CMake/releases/download
 # Install grpc
 RUN mkdir -p /root/grpc-build && \
 	cd /root/grpc-build && \
-	git clone https://github.com/grpc/grpc && \
+	git clone --recurse-submodules -b v1.35.0 https://github.com/grpc/grpc.git && \
 	cd grpc && \
 	git submodule update --init && \
 	mkdir -p cmake/build && \

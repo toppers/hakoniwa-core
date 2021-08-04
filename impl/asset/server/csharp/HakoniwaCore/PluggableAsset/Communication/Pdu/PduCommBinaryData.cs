@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Hakoniwa.PluggableAsset.Communication.Pdu
 {
-    class PduCommBinaryData : IPduCommData
+    public class PduCommBinaryData : IPduCommData
     {
         private byte[] buffer;
 

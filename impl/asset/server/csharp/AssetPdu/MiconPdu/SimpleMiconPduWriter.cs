@@ -8,58 +8,47 @@ using System.Text;
 
 namespace Hakoniwa.PluggableAsset.Communication.Pdu.Micon
 {
-    class SimpleMiconPduWriter : IPduWriter
+    public class SimpleMiconPduWriter : IPduWriter
     {
-        private MiconPduSensor packet = null;
         private string name;
-        public SimpleMiconPduWriter(string name)
+        private Pdu pdu;
+        private IPduWriterConverter converter = null;
+
+        public SimpleMiconPduWriter(Pdu arg_pdu, string name)
         {
             this.name = name;
-            this.packet = new MiconPduSensor()
-            {
-                Header = new MiconPduSensor.Types.Header
-                {
-                    Name = name,
-                    Version = 0x1,
-                    HakoniwaTime = 0,
-                }
-            };
+            this.pdu = arg_pdu;
         }
+        public IPduCommData Get()
+        {
+            if (this.converter == null)
+            {
+                throw new ArgumentException("Converter is not set");
+            }
+            else
+            {
+                return this.converter.ConvertToIoData(this);
+            }
+        }
+
         public string GetName()
         {
-            return name;
+            return this.name;
         }
 
-        public void Send(IIoWriter writer)
+        public IPduReadOperation GetReadOps()
         {
-            packet.Header.Name = name;
-            var stream = new MemoryStream();
-            this.packet.WriteTo(stream);
-            var buf = stream.ToArray();
-            writer.Flush(ref buf);
+            return this.pdu.GetPduReadOps();
         }
 
-        public void SetData(string field_name, int value)
+        public IPduWriteOperation GetWriteOps()
         {
-            throw new NotImplementedException();
+            return this.pdu.GetPduWriteOps();
         }
 
-        public void SetData(string field_name, ulong value)
+        public void SetConverter(IPduWriterConverter cnv)
         {
-            throw new NotImplementedException();
-        }
-
-        public void SetData(string field_name, double value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetHeaderData(string field_name, long value)
-        {
-            if (field_name.Equals("hakoniwa_time"))
-            {
-                this.packet.Header.HakoniwaTime = (ulong)value;
-            }
+            this.converter = cnv;
         }
     }
 }

@@ -8,80 +8,84 @@ using System.Text;
 
 namespace Hakoniwa.PluggableAsset.Communication.Pdu.Micon
 {
-    class SimpleMiconPduReader : IPduReader
+    public class SimpleMiconPduReader : IPduReader
     {
-        private MiconPduActuator packet = null;
         private string name;
-
-        public SimpleMiconPduReader(string name)
+        private Pdu pdu;
+        private IPduReaderConverter converter = null;
+        private bool is_set = false;
+        public SimpleMiconPduReader(Pdu arg_pdu, string name)
         {
+            this.pdu = arg_pdu;
             this.name = name;
         }
-        public void GetData(string field_name, out int value)
+        public IPduCommData Get()
         {
-            throw new NotImplementedException();
-        }
-
-        public void GetData(string field_name, out ulong value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void GetData(string field_name, out double value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public long GetHeaderData(string field_name)
-        {
-            if (this.packet == null)
+            if (this.converter == null)
             {
-                return 0;
+                throw new ArgumentException("Converter is not set");
             }
             else
             {
-                return (long)packet.Header.AssetTime;
+                return this.converter.ConvertToIoData(this);
             }
+        }
+
+        public string GetIoKey()
+        {
+            return this.name;
         }
 
         public string GetName()
         {
-            return name;
+            return this.name;
+        }
+
+        public IPduReadOperation GetReadOps()
+        {
+            return this.pdu.GetPduReadOps();
+        }
+
+        public IPduWriteOperation GetWriteOps()
+        {
+            return this.pdu.GetPduWriteOps();
         }
 
         public bool IsValidData()
         {
-            if (this.packet == null)
+            return is_set;
+        }
+
+        public void Set(IPduCommData data)
+        {
+            PduCommBinaryData binary = null;
+            if (data == null)
             {
-                //SimpleLogger.Get().Log(Level.DEBUG, "IsValid=false");
-                return false;
+                return;
+            }
+
+            if (data is PduCommBinaryData)
+            {
+                binary = (PduCommBinaryData)data;
+            }
+            if (binary == null)
+            {
+                throw new ArgumentException("Invalid data type:" + data.GetType());
+            }
+            if (this.converter == null)
+            {
+                throw new ArgumentException("Ev3PduReader converter null!!");
             }
             else
             {
-                //SimpleLogger.Get().Log(Level.DEBUG, "IsValid:this.packet.Header.Version=" + this.packet.Header.Version);
-                return (this.packet.Header.Version == 0x1);
+                this.is_set = true;
+                this.converter.ConvertToPduData(binary, this);
             }
         }
 
-        public void Recv(IIoReader reader)
+        public void SetConverter(IPduReaderConverter cnv)
         {
-            var buf = reader.Recv();
-            if (buf != null)
-            {
-                var parser = new MessageParser<MiconPduActuator>(() => new MiconPduActuator());
-                this.packet = parser.ParseFrom(new MemoryStream(buf));
-            }
-        }
-
-        public void Send(IIoWriter writer)
-        {
-            if (this.packet != null)
-            {
-                var stream = new MemoryStream();
-                this.packet.WriteTo(stream);
-                var buf = stream.ToArray();
-                writer.Flush(ref buf);
-            }
+            this.converter = cnv;
         }
     }
 }

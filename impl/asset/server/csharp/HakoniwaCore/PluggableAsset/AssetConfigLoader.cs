@@ -315,7 +315,7 @@ namespace Hakoniwa.PluggableAsset
                     }
                     if (pdu.conv_class_name != null)
                     {
-                        IPduWriterConverter conv = AssetConfigLoader.ClassLoader(null, pdu.conv_class_name, null) as IPduWriterConverter;
+                        IPduWriterConverter conv = AssetConfigLoader.ClassLoader(pdu.conv_path, pdu.conv_class_name, null) as IPduWriterConverter;
                         ipdu.SetConverter(conv);
                     }
                 }
@@ -629,7 +629,7 @@ namespace Hakoniwa.PluggableAsset
                     IOutsideAssetController controller = null;
                     if (asset.class_name != null)
                     {
-                        controller = AssetConfigLoader.ClassLoader(null, asset.class_name, asset.name) as IOutsideAssetController;
+                        controller = AssetConfigLoader.ClassLoader(asset.path, asset.class_name, asset.name) as IOutsideAssetController;
                     }
                     if (controller == null)
                     {

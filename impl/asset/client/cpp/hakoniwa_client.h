@@ -54,6 +54,18 @@ typedef struct {
 extern ErcdType hakonwia_core_get_asset_list(HakoniwaAssetInfoArrayType *list);
 extern void hakonwia_core_free_asset_list(HakoniwaAssetInfoArrayType *list);
 
+
+typedef struct {
+    char* tx_ipaddr;
+    char* rx_ipaddr;
+    int tx_portno;
+    int rx_portno;
+    int interval_msec; /* msec */
+} HakoniwaAssetTimeSyncConfigType;
+extern ErcdType hakoniwa_asset_real_time_sync_init(HakoniwaAssetTimeSyncConfigType* cfg);
+extern ErcdType hakoniwa_asset_real_time_sync_start(void);
+extern ErcdType hakoniwa_asset_real_time_sync_stop(void);
+
 #ifdef __cplusplus
 }
 #endif

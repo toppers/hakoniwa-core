@@ -11,7 +11,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Micon
         {
             //int64 hakoniwa_time
             var tmp_bytes = BitConverter.GetBytes(src.GetReadOps().GetDataInt64("simtime"));
-            Buffer.BlockCopy(tmp_bytes, 0, this.my_buffer, 16, tmp_bytes.Length);
+            Buffer.BlockCopy(tmp_bytes, 0, this.my_buffer, 0, tmp_bytes.Length);
             var obj = new PduCommBinaryData(this.my_buffer);
             return obj;
         }

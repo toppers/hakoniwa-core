@@ -19,7 +19,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Micon
                 return null;
             }
             byte[] tmp_bytes = BitConverter.GetBytes(src.GetReadOps().GetDataInt64("simtime"));
-            Buffer.BlockCopy(tmp_bytes, 0, this.my_buffer, 8, tmp_bytes.Length);
+            Buffer.BlockCopy(tmp_bytes, 0, this.my_buffer, 0, tmp_bytes.Length);
             return new PduCommBinaryData(this.my_buffer);
         }
 
@@ -27,7 +27,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Micon
         {
             PduCommBinaryData src_data = src as PduCommBinaryData;
             byte[] buffer = src_data.GetData();
-            dst.GetWriteOps().SetData("simtime", BitConverter.ToInt64(buffer, 8));
+            dst.GetWriteOps().SetData("simtime", BitConverter.ToInt64(buffer, 0));
         }
     }
 }

@@ -18,13 +18,20 @@ namespace HakoniwaRunner
         public long sim_exec_count_max = 10;
         private SimulationController simulator = SimulationController.Get();
 
-        public HakoniwaRunner(string filepath)
+        public HakoniwaRunner(string filepath, int cnt)
         {
+            this.sim_exec_count_max = cnt;
             AssetConfigLoader.Load(filepath);
             string ipaddr = AssetConfigLoader.core_config.core_ipaddr;
             int portno = AssetConfigLoader.core_config.core_portno;
 
+            if (AssetConfigLoader.core_config.sim_time_sync != null)
+            {
+                deltaTime = AssetConfigLoader.core_config.sim_time_sync.deltaTimeMsec * 1000;
+                maxDelayTime = AssetConfigLoader.core_config.sim_time_sync.maxDelayTimeMsec * 1000;
+            }
             Console.WriteLine("ipaddr=" + ipaddr + " portno=" + portno.ToString());
+            Console.WriteLine("deltaTimeMsec=" + deltaTime/1000 + " maxDelayTimeMsec=" + maxDelayTime/1000);
             RpcServer.StartServer(ipaddr, portno);
 
             simulator.RegisterEnvironmentOperation(this);
@@ -84,7 +91,13 @@ namespace HakoniwaRunner
         {
             string filepath = @".\core_config.json";
 
-            var controller = new HakoniwaRunner(filepath);
+            if (args.Length != 1)
+            {
+                Console.WriteLine("Usage: HakoniwaRunner sim_unit_count");
+                return;
+            }
+
+            var controller = new HakoniwaRunner(filepath, int.Parse(args[0]));
 
             controller.Execute();
 

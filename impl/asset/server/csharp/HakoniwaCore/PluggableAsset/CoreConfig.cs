@@ -10,6 +10,7 @@ namespace Hakoniwa.PluggableAsset
         public string core_ipaddr;
         public int core_portno;
         public long asset_timeout;
+        public SimTimeSyncConfig sim_time_sync;
         public string SymTimeMeasureFilePath;
         public string inside_assets_path;
         public InsideAssetConfig []  inside_assets;
@@ -32,6 +33,12 @@ namespace Hakoniwa.PluggableAsset
         public WriterConnectorConfig[] writer_connectors;
         public string pdu_channel_connectors_path;
         public PduChannelConnectorConfig[] pdu_channel_connectors;
+    }
+    [System.Serializable]
+    public class SimTimeSyncConfig
+    {
+        public long deltaTimeMsec; //msec
+        public long maxDelayTimeMsec; //msec
     }
     [System.Serializable]
     public class InsideAssetConfig

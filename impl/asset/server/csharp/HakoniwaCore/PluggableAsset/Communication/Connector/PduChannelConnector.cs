@@ -9,6 +9,10 @@ namespace Hakoniwa.PluggableAsset.Communication.Connector
         public static List<PduChannelConnector> connectors = new List<PduChannelConnector>();
         public static PduChannelConnector Create(string name)
         {
+            if (name == null)
+            {
+                name = "None";
+            }
             var entry = new PduChannelConnector(name);
             connectors.Add(entry);
             return entry;

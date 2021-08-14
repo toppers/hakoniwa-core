@@ -62,7 +62,17 @@ namespace Hakoniwa.Core.Simulation
         {
             lock (this.lockObj)
             {
-                return this.asset_mgr.RegisterOutsideAsset(name);
+                bool ret = false;
+                try
+                {
+                    ret = this.asset_mgr.RegisterOutsideAsset(name);
+                }
+                catch (Exception e)
+                {
+                    SimpleLogger.Get().Log(Level.ERROR, "RegisterOutsideAsset error:" + name);
+                    SimpleLogger.Get().Log(Level.TRACE, e);
+                }
+                return ret;
             }
         }
         public bool RegisterInsideAsset(string name)
@@ -120,7 +130,15 @@ namespace Hakoniwa.Core.Simulation
         {
             lock (this.lockObj)
             {
-                this.asset_mgr.Unregister(name);
+                try
+                {
+                    this.asset_mgr.Unregister(name);
+                }
+                catch (Exception e)
+                {
+                    SimpleLogger.Get().Log(Level.ERROR, "Unregister error:" + name);
+                    SimpleLogger.Get().Log(Level.TRACE, e);
+                }
             }
         }
 

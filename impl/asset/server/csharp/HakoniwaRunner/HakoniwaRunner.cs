@@ -89,7 +89,7 @@ namespace HakoniwaRunner
         }
         static void Main(string[] args)
         {
-            string filepath = @".\core_config.json";
+            string filepath = "./core_config.json";
 
             if (args.Length != 1)
             {

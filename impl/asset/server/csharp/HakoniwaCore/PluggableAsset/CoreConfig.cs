@@ -14,6 +14,8 @@ namespace Hakoniwa.PluggableAsset
         public string SymTimeMeasureFilePath;
         public string inside_assets_path;
         public InsideAssetConfig []  inside_assets;
+
+        public string outside_assets_path;
         public OutsideAssetConfig [] outside_assets;
         public string pdu_writers_path;
         public PduWriterConfig[] pdu_writers;
@@ -23,8 +25,13 @@ namespace Hakoniwa.PluggableAsset
         public RosTopicMessageConfig[] ros_topics;
         public string pdu_configs_path;
         public PduDataConfig[] pdu_configs;
+
+        public string udp_methods_path;
         public UdpMethodConfig[] udp_methods;
+
+        public string mmap_methods_path;
         public MmapMethodConfig[] mmap_methods;
+
         public string ros_topic_method_path;
         public RosTopicMethodConfig ros_topic_method;
         public string reader_connectors_path;

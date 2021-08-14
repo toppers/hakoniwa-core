@@ -545,21 +545,15 @@ namespace Hakoniwa.PluggableAsset
             }
         }
 
-        public static void Load(string filepath)
+        private static void LoadUdpMethods(string filepath)
         {
-            core_config = LoadJsonFile<CoreConfig>(filepath);
-            LoadPduConfig(core_config.pdu_configs_path);
-            if (core_config.ros_topics_path != null)
+            if (filepath != null)
             {
-                string jsonString = File.ReadAllText(core_config.ros_topics_path);
-                var container = JsonConvert.DeserializeObject<RosTopicMessageConfigContainer>(jsonString);
-                core_config.ros_topics = container.fields;
+                if (File.Exists(filepath))
+                {
+                    core_config.udp_methods = LoadJsonFile<UdpMethodConfig[]>(filepath);
+                }
             }
-            //writer pdu configs
-            LoadPduWriters(core_config.pdu_writers_path);
-            //reader pdu configs
-            LoadPduReaders(core_config.pdu_readers_path);
-
             if (core_config.udp_methods != null)
             {
                 //udp method configs
@@ -586,6 +580,43 @@ namespace Hakoniwa.PluggableAsset
                     }
                 }
             }
+        }
+        private static void LoadOutsideAssets(string filepath)
+        {
+            if (filepath != null)
+            {
+                if (File.Exists(filepath))
+                {
+                    core_config.outside_assets = LoadJsonFile<OutsideAssetConfig[]>(filepath);
+                }
+            }
+            if (core_config.outside_assets != null)
+            {
+                foreach (var asset in core_config.outside_assets)
+                {
+                    IOutsideAssetController controller = null;
+                    if (asset.class_name != null)
+                    {
+                        controller = AssetConfigLoader.ClassLoader(asset.path, asset.class_name, asset.name) as IOutsideAssetController;
+                    }
+                    if (controller == null)
+                    {
+                        throw new InvalidDataException("ERROR: can not found classname=" + asset.class_name);
+                    }
+                    SimpleLogger.Get().Log(Level.INFO, "OutSideAsset :" + asset.name);
+                    AssetConfigLoader.AddOutsideAsset(controller);
+                }
+            }
+        }
+        private static void LoadMmapMethods(string filepath)
+        {
+            if (filepath != null)
+            {
+                if (File.Exists(filepath))
+                {
+                    core_config.mmap_methods = LoadJsonFile<MmapMethodConfig[]>(filepath);
+                }
+            }
             if (core_config.mmap_methods != null)
             {
                 //mmap method configs
@@ -610,6 +641,27 @@ namespace Hakoniwa.PluggableAsset
                     }
                 }
             }
+        }
+
+        public static void Load(string filepath)
+        {
+            core_config = LoadJsonFile<CoreConfig>(filepath);
+            LoadPduConfig(core_config.pdu_configs_path);
+            if (core_config.ros_topics_path != null)
+            {
+                string jsonString = File.ReadAllText(core_config.ros_topics_path);
+                var container = JsonConvert.DeserializeObject<RosTopicMessageConfigContainer>(jsonString);
+                core_config.ros_topics = container.fields;
+            }
+            //writer pdu configs
+            LoadPduWriters(core_config.pdu_writers_path);
+            //reader pdu configs
+            LoadPduReaders(core_config.pdu_readers_path);
+            //udp methods configs
+            LoadUdpMethods(core_config.udp_methods_path);
+            //mmap methods configs
+            LoadMmapMethods(core_config.mmap_methods_path);
+
             LoadRosTopicMethod(core_config.ros_topic_method_path);
             //reader connectors configs
             LoadReaderConnectors(core_config.reader_connectors_path);
@@ -622,23 +674,7 @@ namespace Hakoniwa.PluggableAsset
             LoadInsideAssets(core_config.inside_assets_path);
 
             //outside asset configs
-            if (core_config.outside_assets != null)
-            {
-                foreach (var asset in core_config.outside_assets)
-                {
-                    IOutsideAssetController controller = null;
-                    if (asset.class_name != null)
-                    {
-                        controller = AssetConfigLoader.ClassLoader(asset.path, asset.class_name, asset.name) as IOutsideAssetController;
-                    }
-                    if (controller == null)
-                    {
-                        throw new InvalidDataException("ERROR: can not found classname=" + asset.class_name);
-                    }
-                    SimpleLogger.Get().Log(Level.INFO, "OutSideAsset :" + asset.name);
-                    AssetConfigLoader.AddOutsideAsset(controller);
-                }
-            }
+            LoadOutsideAssets(core_config.outside_assets_path);
         }
     }
 }

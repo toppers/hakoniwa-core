@@ -12,6 +12,7 @@ using json = nlohmann::json;
 using namespace hakoniwa;
 
 typedef struct {
+    HakoniwaAssetParamInfoType param_file;
     json param;
     ProcessManager process;
     HakoniwaAssetInfoType* asset;
@@ -24,13 +25,13 @@ static ErcdType init(char* ip_port, HakoniwaProxyControllerType* ctrlp)
 
     hakoniwa_core_init(ip_port);
 
-    err = hakoniwa_core_asset_register(ctrlp->asset);
+    err = hakoniwa_core_asset_register(&ctrlp->param_file);
     if (err != Ercd_OK) {
         printf("ERROR: hakoniwa_core_asset_register() returns %d\n", err);
         return err;
     }
-    printf("INFO: Register Asset %s success\n", ctrlp->asset->name);
-    err = hakoniwa_core_asset_notification_start(ctrlp->asset);
+    printf("INFO: Register Asset %s success\n", ctrlp->param["asset_name"].get<std::string>().c_str());
+    err = hakoniwa_core_asset_notification_start();
     if (err != Ercd_OK) {
         printf("hakoniwa_core_asset_notification_start() returns %d\n", err);
         return err;
@@ -56,12 +57,10 @@ int main(int argc, char** argv)
         return 1;
     }
     HakoniwaAssetInfoType asset;
-    ctrl.asset = &asset;
     param_file = argv[1];
+    ctrl.param_file.param_filename = param_file;
     std::ifstream ifs(param_file);
     ctrl.param = json::parse(ifs);
-    asset.name = (char*)ctrl.param["asset_name"].get<std::string>().c_str();
-    asset.len = strlen(ctrl.param["asset_name"].get<std::string>().c_str());
 
     sprintf(ip_port, "%s:%s", argv[2], argv[3]);
     ErcdType err = init(ip_port, &ctrl);
@@ -109,16 +108,16 @@ int main(int argc, char** argv)
             break;
         }
         if (result) {
-            hakoniwa_core_asset_event_feedback(ctrl.asset, ev.type, Ercd_OK);
+            hakoniwa_core_asset_event_feedback(ev.type, Ercd_OK);
         }
         else {
-            hakoniwa_core_asset_event_feedback(ctrl.asset, ev.type, Ercd_NG);
+            hakoniwa_core_asset_event_feedback(ev.type, Ercd_NG);
         }
     }
     if (ctrl.process.is_running()) {
         ctrl.process.terminate();
     }
-    err = hakoniwa_core_asset_unregister(ctrl.asset);
-    printf("INFO Unregister Asset %s result=%d\n", ctrl.asset->name, err);
+    err = hakoniwa_core_asset_unregister();
+    printf("INFO Unregister Asset %s result=%d\n", ctrl.param["asset_name"].get<std::string>().c_str(), err);
     return 0;
 }

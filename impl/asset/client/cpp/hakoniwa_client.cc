@@ -6,7 +6,8 @@
 #include <atomic>
 #include <thread>
 #include <queue>
-
+#include <fstream>
+#include <iostream>
 #include <grpcpp/grpcpp.h>
 
 #include <sys/types.h>
@@ -31,17 +32,20 @@ using hakoniwa::NormalReply;
 using hakoniwa::AssetInfo;
 using hakoniwa::ErrorCode;
 using hakoniwa::AssetNotificationEvent;
+#include "nlohmann/json.hpp"
+using json = nlohmann::json;
 
 namespace hakoniwa {
 
     class HakoniwaCoreServiceClient {
     public:
-        HakoniwaCoreServiceClient(std::shared_ptr<Channel> channel)
+        HakoniwaCoreServiceClient(const std::shared_ptr<grpc::ChannelInterface>& channel)
             : stub_(CoreService::NewStub(channel)) {}
 
-        ErcdType Register(const HakoniwaAssetInfoType* asset) {
+        ErcdType Register(const HakoniwaAssetParamInfoType* param) {
             AssetInfo request;
-            request.set_name(asset->name);
+            param_load(param->param_filename);
+            request.set_name(asset_name_);
             NormalReply reply;
             ClientContext context;
 
@@ -62,9 +66,9 @@ namespace hakoniwa {
                 return Ercd_NG;
             }
         }
-        ErcdType Unregister(const HakoniwaAssetInfoType* asset) {
+        ErcdType Unregister(void) {
             AssetInfo request;
-            request.set_name(asset->name);
+            request.set_name(asset_name_);
             NormalReply reply;
             ClientContext context;
 
@@ -186,11 +190,11 @@ namespace hakoniwa {
             notification_is_alive_ = true;
         }
 
-        ErcdType AssetNotificationStart(const HakoniwaAssetInfoType* asset)
+        ErcdType AssetNotificationStart(void)
         {
             AssetInfo request;
             AssetNotification notification;
-            request.set_name(asset->name);
+            request.set_name(asset_name_);
             ClientContext context;
 
             std::unique_ptr<grpc::ClientReader<AssetNotification> > reader = stub_->AssetNotificationStart(&context, request);
@@ -259,12 +263,12 @@ namespace hakoniwa {
             }
         }
 
-        ErcdType AssetNotificationFeedback(const HakoniwaAssetInfoType* asset, HakoniwaAssetEventEnumType event, ErcdType ercd) {
+        ErcdType AssetNotificationFeedback(HakoniwaAssetEventEnumType event, ErcdType ercd) {
             ClientContext context;
             AssetNotificationReply feedback;
             NormalReply reply;
             AssetInfo* info = new AssetInfo();
-            info->set_name(asset->name);
+            info->set_name(asset_name_);
 
             feedback.set_event(get_event(event));
             feedback.set_allocated_asset(info);
@@ -297,11 +301,22 @@ namespace hakoniwa {
         }
 
     private:
+        void param_load(const char* param_filename)
+        {
+            if (param_ == nullptr) {
+                std::ifstream ifs(param_filename);
+                param_ = json::parse(ifs);
+                asset_name_ = param_["asset_name"].get<std::string>();
+            }
+        }
         std::unique_ptr<CoreService::Stub> stub_;
         std::queue<AssetNotification*> events_;
         std::mutex mtx_;
         std::condition_variable cv_;
         bool notification_is_alive_ = false;
+        json param_ = nullptr;
+        std::string asset_name_;
+
     };
 
     static HakoniwaCoreServiceClient* gl_client;
@@ -309,21 +324,21 @@ namespace hakoniwa {
     void hakoniwa_core_init(const char* server)
     {
         std::string target_str(server);
-        static HakoniwaCoreServiceClient client(grpc::CreateChannel(
-            target_str, grpc::InsecureChannelCredentials()));
+        static HakoniwaCoreServiceClient client(
+            grpc::CreateChannel(target_str, grpc::InsecureChannelCredentials()));
         gl_client = &client;
         return;
     }
-    ErcdType hakoniwa_core_asset_register(const HakoniwaAssetInfoType* asset)
+    ErcdType hakoniwa_core_asset_register(const HakoniwaAssetParamInfoType* param)
     {
-        ErcdType ercd = gl_client->Register(asset);
+        ErcdType ercd = gl_client->Register(param);
         std::cout << "Client Register reply received: " << std::endl;
         return ercd;
     }
 
-    ErcdType hakoniwa_core_asset_unregister(const HakoniwaAssetInfoType* asset)
+    ErcdType hakoniwa_core_asset_unregister(void)
     {
-        ErcdType ercd = gl_client->Unregister(asset);
+        ErcdType ercd = gl_client->Unregister();
         std::cout << "Client Unregister reply received: " << std::endl;
         return ercd;
     }
@@ -370,25 +385,25 @@ namespace hakoniwa {
         return ev;
     }
 
-    static void notification_thread(const HakoniwaAssetInfoType* asset)
+    static void notification_thread(void)
     {
         std::cout << "####THREAD START: " << std::endl;
-        ErcdType ercd = gl_client->AssetNotificationStart(asset);
+        ErcdType ercd = gl_client->AssetNotificationStart();
         std::cout << "Client AssetNotificationStart reply received: " << std::endl;
         std::cout << "####THREAD END: " << std::endl;
         return;
     }
-    ErcdType hakoniwa_core_asset_notification_start(const HakoniwaAssetInfoType* asset)
+    ErcdType hakoniwa_core_asset_notification_start(void)
     {
         gl_client->AsyncAssetNotificationStart();
-        std::thread thr(notification_thread, asset);
+        std::thread thr(notification_thread);
         thr.detach();
         return Ercd_OK;
     }
 
-    ErcdType hakoniwa_core_asset_event_feedback(const HakoniwaAssetInfoType* asset, HakoniwaAssetEventEnumType event, ErcdType ercd)
+    ErcdType hakoniwa_core_asset_event_feedback(HakoniwaAssetEventEnumType event, ErcdType ercd)
     {
-        return gl_client->AssetNotificationFeedback(asset, event, ercd);
+        return gl_client->AssetNotificationFeedback(event, ercd);
     }
 
     ErcdType hakonwia_core_get_asset_list(HakoniwaAssetInfoArrayType* list)

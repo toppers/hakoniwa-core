@@ -13,11 +13,14 @@ typedef enum {
     Ercd_NG
 } ErcdType;
 typedef struct {
-    char *name;
+    char* param_filename;
+} HakoniwaAssetParamInfoType;
+typedef struct {
+    char * name;
     int len;
 } HakoniwaAssetInfoType;
-extern ErcdType hakoniwa_core_asset_register(const HakoniwaAssetInfoType* asset);
-extern ErcdType hakoniwa_core_asset_unregister(const HakoniwaAssetInfoType* asset);
+extern ErcdType hakoniwa_core_asset_register(const HakoniwaAssetParamInfoType* asset);
+extern ErcdType hakoniwa_core_asset_unregister(void);
 
 extern ErcdType hakoniwa_core_start_simulation(void);
 extern ErcdType hakoniwa_core_stop_simulation(void);
@@ -43,9 +46,9 @@ typedef enum {
 typedef struct {
     HakoniwaAssetEventEnumType type;
 } HakoniwaAssetEventType;
-extern ErcdType hakoniwa_core_asset_notification_start(const HakoniwaAssetInfoType* asset);
+extern ErcdType hakoniwa_core_asset_notification_start(void);
 extern HakoniwaAssetEventType hakoniwa_core_asset_get_event(void);
-extern ErcdType hakoniwa_core_asset_event_feedback(const HakoniwaAssetInfoType* asset, HakoniwaAssetEventEnumType event, ErcdType ercd);
+extern ErcdType hakoniwa_core_asset_event_feedback(HakoniwaAssetEventEnumType event, ErcdType ercd);
 
 typedef struct {
     int array_size;

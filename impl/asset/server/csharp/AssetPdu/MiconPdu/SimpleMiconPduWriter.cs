@@ -50,5 +50,9 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Micon
         {
             this.converter = cnv;
         }
+        public void Reset()
+        {
+            this.pdu.Reset();
+        }
     }
 }

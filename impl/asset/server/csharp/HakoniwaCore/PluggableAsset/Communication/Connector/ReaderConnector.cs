@@ -25,6 +25,11 @@ namespace Hakoniwa.PluggableAsset.Communication.Connector
             this.src_channel = c;
         }
 
+        public void Reset()
+        {
+            this.src_channel.GetReaer().Recv(null);
+        }
+
         public void Recv()
         {
             var tmp = this.src_channel.GetReaer().Recv(this.dst_pdu.GetIoKey());

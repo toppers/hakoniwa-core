@@ -9,6 +9,7 @@ using Hakoniwa.Core.Utils;
 using Hakoniwa.Core.Utils.Logger;
 using Hakoniwa.PluggableAsset;
 using Hakoniwa.PluggableAsset.Assets;
+using Hakoniwa.PluggableAsset.Communication.Connector;
 
 namespace Hakoniwa.Core.Simulation
 {
@@ -164,7 +165,15 @@ namespace Hakoniwa.Core.Simulation
             {
                 if (state == SimulationState.Stopped)
                 {
+                    PduIoConnector.Reset();
                     this.RestoreEnvironment();
+                    foreach (var connector in AssetConfigLoader.RefPduChannelConnector())
+                    {
+                        if (connector.Reader != null)
+                        {
+                            connector.Reader.Reset();
+                        }
+                    }
                     this.reset_request = false;
                     return true;
                 }
@@ -447,7 +456,10 @@ namespace Hakoniwa.Core.Simulation
             }
             foreach (var connector in AssetConfigLoader.RefPduChannelConnector())
             {
-                if ((connector.GetName() == null) && (connector.Reader != null))
+                if (
+                    ((connector.GetName() == null) || connector.GetName().Equals("None"))
+                        && (connector.Reader != null)
+                    )
                 {
                     connector.Reader.Recv();
                 }
@@ -496,7 +508,9 @@ namespace Hakoniwa.Core.Simulation
             this.logger.GetSimTimeLogger().Next();
             foreach (var connector in AssetConfigLoader.RefPduChannelConnector())
             {
-                if ((connector.GetName() == null) && (connector.Writer != null))
+                if (
+                    ((connector.GetName() == null) || connector.GetName().Equals("None"))
+                        && (connector.Writer != null))
                 {
                     connector.Writer.SendWriterPdu();
                     connector.Writer.SendReaderPdu();

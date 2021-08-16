@@ -16,6 +16,14 @@ namespace Hakoniwa.PluggableAsset.Communication.Connector
             return entry;
 
         }
+        public static void Reset()
+        {
+            foreach (var entry in connectors)
+            {
+                entry.ResetPdu();
+            }
+
+        }
         public static PduIoConnector Get(string name)
         {
             foreach (var entry in connectors)
@@ -81,6 +89,17 @@ namespace Hakoniwa.PluggableAsset.Communication.Connector
                 }
             }
             return null;
+        }
+        public void ResetPdu()
+        {
+            foreach (var e in this.pdu_reader)
+            {
+                e.Reset();
+            }
+            foreach (var e in this.pdu_writer)
+            {
+                e.Reset();
+            }
         }
 
         private PduIoConnector(string name)

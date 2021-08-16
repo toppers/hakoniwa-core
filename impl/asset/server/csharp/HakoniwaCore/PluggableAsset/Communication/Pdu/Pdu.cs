@@ -165,6 +165,49 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
             this.SetPdu(arg_pdu_type_name);
         }
 
+        public void Reset()
+        {
+            foreach (var e in pdu_config.fields)
+            {
+                if (IsArray(e.type))
+                {
+                    SimpleLogger.Get().Log(Level.DEBUG, "RESET type " + e.type + " name " + e.name);
+                    string array_type = GetArrayType(e.type);
+                    if (IsPrimitiveType(array_type))
+                    {
+                        SimpleLogger.Get().Log(Level.DEBUG, "RESET PRIMITIVE ARRAY:" + e.name + " type=" + e.type);
+                        this.ResetArrayInitValue(array_type, e.name, GetArraySize(e.type));
+                    }
+                    else
+                    {
+                        Pdu[] elms = new Pdu[GetArraySize(e.type)];
+                        for (int i = 0; i < elms.Length; i++)
+                        {
+                            elms[i] = new Pdu(array_type);
+                        }
+                        SimpleLogger.Get().Log(Level.DEBUG, "RESET STRUCT ARRAY:" + e.name + " type=" + e.type);
+                        this.field_struct_array.Remove(e.name);
+                        this.field_struct_array.Add(e.name, elms);
+                    }
+                }
+                else
+                {
+                    if (IsPrimitiveType(e.type))
+                    {
+                        SimpleLogger.Get().Log(Level.DEBUG, "RESET PRIMITIVE:" + e.name + " type=" + e.type);
+                        this.ResetValue(e.type, e.name);
+                    }
+                    else
+                    {
+                        SimpleLogger.Get().Log(Level.DEBUG, "RESET STRUCT:" + e.name + " type=" + e.type);
+                        this.field_struct.Remove(e.name);
+                        this.field_struct.Add(e.name, new Pdu(e.type));
+                    }
+
+                }
+            }
+        }
+
         public Pdu(string arg_pdu_type_name, PduDataFieldsConfig config)
         {
             this.pdu_type_name = arg_pdu_type_name;
@@ -213,7 +256,58 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
                     break;
             }
         }
-
+        private void ResetValue(string type, string name)
+        {
+            switch (type)
+            {
+                case "int8":
+                    this.field_int8.Remove(name);
+                    this.field_int8.Add(name, 0);
+                    break;
+                case "uint8":
+                    this.field_uint8.Remove(name);
+                    this.field_uint8.Add(name, 0);
+                    break;
+                case "int16":
+                    this.field_int16.Remove(name);
+                    this.field_int16.Add(name, 0);
+                    break;
+                case "uint16":
+                    this.field_uint16.Remove(name);
+                    this.field_uint16.Add(name, 0);
+                    break;
+                case "int32":
+                    this.field_int32.Remove(name);
+                    this.field_int32.Add(name, 0);
+                    break;
+                case "uint32":
+                    this.field_uint32.Remove(name);
+                    this.field_uint32.Add(name, 0);
+                    break;
+                case "int64":
+                    this.field_int64.Remove(name);
+                    this.field_int64.Add(name, 0);
+                    break;
+                case "uint64":
+                    this.field_uint64.Remove(name);
+                    this.field_uint64.Add(name, 0);
+                    break;
+                case "float32":
+                    this.field_float32.Remove(name);
+                    this.field_float32.Add(name, 0);
+                    break;
+                case "float64":
+                    this.field_float64.Remove(name);
+                    this.field_float64.Add(name, 0);
+                    break;
+                case "string":
+                    this.field_string.Remove(name);
+                    this.field_string.Add(name, "");
+                    break;
+                default:
+                    break;
+            }
+        }
         private void SetArrayInitValue(string array_type, string name, int array_size)
         {
             switch (array_type)
@@ -249,6 +343,58 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
                     this.field_float64_array.Add(name, new double[array_size]);
                     break;
                 case "string":
+                    this.field_string_array.Add(name, new string[array_size]);
+                    break;
+                default:
+                    break;
+            }
+        }
+        private void ResetArrayInitValue(string array_type, string name, int array_size)
+        {
+            switch (array_type)
+            {
+                case "int8":
+                    this.field_int8_array.Remove(name);
+                    this.field_int8_array.Add(name, new sbyte[array_size]);
+                    break;
+                case "uint8":
+                    this.field_uint8_array.Remove(name);
+                    this.field_uint8_array.Add(name, new byte[array_size]);
+                    break;
+                case "int16":
+                    this.field_int16_array.Remove(name);
+                    this.field_int16_array.Add(name, new Int16[array_size]);
+                    break;
+                case "uint16":
+                    this.field_uint16_array.Remove(name);
+                    this.field_uint16_array.Add(name, new UInt16[array_size]);
+                    break;
+                case "int32":
+                    this.field_int32_array.Remove(name);
+                    this.field_int32_array.Add(name, new Int32[array_size]);
+                    break;
+                case "uint32":
+                    this.field_uint32_array.Remove(name);
+                    this.field_uint32_array.Add(name, new UInt32[array_size]);
+                    break;
+                case "int64":
+                    this.field_int64_array.Remove(name);
+                    this.field_int64_array.Add(name, new Int64[array_size]);
+                    break;
+                case "uint64":
+                    this.field_uint64_array.Remove(name);
+                    this.field_uint64_array.Add(name, new UInt64[array_size]);
+                    break;
+                case "float32":
+                    this.field_float32_array.Remove(name);
+                    this.field_float32_array.Add(name, new float[array_size]);
+                    break;
+                case "float64":
+                    this.field_float64_array.Remove(name);
+                    this.field_float64_array.Add(name, new double[array_size]);
+                    break;
+                case "string":
+                    this.field_string_array.Remove(name);
                     this.field_string_array.Add(name, new string[array_size]);
                     break;
                 default:

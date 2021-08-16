@@ -11,5 +11,6 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
         IPduCommData Get();
         IPduWriteOperation GetWriteOps();
         IPduReadOperation GetReadOps();
+        void Reset();
     }
 }

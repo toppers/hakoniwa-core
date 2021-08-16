@@ -59,5 +59,9 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.ROS
         {
             this.converter = cnv;
         }
+        public void Reset()
+        {
+            this.pdu.Reset();
+        }
     }
 }

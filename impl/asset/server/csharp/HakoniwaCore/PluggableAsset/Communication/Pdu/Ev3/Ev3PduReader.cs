@@ -85,5 +85,9 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
         {
             this.converter = cnv;
         }
+        public void Reset()
+        {
+            this.pdu.Reset();
+        }
     }
 }

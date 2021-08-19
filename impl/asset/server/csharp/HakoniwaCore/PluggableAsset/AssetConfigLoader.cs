@@ -642,6 +642,16 @@ namespace Hakoniwa.PluggableAsset
                 }
             }
         }
+        private static void LoadWorldConfig(string filepath)
+        {
+            if (filepath != null)
+            {
+                if (File.Exists(filepath))
+                {
+                    core_config.param_world_config = LoadJsonFile<ParamWorldConfigContainer>(filepath);
+                }
+            }
+        }
 
         public static void Load(string filepath)
         {
@@ -653,6 +663,7 @@ namespace Hakoniwa.PluggableAsset
                 var container = JsonConvert.DeserializeObject<RosTopicMessageConfigContainer>(jsonString);
                 core_config.ros_topics = container.fields;
             }
+            LoadWorldConfig(core_config.param_world_config_path);
             //writer pdu configs
             LoadPduWriters(core_config.pdu_writers_path);
             //reader pdu configs

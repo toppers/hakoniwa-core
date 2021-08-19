@@ -40,6 +40,9 @@ namespace Hakoniwa.PluggableAsset
         public WriterConnectorConfig[] writer_connectors;
         public string pdu_channel_connectors_path;
         public PduChannelConnectorConfig[] pdu_channel_connectors;
+
+        public string param_world_config_path;
+        public ParamWorldConfigContainer param_world_config;
     }
     [System.Serializable]
     public class SimTimeSyncConfig
@@ -166,5 +169,15 @@ namespace Hakoniwa.PluggableAsset
     public class RosTopicMessageConfigContainer
     {
         public RosTopicMessageConfig[] fields;
+    }
+    [System.Serializable]
+    public class ParamWorldConfigContainer
+    {
+        public ParamMmagnification magnification;
+    }
+    [System.Serializable]
+    public class ParamMmagnification
+    {
+        public float scan_distance;
     }
 }

@@ -173,11 +173,13 @@ namespace Hakoniwa.PluggableAsset
     [System.Serializable]
     public class ParamWorldConfigContainer
     {
-        public ParamMmagnification magnification;
+        public ParamScale scale;
     }
     [System.Serializable]
-    public class ParamMmagnification
+    public class ParamScale
     {
-        public float scan_distance;
+        public float scan;
+        public float odom;
+        public float cmdvel;
     }
 }

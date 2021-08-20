@@ -34,6 +34,22 @@ namespace Hakoniwa.PluggableAsset
         private static List<PduIoConnector> pdu_io_connectors = new List<PduIoConnector>();
         private static List<PduDataConfig> pdu_configs = new List<PduDataConfig>();
 
+        public static ParamScale GetScale()
+        {
+            if (core_config.param_world_config != null)
+            {
+                if (core_config.param_world_config.scale != null)
+                {
+                    return core_config.param_world_config.scale;
+                }
+            }
+            var tmp = new ParamScale();
+            tmp.cmdvel = 1.0f;
+            tmp.odom = 1.0f;
+            tmp.scan = 1.0f;
+            return tmp;
+        }
+
         public static RosTopicMessageConfig GetRosTopic(string config_name)
         {
             if (core_config.ros_topics == null)

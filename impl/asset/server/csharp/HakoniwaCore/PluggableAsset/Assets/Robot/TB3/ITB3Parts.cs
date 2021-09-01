@@ -9,5 +9,6 @@ namespace Hakoniwa.PluggableAsset.Assets.Robot.TB3
         string GetMotor(int index);
         string GetIMU();
         string GetLaserScan();
+        string GetCamera();
     }
 }

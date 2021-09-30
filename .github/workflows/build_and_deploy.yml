@@ -1,0 +1,28 @@
+
+name: Hakoniwa.dll
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Get DateTime
+      id: date
+      run: echo "::set-output name=date::$(date +'%Y%m%d%H%M%S')"
+    - name: Build
+      run: |
+        bash ./impl/asset/server/csharp/HakoniwaCore/build_by_docker.bash Rebuild Debug
+      shell: bash
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: Hakoniwa.dll.${{ steps.date.outputs.date }}
+        draft: true
+        prerelease: false
+        files: |
+          dst/Hakoniwa.deps.json
+          dst/Hakoniwa.dll
+          dst/Hakoniwa.pdb

@@ -20,6 +20,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
         private Dictionary<string, float> field_float32 = new Dictionary<string, float>();
         private Dictionary<string, double> field_float64 = new Dictionary<string, double>();
         private Dictionary<string, string> field_string = new Dictionary<string, string>();
+        private Dictionary<string, bool> field_bool = new Dictionary<string, bool>();
         private Dictionary<string, Pdu> field_struct = new Dictionary<string, Pdu>();
 
         private Dictionary<string, SByte[]> field_int8_array = new Dictionary<string, SByte[]>();
@@ -33,6 +34,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
         private Dictionary<string, float[]> field_float32_array = new Dictionary<string, float[]>();
         private Dictionary<string, double[]> field_float64_array = new Dictionary<string, double[]>();
         private Dictionary<string, string[]> field_string_array = new Dictionary<string, string[]>();
+        private Dictionary<string, bool[]> field_bool_array = new Dictionary<string, bool[]>();
         private Dictionary<string, Pdu[]> field_struct_array = new Dictionary<string, Pdu[]>();
 
         private static int GetArraySize(string type)
@@ -76,6 +78,8 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
                 case "float64":
                     return true;
                 case "string":
+                    return true;
+                case "bool":
                     return true;
                 default:
                     return false;
@@ -252,6 +256,9 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
                 case "string":
                     this.field_string.Add(name, "");
                     break;
+                case "bool":
+                    this.field_bool.Add(name, false);
+                    break;
                 default:
                     break;
             }
@@ -304,6 +311,10 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
                     this.field_string.Remove(name);
                     this.field_string.Add(name, "");
                     break;
+                case "bool":
+                    this.field_bool.Remove(name);
+                    this.field_bool.Add(name, false);
+                    break;
                 default:
                     break;
             }
@@ -344,6 +355,9 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
                     break;
                 case "string":
                     this.field_string_array.Add(name, new string[array_size]);
+                    break;
+                case "bool":
+                    this.field_bool_array.Add(name, new bool[array_size]);
                     break;
                 default:
                     break;
@@ -396,6 +410,10 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
                 case "string":
                     this.field_string_array.Remove(name);
                     this.field_string_array.Add(name, new string[array_size]);
+                    break;
+                case "bool":
+                    this.field_bool_array.Remove(name);
+                    this.field_bool_array.Add(name, new bool[array_size]);
                     break;
                 default:
                     break;
@@ -514,6 +532,16 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
             this.field_string[field_name] = value;
         }
 
+        public void SetData(string field_name, bool value)
+        {
+            if (!this.field_bool.ContainsKey(field_name))
+            {
+                throw new ArgumentException("Invalid PDU access : field_name=" + field_name + " value=" + value);
+            }
+            //SimpleLogger.Get().Log(Level.DEBUG, "pdu_name=" + this.GetName() + " value=" + value);
+            this.field_bool[field_name] = value;
+        }
+
         public void SetData(string field_name, byte[] value)
         {
             if (!this.field_uint8_array.ContainsKey(field_name))
@@ -611,6 +639,15 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
                 throw new ArgumentException("Invalid PDU access : field_name=" + field_name + " value=" + value);
             }
             this.field_string_array[field_name] = value;
+        }
+
+        public void SetData(string field_name, bool[] value)
+        {
+            if (!this.field_bool_array.ContainsKey(field_name))
+            {
+                throw new ArgumentException("Invalid PDU access : field_name=" + field_name + " value=" + value);
+            }
+            this.field_bool_array[field_name] = value;
         }
 
         public void SetData(string field_name, Pdu pdu)
@@ -731,6 +768,15 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
             return field_string[field_name];
         }
 
+        public bool GetDataBool(string field_name)
+        {
+            if (!this.field_bool.ContainsKey(field_name))
+            {
+                throw new ArgumentException("Invalid PDU access : field_name=" + field_name);
+            }
+            return field_bool[field_name];
+        }
+
         public byte[] GetDataBytes(string field_name)
         {
             throw new NotImplementedException();
@@ -833,6 +879,15 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
                 throw new ArgumentException("Invalid PDU access : field_name=" + field_name);
             }
             return field_string_array[field_name];
+        }
+
+        public bool[] GetDataBoolArray(string field_name)
+        {
+            if (!this.field_bool_array.ContainsKey(field_name))
+            {
+                throw new ArgumentException("Invalid PDU access : field_name=" + field_name);
+            }
+            return field_bool_array[field_name];
         }
 
         public Pdu Ref(string field_name)

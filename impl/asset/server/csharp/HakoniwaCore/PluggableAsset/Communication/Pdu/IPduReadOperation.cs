@@ -17,6 +17,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
         float GetDataFloat32(string field_name);
         double GetDataFloat64(string field_name);
         string GetDataString(string field_name);
+        bool GetDataBool(string field_name);
 
         SByte[] GetDataInt8Array(string field_name);
         Byte[] GetDataUInt8Array(string field_name);
@@ -29,6 +30,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
         float[] GetDataFloat32Array(string field_name);
         double[] GetDataFloat64Array(string field_name);
         string[] GetDataStringArray(string field_name);
+        bool[] GetDataBoolArray(string field_name);
 
         Pdu Ref(string field_name);
         Pdu[] Refs(string field_name);

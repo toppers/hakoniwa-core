@@ -123,6 +123,7 @@ namespace Hakoniwa.PluggableAsset
         public string topic_type_name;
         public string robot_name;
         public bool sub;
+        public int pub_cycle_scale;
     }
     [System.Serializable]
     public class PduDataConfig

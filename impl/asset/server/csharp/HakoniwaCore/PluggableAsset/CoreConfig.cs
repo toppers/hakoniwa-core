@@ -117,13 +117,20 @@ namespace Hakoniwa.PluggableAsset
         public string parameters;
     }
     [System.Serializable]
+    public class RostopicPublisherOption
+    {
+        public int cycle_scale;
+        public bool latch;
+        public int queue_size;
+    }
+    [System.Serializable]
     public class RosTopicMessageConfig
     {
         public string topic_message_name;
         public string topic_type_name;
         public string robot_name;
         public bool sub;
-        public int pub_cycle_scale;
+        public RostopicPublisherOption pub_option;
     }
     [System.Serializable]
     public class PduDataConfig

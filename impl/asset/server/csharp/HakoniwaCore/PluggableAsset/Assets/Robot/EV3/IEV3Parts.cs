@@ -1,6 +1,15 @@
 ﻿
 namespace Hakoniwa.PluggableAsset.Assets.Robot.EV3
 {
+    public enum ButtonSensorType
+    {
+        BUTTON_SENSOR_LEFT = 0,
+        BUTTON_SENSOR_RIGHT = 1,
+        BUTTON_SENSOR_UP = 2,
+        BUTTON_SENSOR_DOWN = 3,
+        BUTTON_SENSOR_ENTER = 4,
+        BUTTON_SENSOR_BACK = 5,
+    }
     public interface IEV3Parts
     {
         string GetMotorA();
@@ -12,6 +21,7 @@ namespace Hakoniwa.PluggableAsset.Assets.Robot.EV3
         string getUltraSonicSensor();
         string getTouchSensor0();
         string getTouchSensor1();
+        string getButtonSensor(ButtonSensorType type);
         string getGyroSensor();
         string getGpsSensor();
     }

@@ -12,6 +12,7 @@ namespace Hakoniwa.PluggableAsset.Assets.Robot.EV3
     }
     public interface IEV3Parts
     {
+        void Load();
         string GetMotorA();
         string GetMotorB();
         string GetMotorC();
@@ -25,4 +26,28 @@ namespace Hakoniwa.PluggableAsset.Assets.Robot.EV3
         string getGyroSensor();
         string getGpsSensor();
     }
+    [System.Serializable]
+    public class EV3RobotButtonPartsConfig
+    {
+        public string left;
+        public string right;
+        public string up;
+        public string down;
+        public string enter;
+        public string back;
+    }
+
+    [System.Serializable]
+    public class EV3RobotPartsConfig
+    {
+        public string[] color_sensors;
+        public string[] touch_sensors;
+        public string ultrasonic_sensor;
+        public EV3RobotButtonPartsConfig button_sensor;
+        public string gps_sensor;
+        public string gyro_sensor;
+        public string led;
+        public string[] motors;
+    }
+
 }

@@ -8,5 +8,8 @@ namespace Hakoniwa.PluggableAsset.Assets.Robot
     {
         float GetDegree();
         void ClearDegree();
+        float GetCurrentAngle();
+        float GetCurrentAngleVelocity();
+        float GetRadius();
     }
 }

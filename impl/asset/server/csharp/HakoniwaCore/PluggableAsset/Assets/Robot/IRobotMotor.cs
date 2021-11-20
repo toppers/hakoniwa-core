@@ -8,5 +8,6 @@ namespace Hakoniwa.PluggableAsset.Assets.Robot
         void SetForce(int force);
         void SetStop(bool stop);
         void SetTargetVelicty(int targetVelocity);
+        void SetTargetVelicty(float targetVelocity);
     }
 }

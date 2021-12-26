@@ -8,5 +8,7 @@ namespace Hakoniwa.PluggableAsset.Assets.Environment
     public interface IHakoEnv
     {
         void Initialize(System.Object root);
+        string GetAssetName();
+        void UpdateSensorValues(Pdu pdu);
     }
 }

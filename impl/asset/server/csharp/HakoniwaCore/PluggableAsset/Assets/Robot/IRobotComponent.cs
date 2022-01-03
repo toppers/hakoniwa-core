@@ -6,5 +6,6 @@ namespace Hakoniwa.PluggableAsset.Assets.Robot
     public interface IRobotComponent
     {
         void Initialize(System.Object root);
+        RosTopicMessageConfig [] getRosConfig();
     }
 }

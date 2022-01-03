@@ -10,5 +10,6 @@ namespace Hakoniwa.PluggableAsset.Assets.Environment
         void Initialize(System.Object root);
         string GetAssetName();
         void UpdateSensorValues(Pdu pdu);
+        RosTopicMessageConfig [] getRosConfig();
     }
 }

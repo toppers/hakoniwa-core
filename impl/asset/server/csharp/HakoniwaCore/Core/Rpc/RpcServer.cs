@@ -89,15 +89,29 @@ namespace Hakoniwa.Core.Rpc
         public override Task<NormalReply> StartSimulation(Empty empty, ServerCallContext context)
         {
             SimpleLogger.Get().Log(Level.INFO, "StartSimulation");
-            if (RpcServer.GetSimulator().Start())
+            try
             {
-                return Task.FromResult(new NormalReply
+                if (RpcServer.GetSimulator().Start())
                 {
-                    Ercd = ErrorCode.Ok
-                });
+                    SimpleLogger.Get().Log(Level.INFO, "StartSimulation:Success");
+                    return Task.FromResult(new NormalReply
+                    {
+                        Ercd = ErrorCode.Ok
+                    });
+                }
+                else
+                {
+                    SimpleLogger.Get().Log(Level.INFO, "StartSimulation:Failed");
+                    return Task.FromResult(new NormalReply
+                    {
+                        Ercd = ErrorCode.Inval
+                    });
+                }
             }
-            else
+            catch (Exception e)
             {
+                SimpleLogger.Get().Log(Level.ERROR, e);
+                SimpleLogger.Get().Log(Level.INFO, "StartSimulation:Exception");
                 return Task.FromResult(new NormalReply
                 {
                     Ercd = ErrorCode.Inval

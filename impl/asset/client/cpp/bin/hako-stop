@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ -z $CORE_IPADDR ]
+then
+	echo "ERROR: please set CORE_IPADDR" 
+	exit 1
+fi
+if [ -z $CORE_PORTNO ]
+then
+	echo "ERROR: please set CORE_PORTNO" 
+	exit 1
+fi
+
+hakoniwa_command ${CORE_IPADDR} ${CORE_PORTNO} stop

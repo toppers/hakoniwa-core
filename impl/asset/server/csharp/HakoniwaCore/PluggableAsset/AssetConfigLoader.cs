@@ -221,14 +221,34 @@ namespace Hakoniwa.PluggableAsset
                 try
                 {
                     typeinfo = Type.GetType(class_name);
+                    SimpleLogger.Get().Log(Level.INFO, "typeinfo=" + typeinfo);
                     if (typeinfo == null)
                     {
                         //see:https://freelyapps.net/unityengine-types-can-no-longer-be-used/
-                        typeinfo = System.Reflection.Assembly.Load("Assembly-CSharp").GetType(class_name);
-                        if (typeinfo == null)
+                        try
                         {
-                            throw new InvalidDataException("ERROR: can not found class=" + class_name);
+                            var loadobj = System.Reflection.Assembly.Load("Assembly-CSharp");
+                            SimpleLogger.Get().Log(Level.INFO, "Found Assembly-CSharp");
+                            typeinfo = loadobj.GetType(class_name);
                         }
+                        catch (Exception)
+                        {
+                            SimpleLogger.Get().Log(Level.INFO, "Not found Assembly-CSharp");
+                            var loadobj = System.Reflection.Assembly.Load("Hakoniwa.PluggableAsset.Communication");
+                            if (loadobj != null)
+                            {
+                                typeinfo = loadobj.GetType(class_name);
+                                SimpleLogger.Get().Log(Level.INFO, "Found Hakoniwa.PluggableAsset.Communication");
+                            }
+                            else
+                            {
+                                SimpleLogger.Get().Log(Level.INFO, "Not found Hakoniwa.PluggableAsset.Communication");
+                            }
+                        }
+                    }
+                    if (typeinfo == null)
+                    {
+                        throw new InvalidDataException("ERROR: can not found class=" + class_name);
                     }
                     SimpleLogger.Get().Log(Level.INFO, "load typeinfo" + typeinfo);
                 }

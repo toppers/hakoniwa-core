@@ -230,6 +230,10 @@ namespace Hakoniwa.PluggableAsset
                             var loadobj = System.Reflection.Assembly.Load("Assembly-CSharp");
                             SimpleLogger.Get().Log(Level.INFO, "Found Assembly-CSharp");
                             typeinfo = loadobj.GetType(class_name);
+                            if (typeinfo == null)
+                            {
+                                throw new DllNotFoundException();
+                            }
                         }
                         catch (Exception)
                         {

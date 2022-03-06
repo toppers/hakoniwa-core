@@ -1,7 +1,5 @@
 ﻿using Hakoniwa.Core.Utils.Logger;
 using Hakoniwa.PluggableAsset.Assets;
-using Hakoniwa.PluggableAsset.Assets.Micon.EV3;
-using Hakoniwa.PluggableAsset.Assets.Robot.EV3;
 using Hakoniwa.PluggableAsset.Communication.Channel;
 using Hakoniwa.PluggableAsset.Communication.Connector;
 using Hakoniwa.PluggableAsset.Communication.Method;
@@ -9,13 +7,11 @@ using Hakoniwa.PluggableAsset.Communication.Method.Mmap;
 using Hakoniwa.PluggableAsset.Communication.Method.ROS;
 using Hakoniwa.PluggableAsset.Communication.Method.Udp;
 using Hakoniwa.PluggableAsset.Communication.Pdu;
-using Hakoniwa.PluggableAsset.Communication.Pdu.Ev3;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Text;
 
 namespace Hakoniwa.PluggableAsset
 {
@@ -300,7 +296,7 @@ namespace Hakoniwa.PluggableAsset
             AssetConfigLoader.pdu_configs.Add(config);
         }
 
-        private static T LoadJsonFile<T>(string filepath)
+        public static T LoadJsonFile<T>(string filepath)
         {
             try
             {
@@ -308,6 +304,19 @@ namespace Hakoniwa.PluggableAsset
                 var cfg = JsonConvert.DeserializeObject<T>(jsonString);
                 SimpleLogger.Get().Log(Level.INFO, "jsonstring=" + jsonString);
                 return cfg;
+            }
+            catch (Exception e)
+            {
+                SimpleLogger.Get().Log(Level.ERROR, e);
+                throw e;
+            }
+        }
+        public static void SaveJsonFile<T>(string filepath, T json_data)
+        {
+            try
+            {
+                string json = JsonConvert.SerializeObject(json_data, Formatting.Indented);
+                File.WriteAllText(filepath, json);
             }
             catch (Exception e)
             {

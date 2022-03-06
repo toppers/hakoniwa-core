@@ -190,4 +190,20 @@ namespace Hakoniwa.PluggableAsset
         public float odom;
         public float cmdvel;
     }
+    [System.Serializable]
+    public class LoginRobotInfoType
+    {
+        public string roboname;
+        public string robotype;
+    }
+    [System.Serializable]
+    public class LoginRobot
+    {
+        public LoginRobotInfoType [] robos;
+    }
+    [System.Serializable]
+    public class RobotTypes
+    {
+        public string [] robotype;
+    }
 }

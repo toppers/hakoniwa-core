@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Text;
 
 namespace Hakoniwa.PluggableAsset
@@ -195,6 +196,7 @@ namespace Hakoniwa.PluggableAsset
     {
         public string roboname;
         public string robotype;
+        public Vector3 pos;
     }
     [System.Serializable]
     public class LoginRobot

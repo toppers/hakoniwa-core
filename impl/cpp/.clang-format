@@ -1,0 +1,12 @@
+BasedOnStyle: LLVM
+AccessModifierOffset: -4
+ColumnLimit: 80
+ConstructorInitializerIndentWidth: 4
+ContinuationIndentWidth: 4
+DeriveLineEnding: true
+IndentCaseBlocks: true
+IndentCaseLabels: false
+Language: Cpp
+Standard: c++14
+BraceWrapping: Custom
+  IndentBraces: true

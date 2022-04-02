@@ -93,6 +93,7 @@ namespace Hakoniwa.Core.Simulation
 
         public void SetInsideWorldSimulator(IInsideWorldSimulatior isim)
         {
+#if false
             if (AssetConfigLoader.core_config.inside_assets != null)
             {
                 foreach (var iasset in AssetConfigLoader.core_config.inside_assets)
@@ -105,6 +106,7 @@ namespace Hakoniwa.Core.Simulation
                     }
                 }
             }
+#endif
             this.inside_simulator = isim;
         }
         public void SetSimulationWorldTime(long max_delay_time, long delta_time)

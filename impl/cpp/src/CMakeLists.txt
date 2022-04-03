@@ -1,0 +1,17 @@
+set(HAKO_CMAKE_VERSION ${HAKO_CMAKE_VERSION})
+
+project(hakoniwa-core
+    LANGUAGES C CXX
+)
+
+add_library(
+    hako STATIC
+    hako/hako_impl.cpp
+    hako/hako_master_impl.cpp
+)
+
+target_include_directories(
+    hako
+    PRIVATE ${PROJECT_SOURCE_DIR}/include
+    PRIVATE ${PROJECT_SOURCE_DIR}/hako
+)

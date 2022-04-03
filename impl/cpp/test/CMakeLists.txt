@@ -9,18 +9,20 @@ find_package(GTest REQUIRED)
 include(GoogleTest)
 
 add_executable(
-    hakoniwa-core-test
+    hako-test
     api/main.cpp
 )
 
 target_include_directories(
-    hakoniwa-core-test
+    hako-test
+    PRIVATE ${HAKO_INTERFACE_DIR}
     PRIVATE ${GTEST_INCLUDE_DIRS}
 )
 
-target_link_libraries(hakoniwa-core-test 
+target_link_libraries(hako-test
+    hako
     -pthread
     GTest::GTest
 )
 
-gtest_add_tests(TARGET hakoniwa-core-test)
+gtest_add_tests(TARGET hako-test)

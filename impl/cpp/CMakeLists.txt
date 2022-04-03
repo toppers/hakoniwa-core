@@ -9,6 +9,8 @@ project(hakoniwa-core
 
 enable_testing()
 
+set(HAKO_INTERFACE_DIR "${PROJECT_SOURCE_DIR}/src/include")
+
 if (DEFINED HAKO_OPTION_FILEPATH)
     include(${HAKO_OPTION_FILEPATH})
 else()
@@ -18,7 +20,7 @@ endif()
 message(STATUS "BUILD_TYPE" ${BUILD_TYPE})
 message(STATUS "GCOV" ${GCOV})
 
-# add_subdirectory(src)
+add_subdirectory(src)
 
 if (test)
     add_subdirectory(test)

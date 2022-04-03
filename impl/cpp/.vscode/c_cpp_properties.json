@@ -4,6 +4,8 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
+                "${workspaceFolder}/src/include/**",
+                "${workspaceFolder}/src/hako/**",
                 "/usr/include/**",
                 "/usr/include/gtest/**",
                 "/usr/local/grpc/include/**"

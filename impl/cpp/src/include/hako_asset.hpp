@@ -16,6 +16,7 @@ namespace hako {
         virtual bool asset_register(const std::string & name, AssetCallbackType &callbacks) = 0;
         virtual bool asset_unregister(const std::string & name) = 0;
         virtual void notify_simtime(HakoTimeType simtime) = 0;
+        virtual HakoTimeType get_worldtime() = 0;
 
     };
 }

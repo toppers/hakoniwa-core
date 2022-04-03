@@ -5,6 +5,7 @@
 #include <memory>
 #include <sys/types.h>
 #include <sys/ipc.h>
+#include <errno.h>
 
 /*
  * usec

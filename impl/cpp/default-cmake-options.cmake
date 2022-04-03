@@ -21,6 +21,10 @@ else()
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2")
 endif()
 
+if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    add_compile_definitions(MACOSX TRUE)
+endif()
+
 set(GCOV "disabled")
 if (gcov)
     set(GCOV "enabled")

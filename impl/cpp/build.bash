@@ -22,11 +22,12 @@ fi
 cd cmake-build
 if [ ${OPT} = "test" ]
 then
-    cmake -D test=true -D debug=true -d gcov=true ..
+    cmake -D test=true -D debug=true -D gcov=true ..
 
     make
     make test
 else
+    cmake -D test=false -D debug=true -D gcov=false ..
     make
 fi
 

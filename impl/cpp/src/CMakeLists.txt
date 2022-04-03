@@ -8,6 +8,7 @@ add_library(
     hako STATIC
     hako/hako_impl.cpp
     hako/hako_master_impl.cpp
+    hako/utils/hako_shared_memory.cpp
 )
 
 target_include_directories(

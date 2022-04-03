@@ -10,12 +10,15 @@ include(GoogleTest)
 
 add_executable(
     hako-test
-    api/main.cpp
+    hako/hako_shared_memory_test.cpp
+    hako/hako_test.cpp
+    hako/main.cpp
 )
 
 target_include_directories(
     hako-test
     PRIVATE ${HAKO_INTERFACE_DIR}
+    PRIVATE ${HAKO_SOURCE_DIR}
     PRIVATE ${GTEST_INCLUDE_DIRS}
 )
 

@@ -9,6 +9,7 @@ project(hakoniwa-core
 
 enable_testing()
 
+set(HAKO_SOURCE_DIR "${PROJECT_SOURCE_DIR}/src/hako")
 set(HAKO_INTERFACE_DIR "${PROJECT_SOURCE_DIR}/src/include")
 
 if (DEFINED HAKO_OPTION_FILEPATH)

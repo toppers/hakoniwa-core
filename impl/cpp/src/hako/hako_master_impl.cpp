@@ -6,9 +6,10 @@ bool hako::HakoMasterControllerImpl::execute()
     return true;
 }
 
-void hako::HakoMasterControllerImpl::set_config_simtime(HakoTimeType max_delay_time, HakoTimeType delta_time)
+void hako::HakoMasterControllerImpl::set_config_simtime(HakoTimeType max_delay_time_usec, HakoTimeType delta_time_usec)
 {
-    this->max_delay_time_ = max_delay_time;
-    this->delta_time_ = delta_time;
+    this->hako_time_set_.max_delay_time_usec = max_delay_time_usec;
+    this->hako_time_set_.delta_time_usec = delta_time_usec;
+    this->hako_time_set_.current_time_usec = 0ULL;
     return;
 }

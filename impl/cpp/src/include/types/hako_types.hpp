@@ -12,6 +12,14 @@
  */
 typedef uint64_t HakoTimeType;
 
+
+typedef uint32_t HakoAssetIdType;
+#define HAKO_FIXED_STRLEN_MAX  256
+typedef struct {
+    uint32_t    len;
+    char        data[HAKO_FIXED_STRLEN_MAX + 1];
+} HakoFixedStringType;
+
 typedef struct {
     void (*callback_start) ();
     void (*callback_stop) ();

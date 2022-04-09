@@ -64,12 +64,12 @@ namespace hako::data {
         /*
          * Time APIs
          */
-        HakoTimeSetType *get_time()
+        HakoTimeSetType &get_time()
         {
             if ((this->shmp_ == nullptr) || (this->master_datap_ == nullptr)) {
                 throw std::invalid_argument("ERROR: not initialized yet");
             }
-            return &this->master_datap_->time_usec;
+            return this->master_datap_->time_usec;
         }
         /*
          * Assets APIs

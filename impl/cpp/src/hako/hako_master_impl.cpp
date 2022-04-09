@@ -29,8 +29,3 @@ HakoTimeType hako::HakoMasterControllerImpl::get_delta_time_usec()
     auto timeset = this->master_data_->get_time();
     return timeset.delta;
 }
-
-int32_t hako::HakoMasterControllerImpl::get_shmid()
-{
-    return this->master_data_->get_shmid();
-}

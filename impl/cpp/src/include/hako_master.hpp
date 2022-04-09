@@ -16,7 +16,6 @@ namespace hako {
         virtual void set_config_simtime(HakoTimeType max_delay_time_usec, HakoTimeType delta_time_usec) = 0;
         virtual HakoTimeType get_max_deltay_time_usec() = 0;
         virtual HakoTimeType get_delta_time_usec() = 0;
-        virtual int32_t get_shmid() = 0;
     };
 }
 

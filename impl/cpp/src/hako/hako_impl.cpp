@@ -31,27 +31,27 @@ std::shared_ptr<hako::IHakoMasterController> hako::create_master()
     if (master_data_ptr == nullptr) {
         throw std::invalid_argument("ERROR: hako::init() is not called yet");
     }
-    if (master_ptr == nullptr) {
+    else if (master_ptr == nullptr) {
         master_ptr = std::make_shared<hako::HakoMasterControllerImpl>(master_data_ptr);
     }
     return master_ptr;
 }
 
-std::shared_ptr<hako::IHakoAssetController> hako::create_asset_controller(int32_t shmid)
+std::shared_ptr<hako::IHakoAssetController> hako::create_asset_controller()
 {
-    if (master_data_ptr == nullptr) {
-        master_data_ptr = std::make_shared<hako::data::HakoMasterData>();
-        master_data_ptr->load(shmid);
-    }
     if (asset_ptr != nullptr) {
         return asset_ptr;
+    }
+    else if (master_data_ptr == nullptr) {
+        master_data_ptr = std::make_shared<hako::data::HakoMasterData>();
+        master_data_ptr->load();
     }
     asset_ptr = std::make_shared<hako::HakoAssetControllerImpl>(master_data_ptr);
 
     return asset_ptr;
 }
 
-std::shared_ptr<hako::IHakoSimulationController> hako::get_simulation_controller(int32_t shmid)
+std::shared_ptr<hako::IHakoSimulationController> hako::get_simulation_controller()
 {
     //TODO
     return nullptr;

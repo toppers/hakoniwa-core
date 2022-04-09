@@ -48,7 +48,7 @@ TEST_F(HakoTest, IHakoAssetController_01)
     hako_master->set_config_simtime(max_delay_usec, delta_usec);
 
     //do
-    std::shared_ptr<hako::IHakoAssetController> hako_asset = hako::create_asset_controller(hako_master->get_shmid());
+    std::shared_ptr<hako::IHakoAssetController> hako_asset = hako::create_asset_controller();
 
     AssetCallbackType callback;
     callback.reset = nullptr;

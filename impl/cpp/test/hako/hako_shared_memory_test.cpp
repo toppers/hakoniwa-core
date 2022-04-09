@@ -26,11 +26,11 @@ TEST_F(HakoSharedMemoryTest, HakoSharedMemory_01)
     int32_t shmid = shm->create_memory(HAKO_SHARED_MEMORY_ID_0, 1024);
     EXPECT_TRUE(shmid > 0);
 
-    void *value = shm->lock_memory(shmid);
+    void *value = shm->lock_memory(HAKO_SHARED_MEMORY_ID_0);
     EXPECT_TRUE(value != nullptr);
 
-    shm->unlock_memory(shmid);
+    shm->unlock_memory(HAKO_SHARED_MEMORY_ID_0);
 
-    shm->destroy_memory(shmid);
+    shm->destroy_memory(HAKO_SHARED_MEMORY_ID_0);
 
 }

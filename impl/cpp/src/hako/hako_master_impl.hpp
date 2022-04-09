@@ -15,7 +15,6 @@ namespace hako {
         virtual void set_config_simtime(HakoTimeType max_delay_time_usec, HakoTimeType delta_time_usec);
         virtual HakoTimeType get_max_deltay_time_usec();
         virtual HakoTimeType get_delta_time_usec();
-        virtual int32_t get_shmid();
     private:
         HakoMasterControllerImpl() {}
         std::shared_ptr<data::HakoMasterData> master_data_;

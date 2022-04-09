@@ -12,19 +12,32 @@ namespace hako::data {
     } HakoTimeSetType;
 
     typedef enum {
-        Unknown = 0,
-        Inside,
-        Outside,
-        Count
+        HakoAsset_Unknown = 0,
+        HakoAsset_Inside,
+        HakoAsset_Outside,
+        HakoAsset_Count
     } HakoAssetType;
+
 
     typedef struct {
         HakoAssetIdType     id;
         HakoFixedStringType name;
         HakoAssetType       type;
-        HakoTimeType        ctime;
         AssetCallbackType   callback;
     } HakoAssetEntryType;
+
+    typedef enum {
+        HakoAssetEvent_None = 0,
+        HakoAssetEvent_Start,
+        HakoAssetEvent_Stop,
+        HakoAssetEvent_Reset,
+        HakoAssetEvent_Count
+    } HakoAssetEventType;
+
+    typedef struct {
+        HakoTimeType        ctime;
+        HakoAssetEventType  event;
+    } HakoAssetEntryEventType;
 
 }
 

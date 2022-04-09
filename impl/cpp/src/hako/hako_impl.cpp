@@ -1,6 +1,7 @@
 #include "hako.hpp"
 #include "hako_master_impl.hpp"
 #include "hako_asset_impl.hpp"
+#include "hako_simevent_impl.hpp"
 
 static std::shared_ptr<hako::data::HakoMasterData> master_data_ptr = nullptr;
 static std::shared_ptr<hako::IHakoMasterController> master_ptr = nullptr;
@@ -51,7 +52,7 @@ std::shared_ptr<hako::IHakoAssetController> hako::create_asset_controller()
     return asset_ptr;
 }
 
-std::shared_ptr<hako::IHakoSimulationController> hako::get_simulation_controller()
+std::shared_ptr<hako::IHakoSimulationEventController> hako::get_simevent_controller()
 {
     //TODO
     return nullptr;

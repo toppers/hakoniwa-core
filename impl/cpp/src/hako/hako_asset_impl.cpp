@@ -2,7 +2,7 @@
 
 bool hako::HakoAssetControllerImpl::asset_register(const std::string & name, AssetCallbackType &callbacks)
 {
-    auto id = this->master_data_->alloc_asset(name, hako::data::HakoAssetType::Inside, callbacks);
+    auto id = this->master_data_->alloc_asset(name, hako::data::HakoAssetType::HakoAsset_Inside, callbacks);
     if (id < 0) {
         return false;
     }

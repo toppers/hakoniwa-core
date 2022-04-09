@@ -13,6 +13,7 @@ namespace hako::data {
         HakoTimeSetType         time_usec;
         uint32_t                asset_num;
         HakoAssetEntryType      assets[HAKO_DATA_MAX_ASSET_NUM];
+        HakoAssetEntryEventType assets_ev[HAKO_DATA_MAX_ASSET_NUM];
     } HakoMasterDataType;
 
     class HakoMasterData {
@@ -106,7 +107,7 @@ namespace hako::data {
             if ((this->shmp_ == nullptr) || (this->master_datap_ == nullptr)) {
                 throw std::invalid_argument("ERROR: not initialized yet");
             }
-            if (type == hako::data::HakoAssetType::Unknown) {
+            if (type == hako::data::HakoAssetType::HakoAsset_Unknown) {
                 return -1;
             }
             if (name.length() > HAKO_FIXED_STRLEN_MAX) {
@@ -118,11 +119,11 @@ namespace hako::data {
                 (this->get_asset_nolock(name) == nullptr) &&
                 (this->master_datap_->asset_num < HAKO_DATA_MAX_ASSET_NUM)) {
                 for (int i = 0; i < HAKO_DATA_MAX_ASSET_NUM; i++) {
-                    if (this->master_datap_->assets[i].type == hako::data::HakoAssetType::Unknown) {
+                    if (this->master_datap_->assets[i].type == hako::data::HakoAssetType::HakoAsset_Unknown) {
                         this->master_datap_->assets[i].id = i;
                         this->master_datap_->assets[i].type = type;
-                        this->master_datap_->assets[i].ctime = 0ULL;
                         this->master_datap_->assets[i].callback = callback;
+                        this->master_datap_->assets_ev[i].ctime = 0ULL;
                         hako::utils::hako_string2fixed(name, this->master_datap_->assets[i].name);
                         id = i;
                         this->master_datap_->asset_num++;
@@ -143,7 +144,7 @@ namespace hako::data {
             if (this->master_datap_->state == HakoSim_Stopped) {
                 HakoAssetEntryType *entry = this->get_asset_nolock(name);
                 if (entry != nullptr) {
-                    entry->type = hako::data::HakoAssetType::Unknown;
+                    entry->type = hako::data::HakoAssetType::HakoAsset_Unknown;
                     this->master_datap_->asset_num--;
                     ret = true;
                 }
@@ -154,7 +155,7 @@ namespace hako::data {
         HakoAssetEntryType *get_asset(HakoAssetIdType id)
         {
             if ((id >= 0) && (id < HAKO_DATA_MAX_ASSET_NUM)) {
-                if (this->master_datap_->assets[id].type != hako::data::HakoAssetType::Unknown) {
+                if (this->master_datap_->assets[id].type != hako::data::HakoAssetType::HakoAsset_Unknown) {
                     return &this->master_datap_->assets[id];
                 }
             }
@@ -173,7 +174,7 @@ namespace hako::data {
         {
             for (int i = 0; i < HAKO_DATA_MAX_ASSET_NUM; i++) {
                 HakoAssetEntryType &entry = this->master_datap_->assets[i];
-                if (entry.type == hako::data::HakoAssetType::Unknown) {
+                if (entry.type == hako::data::HakoAssetType::HakoAsset_Unknown) {
                     continue;
                 }
                 else if (entry.name.len != name.length()) {

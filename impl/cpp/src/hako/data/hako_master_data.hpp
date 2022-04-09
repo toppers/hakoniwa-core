@@ -25,36 +25,36 @@ namespace hako::data {
         void init()
         {
             this->shmp_ = std::make_shared<hako::utils::HakoSharedMemory>();
-            this->seg_id_ = this->shmp_->create_memory(HAKO_SHARED_MEMORY_ID_0, sizeof(HakoMasterDataType));
-            if (this->seg_id_ < 0) {
+            this->shmid_ = this->shmp_->create_memory(HAKO_SHARED_MEMORY_ID_0, sizeof(HakoMasterDataType));
+            if (this->shmid_ < 0) {
                 throw std::bad_alloc();
             }
-            void *datap = this->shmp_->lock_memory(this->seg_id_);
+            void *datap = this->shmp_->lock_memory(this->shmid_);
             this->master_datap_ = static_cast<HakoMasterDataType*>(datap);
             {
                 memset(this->master_datap_, 0, sizeof(HakoMasterDataType));
             }
-            this->shmp_->unlock_memory(this->seg_id_);
+            this->shmp_->unlock_memory(this->shmid_);
         }
-        void load(int32_t seg_id)
+        void load(int32_t shmid)
         {
             if (this->shmp_ != nullptr) {
                 return;
             }
             this->shmp_ = std::make_shared<hako::utils::HakoSharedMemory>();
-            void *datap = this->shmp_->load_memory(seg_id);
+            void *datap = this->shmp_->load_memory(shmid);
             this->master_datap_ = static_cast<HakoMasterDataType*>(datap);
             if ((this->shmp_ == nullptr) || (this->master_datap_ == nullptr)) {
                 throw std::invalid_argument("ERROR: not initialized yet");
             }
-            this->seg_id_ = seg_id;
+            this->shmid_ = shmid;
             return;
         }
         void destroy()
         {
             if (this->shmp_ != nullptr) {
-                this->shmp_->destroy_memory(this->seg_id_);
-                this->seg_id_ = -1;
+                this->shmp_->destroy_memory(this->shmid_);
+                this->shmid_ = -1;
                 this->master_datap_ = nullptr;
             }
         }
@@ -67,14 +67,14 @@ namespace hako::data {
             if ((this->shmp_ == nullptr) || (this->master_datap_ == nullptr)) {
                 throw std::invalid_argument("ERROR: not initialized yet");
             }
-            (void)this->shmp_->lock_memory(this->seg_id_);
+            (void)this->shmp_->lock_memory(this->shmid_);
         }
         void unlock()
         {
             if ((this->shmp_ == nullptr) || (this->master_datap_ == nullptr)) {
                 throw std::invalid_argument("ERROR: not initialized yet");
             }
-            (void)this->shmp_->unlock_memory(this->seg_id_);
+            (void)this->shmp_->unlock_memory(this->shmid_);
         }
         /*
          * Time APIs
@@ -100,7 +100,7 @@ namespace hako::data {
         /*
          * Assets APIs
          */        
-        HakoAssetIdType alloc_asset(const std::string &name, HakoAssetType type)
+        HakoAssetIdType alloc_asset(const std::string &name, HakoAssetType type, AssetCallbackType &callback)
         {
             if ((this->shmp_ == nullptr) || (this->master_datap_ == nullptr)) {
                 throw std::invalid_argument("ERROR: not initialized yet");
@@ -120,6 +120,7 @@ namespace hako::data {
                         this->master_datap_->assets[i].id = i;
                         this->master_datap_->assets[i].type = type;
                         this->master_datap_->assets[i].ctime = 0ULL;
+                        this->master_datap_->assets[i].callback = callback;
                         hako::utils::hako_string2fixed(name, this->master_datap_->assets[i].name);
                         id = i;
                         this->master_datap_->asset_num++;
@@ -160,7 +161,10 @@ namespace hako::data {
             this->unlock();
             return entry;
         }
-
+        int32_t get_shmid()
+        {
+            return this->shmid_;
+        }
     private:
         HakoAssetEntryType *get_asset_nolock(const std::string &name)
         {
@@ -181,7 +185,7 @@ namespace hako::data {
         }
 
         std::shared_ptr<hako::utils::HakoSharedMemory>  shmp_;
-        int32_t seg_id_ = -1;
+        int32_t shmid_ = -1;
         HakoMasterDataType *master_datap_ = nullptr;
     };
 }

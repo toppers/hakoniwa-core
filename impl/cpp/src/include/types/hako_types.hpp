@@ -20,9 +20,9 @@ typedef struct {
 } HakoFixedStringType;
 
 typedef struct {
-    void (*callback_start) ();
-    void (*callback_stop) ();
-    void (*callback_reset) ();
+    void (*start) ();
+    void (*stop) ();
+    void (*reset) ();
 } AssetCallbackType;
 
 

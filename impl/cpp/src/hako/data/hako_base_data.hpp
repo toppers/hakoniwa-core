@@ -23,6 +23,7 @@ namespace hako::data {
         HakoFixedStringType name;
         HakoAssetType       type;
         HakoTimeType        ctime;
+        AssetCallbackType   callback;
     } HakoAssetEntryType;
 
 }

@@ -12,6 +12,7 @@ void hako::utils::hako_string2fixed(const std::string &src, HakoFixedStringType 
         throw new std::bad_alloc();
     }
     memcpy(&dst.data[0], src.c_str(), src.length());
+    dst.len = src.length();
     dst.data[src.length()] = 0x0;
     return;
 }

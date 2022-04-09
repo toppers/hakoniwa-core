@@ -8,10 +8,10 @@
 void do_shared_memory_multi_proc_test()
 {
     std::shared_ptr<hako::utils::HakoSharedMemory> shm = std::make_shared<hako::utils::HakoSharedMemory>();
-    int32_t seg_id = shm->create_memory(HAKO_SHARED_MEMORY_ID_0, 1024);
-    EXPECT_TRUE(seg_id > 0);
+    int32_t shmid = shm->create_memory(HAKO_SHARED_MEMORY_ID_0, 1024);
+    EXPECT_TRUE(shmid > 0);
 
-    void *value = shm->lock_memory(seg_id);
+    void *value = shm->lock_memory(shmid);
     EXPECT_TRUE(value != nullptr);
 
     for (int i = 0; i < 5; i++)
@@ -20,7 +20,7 @@ void do_shared_memory_multi_proc_test()
         usleep (1000000);
     }
 
-    shm->unlock_memory(seg_id);
+    shm->unlock_memory(shmid);
 
     for (int i = 0; i < 5; i++)
     {
@@ -28,7 +28,7 @@ void do_shared_memory_multi_proc_test()
         usleep (1000000);
     }
 
-    shm->destroy_memory(seg_id);
+    shm->destroy_memory(shmid);
     return;
 }
 

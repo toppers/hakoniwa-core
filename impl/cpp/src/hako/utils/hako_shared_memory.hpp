@@ -23,10 +23,10 @@ namespace hako::utils {
         virtual ~HakoSharedMemory() {}
 
         int32_t create_memory(int32_t id, int32_t size);
-        void* load_memory(int32_t seg_id);
+        void* load_memory(int32_t shmid);
 
-        void* lock_memory(int32_t seg_id);
-        void unlock_memory(int32_t seg_id);
+        void* lock_memory(int32_t shmid);
+        void unlock_memory(int32_t shmid);
         void destroy_memory(int32_t id);
 
     private:

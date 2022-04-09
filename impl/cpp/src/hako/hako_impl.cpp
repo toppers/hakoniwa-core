@@ -37,22 +37,21 @@ std::shared_ptr<hako::IHakoMasterController> hako::create_master()
     return master_ptr;
 }
 
-std::shared_ptr<hako::IHakoAssetController> hako::create_asset_controller(int32_t seg_id)
+std::shared_ptr<hako::IHakoAssetController> hako::create_asset_controller(int32_t shmid)
 {
-    if (master_data_ptr != nullptr) {
-        throw std::invalid_argument("ERROR: hako::init() is already called");
+    if (master_data_ptr == nullptr) {
+        master_data_ptr = std::make_shared<hako::data::HakoMasterData>();
+        master_data_ptr->load(shmid);
     }
     if (asset_ptr != nullptr) {
         return asset_ptr;
     }
-    master_data_ptr = std::make_shared<hako::data::HakoMasterData>();
-    master_data_ptr->load(seg_id);
     asset_ptr = std::make_shared<hako::HakoAssetControllerImpl>(master_data_ptr);
 
     return asset_ptr;
 }
 
-std::shared_ptr<hako::IHakoSimulationController> hako::get_simulation_controller(int32_t seg_id)
+std::shared_ptr<hako::IHakoSimulationController> hako::get_simulation_controller(int32_t shmid)
 {
     //TODO
     return nullptr;

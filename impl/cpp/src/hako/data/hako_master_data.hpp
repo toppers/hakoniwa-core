@@ -3,6 +3,7 @@
 
 #include "data/hako_base_data.hpp"
 #include "utils/hako_shared_memory.hpp"
+#include "utils/hako_string.hpp"
 #include <string.h>
 
 namespace hako::data {
@@ -74,14 +75,89 @@ namespace hako::data {
         /*
          * Assets APIs
          */        
-        bool alloc_asset(const std::string &name);
-        void free_asset(const std::string &name);
-        HakoAssetEntryType &get_asset(const std::string &name);
+        HakoAssetIdType alloc_asset(const std::string &name, HakoAssetType type)
+        {
+            if ((this->shmp_ == nullptr) || (this->master_datap_ == nullptr)) {
+                throw std::invalid_argument("ERROR: not initialized yet");
+            }
+            if (type == hako::data::HakoAssetType::Unknown) {
+                return -1;
+            }
+            if (name.length() > HAKO_FIXED_STRLEN_MAX) {
+                return -1;
+            }
+            HakoAssetIdType id = -1;
+            this->lock();
+            if ((this->get_asset_nolock(name) == nullptr) &&
+                (this->master_datap_->asset_num < HAKO_DATA_MAX_ASSET_NUM)) {
+                for (int i = 0; i < HAKO_DATA_MAX_ASSET_NUM; i++) {
+                    if (this->master_datap_->assets[i].type == hako::data::HakoAssetType::Unknown) {
+                        this->master_datap_->assets[i].id = i;
+                        this->master_datap_->assets[i].type = type;
+                        this->master_datap_->assets[i].ctime = 0ULL;
+                        hako::utils::hako_string2fixed(name, this->master_datap_->assets[i].name);
+                        id = i;
+                        this->master_datap_->asset_num++;
+                        break;
+                    }
+                }
+            }
+            else {
+                /* nothing to do */
+            }
+            this->unlock();
+            return id;
+        }
+        void free_asset(const std::string &name)
+        {
+            this->lock();
+            HakoAssetEntryType *entry = this->get_asset_nolock(name);
+            if (entry != nullptr) {
+                entry->type = hako::data::HakoAssetType::Unknown;
+                this->master_datap_->asset_num--;
+            }
+            this->unlock();
+        }
+        HakoAssetEntryType *get_asset(HakoAssetIdType id)
+        {
+            if ((id >= 0) && (id >= HAKO_DATA_MAX_ASSET_NUM)) {
+                if (this->master_datap_->assets[id].type != hako::data::HakoAssetType::Unknown) {
+                    return &this->master_datap_->assets[id];
+                }
+            }
+            return nullptr;
+        }
+        HakoAssetEntryType *get_asset(const std::string &name)
+        {
+            HakoAssetEntryType *entry;
+            this->lock();
+            entry = this->get_asset_nolock(name);
+            this->unlock();
+            return entry;
+        }
 
     private:
+        HakoAssetEntryType *get_asset_nolock(const std::string &name)
+        {
+            for (int i = 0; i < HAKO_DATA_MAX_ASSET_NUM; i++) {
+                HakoAssetEntryType &entry = this->master_datap_->assets[i];
+                if (entry.type == hako::data::HakoAssetType::Unknown) {
+                    continue;
+                }
+                else if (entry.name.len != name.length()) {
+                    continue;
+                }
+                else if (strncmp(entry.name.data, name.c_str(), entry.name.len) != 0) {
+                    continue;
+                }
+                return &entry;
+            }
+            return nullptr;
+        }
+
         std::shared_ptr<hako::utils::HakoSharedMemory>  shmp_;
-        int32_t seg_id_ = 01;
-        HakoMasterDataType *master_datap_;
+        int32_t seg_id_ = -1;
+        HakoMasterDataType *master_datap_ = nullptr;
     };
 }
 

@@ -13,7 +13,7 @@
  */
 typedef uint64_t HakoTimeType;
 
-typedef uint32_t HakoAssetIdType;
+typedef int32_t HakoAssetIdType;
 typedef struct {
     uint32_t    len;
     char        data[HAKO_FIXED_STRLEN_MAX + 1];

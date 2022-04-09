@@ -4,18 +4,6 @@
 #include "hako_asset.hpp"
 
 namespace hako {
-    typedef enum {
-        Unknown = 0,
-        Inside,
-        Outside,
-        Count
-    } HakoAssetType;
-    typedef struct {
-        HakoAssetIdType     id;
-        HakoAssetNameType   name;
-        HakoAssetType       type;
-        HakoTimeType        ctime;
-    } HakoAssetEntryType;
     class HakoAssetControllerImpl : public IHakoAssetController {
     public:
         HakoAssetControllerImpl() {}

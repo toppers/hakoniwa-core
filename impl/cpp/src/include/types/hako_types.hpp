@@ -6,15 +6,14 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <errno.h>
+#include "config/hako_config.hpp"
 
 /*
  * usec
  */
 typedef uint64_t HakoTimeType;
 
-
 typedef uint32_t HakoAssetIdType;
-#define HAKO_FIXED_STRLEN_MAX  256
 typedef struct {
     uint32_t    len;
     char        data[HAKO_FIXED_STRLEN_MAX + 1];

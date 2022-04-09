@@ -114,7 +114,8 @@ namespace hako::data {
             }
             HakoAssetIdType id = -1;
             this->lock();
-            if ((this->get_asset_nolock(name) == nullptr) &&
+            if (this->master_datap_->state == HakoSim_Stopped &&
+                (this->get_asset_nolock(name) == nullptr) &&
                 (this->master_datap_->asset_num < HAKO_DATA_MAX_ASSET_NUM)) {
                 for (int i = 0; i < HAKO_DATA_MAX_ASSET_NUM; i++) {
                     if (this->master_datap_->assets[i].type == hako::data::HakoAssetType::Unknown) {
@@ -135,15 +136,20 @@ namespace hako::data {
             this->unlock();
             return id;
         }
-        void free_asset(const std::string &name)
+        bool free_asset(const std::string &name)
         {
+            bool ret = false;
             this->lock();
-            HakoAssetEntryType *entry = this->get_asset_nolock(name);
-            if (entry != nullptr) {
-                entry->type = hako::data::HakoAssetType::Unknown;
-                this->master_datap_->asset_num--;
+            if (this->master_datap_->state == HakoSim_Stopped) {
+                HakoAssetEntryType *entry = this->get_asset_nolock(name);
+                if (entry != nullptr) {
+                    entry->type = hako::data::HakoAssetType::Unknown;
+                    this->master_datap_->asset_num--;
+                    ret = true;
+                }
             }
             this->unlock();
+            return ret;
         }
         HakoAssetEntryType *get_asset(HakoAssetIdType id)
         {

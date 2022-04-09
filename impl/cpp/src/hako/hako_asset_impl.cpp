@@ -2,8 +2,6 @@
 
 bool hako::HakoAssetControllerImpl::asset_register(const std::string & name, AssetCallbackType &callbacks)
 {
-    //TODO simulation controller check
-
     auto id = this->master_data_->alloc_asset(name, hako::data::HakoAssetType::Inside, callbacks);
     if (id < 0) {
         return false;
@@ -12,9 +10,7 @@ bool hako::HakoAssetControllerImpl::asset_register(const std::string & name, Ass
 }
 bool hako::HakoAssetControllerImpl::asset_unregister(const std::string & name)
 {
-    //TODO simulation controller check
-    this->master_data_->free_asset(name);
-    return true;
+    return this->master_data_->free_asset(name);
 }
 void hako::HakoAssetControllerImpl::notify_simtime(HakoTimeType simtime)
 {

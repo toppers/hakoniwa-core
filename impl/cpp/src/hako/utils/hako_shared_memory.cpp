@@ -16,7 +16,8 @@ union semun {
 
 int32_t hako::utils::HakoSharedMemory::create_memory(int32_t id, int32_t size)
 {
-    int32_t seg_id = shmget(id, size, IPC_CREAT | S_IRUSR | S_IWUSR);
+    int32_t total_size = size + sizeof(SharedMemoryMetaDataType);
+    int32_t seg_id = shmget(id, total_size, IPC_CREAT | S_IRUSR | S_IWUSR);
     if (seg_id < 0) {
         printf("ERROR: shmget() id=%d size=%d error=%d\n", id, size, errno);
         return -1;
@@ -36,19 +37,35 @@ int32_t hako::utils::HakoSharedMemory::create_memory(int32_t id, int32_t size)
     argument.array = values;
     int err = semctl(sem_id, 0, SETALL, argument);
     if (err < 0) {
-        printf("ERROR: semctl() error = %d segid=%d memp=%p\n", errno, seg_id, this->shared_memory_map_[seg_id].addr);
+        printf("ERROR: semctl() error = %d segid=%d\n", errno, seg_id);
         (void)shmdt(shared_memory);
         (void)shmctl (seg_id, IPC_RMID, 0);
         (void)semctl(sem_id, 1, IPC_RMID, NULL);
         return -1;
     }
-
+    SharedMemoryMetaDataType *metap = static_cast<SharedMemoryMetaDataType*>(shared_memory);
+    metap->sem_id = sem_id;
+    metap->data_size = size;
     SharedMemoryInfoType info;
-    info.addr = shared_memory;
+    info.addr = metap;
     info.sem_id = sem_id;
     this->shared_memory_map_.insert(std::make_pair(seg_id, info));
     //printf("segid=%d memp=%p\n", seg_id, this->shared_memory_map_[seg_id].addr);
     return seg_id;
+}
+
+void* hako::utils::HakoSharedMemory::load_memory(int32_t seg_id)
+{
+    void *shared_memory = shmat(seg_id, 0, 0);
+    if (shared_memory == nullptr) {
+        return nullptr;
+    }
+    SharedMemoryMetaDataType *metap = static_cast<SharedMemoryMetaDataType*>(shared_memory);
+    SharedMemoryInfoType info;
+    info.addr = metap;
+    info.sem_id = metap->sem_id;
+    this->shared_memory_map_.insert(std::make_pair(seg_id, info));
+    return &this->shared_memory_map_[seg_id].addr->data[0];
 }
 
 void* hako::utils::HakoSharedMemory::lock_memory(int32_t seg_id)
@@ -59,9 +76,9 @@ void* hako::utils::HakoSharedMemory::lock_memory(int32_t seg_id)
     sop.sem_flg =  0;            // Operation flag
     int32_t err = semop(this->shared_memory_map_[seg_id].sem_id, &sop, 1);
     if (err < 0) {
-        printf("ERROR: unlock_memory() semop() error=%d segid=%d memp=%p\n", errno, seg_id, this->shared_memory_map_[seg_id].addr);
+        printf("ERROR: unlock_memory() semop() error=%d segid=%d\n", errno, seg_id);
     }
-    return this->shared_memory_map_[seg_id].addr;
+    return &this->shared_memory_map_[seg_id].addr->data[0];
 }
 
 void hako::utils::HakoSharedMemory::unlock_memory(int32_t seg_id)
@@ -72,7 +89,7 @@ void hako::utils::HakoSharedMemory::unlock_memory(int32_t seg_id)
     sop.sem_flg =  0;            // Operation flag
     int32_t err = semop(this->shared_memory_map_[seg_id].sem_id, &sop, 1);
     if (err < 0) {
-        printf("ERROR: unlock_memory() semop() error=%d segid=%d memp=%p\n", errno, seg_id, this->shared_memory_map_[seg_id].addr);
+        printf("ERROR: unlock_memory() semop() error=%d segid=%d\n", errno, seg_id);
     }
     return;
 }

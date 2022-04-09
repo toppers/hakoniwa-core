@@ -11,7 +11,7 @@ void hako::HakoMasterControllerImpl::set_config_simtime(HakoTimeType max_delay_t
 {
     this->master_data_->lock();
     {
-        auto & timeset = this->master_data_->get_time();
+        auto & timeset = this->master_data_->ref_time_nolock();
         timeset.max_delay = max_delay_time_usec;
         timeset.delta = delta_time_usec;
     }
@@ -21,24 +21,12 @@ void hako::HakoMasterControllerImpl::set_config_simtime(HakoTimeType max_delay_t
 
 HakoTimeType hako::HakoMasterControllerImpl::get_max_deltay_time_usec()
 {
-    HakoTimeType max_delay;
-    this->master_data_->lock();
-    {
-        auto & timeset = this->master_data_->get_time();
-        max_delay = timeset.max_delay;
-    }
-    this->master_data_->unlock();
-    return max_delay;
+    auto timeset = this->master_data_->get_time();
+    return timeset.max_delay;
 }
 HakoTimeType hako::HakoMasterControllerImpl::get_delta_time_usec()
 {
-    HakoTimeType delta;
-    this->master_data_->lock();
-    {
-        auto timeset = this->master_data_->get_time();
-        delta = timeset.delta;
-    }
-    this->master_data_->unlock();
-    return delta;
+    auto timeset = this->master_data_->get_time();
+    return timeset.delta;
 }
 

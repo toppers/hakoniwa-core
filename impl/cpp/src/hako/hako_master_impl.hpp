@@ -7,7 +7,6 @@
 namespace hako {
     class HakoMasterControllerImpl : public IHakoMasterController {
     public:
-        HakoMasterControllerImpl() {}
         HakoMasterControllerImpl(std::shared_ptr<data::HakoMasterData> ptr)
         {
             this->master_data_ = ptr;
@@ -17,6 +16,7 @@ namespace hako {
         virtual HakoTimeType get_max_deltay_time_usec();
         virtual HakoTimeType get_delta_time_usec();
     private:
+        HakoMasterControllerImpl() {}
         std::shared_ptr<data::HakoMasterData> master_data_;
     };
 }

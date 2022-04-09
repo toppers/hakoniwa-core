@@ -36,6 +36,20 @@ namespace hako::data {
             }
             this->shmp_->unlock_memory(this->seg_id_);
         }
+        void load(int32_t seg_id)
+        {
+            if (this->shmp_ != nullptr) {
+                return;
+            }
+            this->shmp_ = std::make_shared<hako::utils::HakoSharedMemory>();
+            void *datap = this->shmp_->load_memory(seg_id);
+            this->master_datap_ = static_cast<HakoMasterDataType*>(datap);
+            if ((this->shmp_ == nullptr) || (this->master_datap_ == nullptr)) {
+                throw std::invalid_argument("ERROR: not initialized yet");
+            }
+            this->seg_id_ = seg_id;
+            return;
+        }
         void destroy()
         {
             if (this->shmp_ != nullptr) {
@@ -65,12 +79,23 @@ namespace hako::data {
         /*
          * Time APIs
          */
-        HakoTimeSetType &get_time()
+        HakoTimeSetType get_time()
         {
             if ((this->shmp_ == nullptr) || (this->master_datap_ == nullptr)) {
                 throw std::invalid_argument("ERROR: not initialized yet");
             }
-            return this->master_datap_->time_usec;
+            this->lock();
+            HakoTimeSetType timeset = this->master_datap_->time_usec;
+            this->unlock();
+            return timeset;
+        }
+        HakoTimeSetType& ref_time_nolock()
+        {
+            if ((this->shmp_ == nullptr) || (this->master_datap_ == nullptr)) {
+                throw std::invalid_argument("ERROR: not initialized yet");
+            }
+            HakoTimeSetType &timeset = this->master_datap_->time_usec;
+            return timeset;
         }
         /*
          * Assets APIs

@@ -26,6 +26,7 @@ TEST_F(HakoTest, IHakoMasterController_01)
     HakoTimeType delta_usec = 10000ULL;
     std::shared_ptr<hako::IHakoMasterController> hako_master = hako::create_master();
     hako_master->set_config_simtime(max_delay_usec, delta_usec);
+
     EXPECT_EQ(hako_master->get_max_deltay_time_usec(), max_delay_usec);
     EXPECT_EQ(hako_master->get_delta_time_usec(), delta_usec);
 

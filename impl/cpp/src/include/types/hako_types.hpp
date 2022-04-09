@@ -25,8 +25,15 @@ typedef struct {
     void (*reset) ();
 } AssetCallbackType;
 
+typedef enum
+{
+    HakoSim_Stopped = 0,
+    HakoSim_Runnable,
+    HakoSim_Running,
+    HakoSim_Stopping,
+    HakoSim_Terminated,
+    HakoSim_Count
+} HakoSimulationStateType;
 
-#define HAKO_SHARED_MEMORY_BASE_ID   0x00FF
-#define HAKO_SHARED_MEMORY_ID_0     (0x0 + HAKO_SHARED_MEMORY_BASE_ID)
 
 #endif /* _HAKO_TYPES_HPP_ */

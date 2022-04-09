@@ -9,9 +9,10 @@
 namespace hako::data {
 
     typedef struct {
-        HakoTimeSetType     time_usec;
-        uint32_t            asset_num;
-        HakoAssetEntryType  assets[HAKO_DATA_MAX_ASSET_NUM];
+        HakoSimulationStateType state;
+        HakoTimeSetType         time_usec;
+        uint32_t                asset_num;
+        HakoAssetEntryType      assets[HAKO_DATA_MAX_ASSET_NUM];
     } HakoMasterDataType;
 
     class HakoMasterData {
@@ -146,7 +147,7 @@ namespace hako::data {
         }
         HakoAssetEntryType *get_asset(HakoAssetIdType id)
         {
-            if ((id >= 0) && (id >= HAKO_DATA_MAX_ASSET_NUM)) {
+            if ((id >= 0) && (id < HAKO_DATA_MAX_ASSET_NUM)) {
                 if (this->master_datap_->assets[id].type != hako::data::HakoAssetType::Unknown) {
                     return &this->master_datap_->assets[id];
                 }

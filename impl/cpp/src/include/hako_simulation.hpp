@@ -4,15 +4,6 @@
 #include "types/hako_types.hpp"
 
 namespace hako {
-    typedef enum
-    {
-        Stopped = 0,
-        Runnable,
-        Running,
-        Stopping,
-        Terminated,
-        Count
-    } SimulationStateType;
 
     class IHakoSimulationController {
     public:
@@ -21,7 +12,7 @@ namespace hako {
         /*
          * Simulation APIs
          */
-        virtual SimulationStateType get_state() = 0;
+        virtual HakoSimulationStateType get_state() = 0;
         virtual HakoTimeType get_worldtime() = 0;
         virtual bool start() = 0;
         virtual bool stop() = 0;

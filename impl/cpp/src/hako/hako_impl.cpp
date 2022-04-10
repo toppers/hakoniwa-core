@@ -2,6 +2,7 @@
 #include "hako_master_impl.hpp"
 #include "hako_asset_impl.hpp"
 #include "hako_simevent_impl.hpp"
+#include "utils/hako_logger.hpp"
 
 static std::shared_ptr<hako::data::HakoMasterData> master_data_ptr = nullptr;
 static std::shared_ptr<hako::IHakoMasterController> master_ptr = nullptr;
@@ -10,6 +11,7 @@ static std::shared_ptr<hako::IHakoSimulationEventController> simevent_ptr = null
 
 void hako::init()
 {
+    hako::utils::logger::init();
     if (master_data_ptr == nullptr) {
         master_data_ptr = std::make_shared<hako::data::HakoMasterData>();
         master_data_ptr->init();

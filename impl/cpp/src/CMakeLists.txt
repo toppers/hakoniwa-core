@@ -12,10 +12,12 @@ add_library(
     hako/hako_master_impl.cpp
     hako/utils/hako_shared_memory.cpp
     hako/utils/hako_string.cpp
+    hako/utils/hako_logger.cpp
 )
 
 target_include_directories(
     hako
+    PRIVATE /usr/local/include
     PRIVATE ${PROJECT_SOURCE_DIR}/include
     PRIVATE ${PROJECT_SOURCE_DIR}/hako
 )

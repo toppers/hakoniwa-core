@@ -99,6 +99,33 @@ namespace hako::data {
             HakoTimeSetType &timeset = this->master_datap_->time_usec;
             return timeset;
         }
+        HakoSimulationStateType& ref_state_nolock()
+        {
+            return this->master_datap_->state;
+        }
+        void publish_event_nolock(HakoAssetEventType event)
+        {
+            for (int i = 0; i < HAKO_DATA_MAX_ASSET_NUM; i++) {
+                auto& entry = this->master_datap_->assets[i];
+                auto& entry_ev = this->master_datap_->assets_ev[i];
+                if (entry.type != hako::data::HakoAssetType::HakoAsset_Unknown) {
+                    entry_ev.event = event;
+                    switch (event) {
+                        case hako::data::HakoAssetEvent_Start:
+                           entry.callback.start();
+                            break;
+                        case hako::data::HakoAssetEvent_Stop:
+                           entry.callback.stop();
+                            break;
+                        case hako::data::HakoAssetEvent_Reset:
+                           entry.callback.reset();
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
         /*
          * Assets APIs
          */        
@@ -161,6 +188,16 @@ namespace hako::data {
             }
             return nullptr;
         }
+        HakoAssetEntryEventType *get_asset_event(HakoAssetIdType id)
+        {
+            if ((id >= 0) && (id < HAKO_DATA_MAX_ASSET_NUM)) {
+                if (this->master_datap_->assets[id].type != hako::data::HakoAssetType::HakoAsset_Unknown) {
+                    return &this->master_datap_->assets_ev[id];
+                }
+            }
+            return nullptr;
+        }
+
         HakoAssetEntryType *get_asset(const std::string &name)
         {
             HakoAssetEntryType *entry;

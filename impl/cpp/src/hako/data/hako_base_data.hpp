@@ -37,8 +37,8 @@ namespace hako::data {
     typedef struct {
         HakoTimeType        ctime;
         HakoAssetEventType  event;
+        bool                event_feedback;
     } HakoAssetEntryEventType;
-
 }
 
 #endif /* _HAKO_BASE_DATA_HPP_ */

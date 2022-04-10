@@ -31,7 +31,8 @@ namespace hako {
          * monitor
          */
         void run_nolock();
-        
+        bool feedback(const std::string& asset_name, bool isOk, HakoSimulationStateType exp_state);
+        bool trigger_event(HakoSimulationStateType curr_state, HakoSimulationStateType next_state, hako::data::HakoAssetEventType event);
         HakoSimulationEventController() {}
         std::shared_ptr<data::HakoMasterData> master_data_;
     };    

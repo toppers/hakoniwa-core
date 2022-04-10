@@ -15,7 +15,9 @@ bool hako::HakoSimulationEventController::start()
     }
     this->master_data_->unlock();
 
-    this->master_data_->publish_event_nolock(hako::data::HakoAssetEvent_Start);
+    if (ret) {
+        this->master_data_->publish_event_nolock(hako::data::HakoAssetEvent_Start);
+    }
     return ret;
 }
 
@@ -26,7 +28,6 @@ bool hako::HakoSimulationEventController::start_feedback(const std::string& asse
     {
         auto& state = this->master_data_->ref_state_nolock();
         if (state == HakoSim_Runnable) {
-            //TODO
             auto* entry = this->master_data_->get_asset(asset_name);
             if (entry != nullptr) {
                 auto* entry_ev = this->master_data_->get_asset_event(entry->id);
@@ -60,7 +61,9 @@ bool hako::HakoSimulationEventController::stop()
     }
     this->master_data_->unlock();
 
-    this->master_data_->publish_event_nolock(hako::data::HakoAssetEvent_Stop);
+    if (ret) {
+        this->master_data_->publish_event_nolock(hako::data::HakoAssetEvent_Stop);
+    }
 
     return ret;
 }
@@ -72,7 +75,6 @@ bool hako::HakoSimulationEventController::stop_feedback(const std::string& asset
     {
         auto& state = this->master_data_->ref_state_nolock();
         if (state == HakoSim_Stopping) {
-            //TODO
             auto* entry = this->master_data_->get_asset(asset_name);
             if (entry != nullptr) {
                 auto* entry_ev = this->master_data_->get_asset_event(entry->id);
@@ -105,7 +107,9 @@ bool hako::HakoSimulationEventController::reset()
     }
     this->master_data_->unlock();
 
-    this->master_data_->publish_event_nolock(hako::data::HakoAssetEvent_Reset);
+    if (ret) {
+        this->master_data_->publish_event_nolock(hako::data::HakoAssetEvent_Reset);
+    }
     return ret;
 }
 bool hako::HakoSimulationEventController::reset_feedback(const std::string& asset_name, bool isOk)
@@ -115,7 +119,6 @@ bool hako::HakoSimulationEventController::reset_feedback(const std::string& asse
     {
         auto& state = this->master_data_->ref_state_nolock();
         if (state == HakoSim_Resetting) {
-            //TODO
             auto* entry = this->master_data_->get_asset(asset_name);
             if (entry != nullptr) {
                 auto* entry_ev = this->master_data_->get_asset_event(entry->id);

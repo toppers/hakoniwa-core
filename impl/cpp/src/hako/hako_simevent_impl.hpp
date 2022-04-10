@@ -11,6 +11,7 @@ namespace hako {
         {
             this->master_data_ = ptr;
         }
+        HakoSimulationStateType state();
 
         /*
          * simulation execution event

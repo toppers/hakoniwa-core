@@ -1,5 +1,11 @@
 #include "hako_simevent_impl.hpp"
 
+HakoSimulationStateType hako::HakoSimulationEventController::state()
+{
+    auto& state = this->master_data_->ref_state_nolock();
+    return state;
+}
+
 bool hako::HakoSimulationEventController::trigger_event(HakoSimulationStateType curr_state, HakoSimulationStateType next_state, hako::data::HakoAssetEventType event)
 {
     bool ret = true;
@@ -33,9 +39,9 @@ bool hako::HakoSimulationEventController::feedback(const std::string& asset_name
     this->master_data_->lock();
     {
         auto& state = this->master_data_->ref_state_nolock();
-        auto* entry = this->master_data_->get_asset(asset_name);
+        auto* entry = this->master_data_->get_asset_nolock(asset_name);
         if (entry != nullptr) {
-            auto* entry_ev = this->master_data_->get_asset_event(entry->id);
+            auto* entry_ev = this->master_data_->get_asset_event_nolock(entry->id);
             if (state == exp_state) {
                 entry_ev->event_feedback = isOk;
             }

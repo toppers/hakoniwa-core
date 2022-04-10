@@ -25,6 +25,12 @@ void hako::destroy()
         master_data_ptr->destroy();
         master_data_ptr = nullptr;
     }
+    if (asset_ptr != nullptr) {
+        asset_ptr = nullptr;
+    }
+    if (simevent_ptr != nullptr) {
+        simevent_ptr = nullptr;
+    }
     return;
 }
 

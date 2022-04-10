@@ -207,6 +207,21 @@ namespace hako::data {
             this->unlock();
             return entry;
         }
+        bool is_all_feedback_nolock()
+        {
+            bool ret = true;
+            for (int i = 0; i < HAKO_DATA_MAX_ASSET_NUM; i++) {
+                HakoAssetEntryType &entry = this->master_datap_->assets[i];
+                if (entry.type == hako::data::HakoAssetType::HakoAsset_Unknown) {
+                    continue;
+                }
+                else if (this->master_datap_->assets_ev[i].event_feedback == false) {
+                    ret = false;
+                    break;
+                }
+            }
+            return ret;
+        }
     private:
         HakoAssetEntryType *get_asset_nolock(const std::string &name)
         {

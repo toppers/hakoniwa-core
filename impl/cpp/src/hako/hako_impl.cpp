@@ -38,10 +38,8 @@ void hako::destroy()
 
 std::shared_ptr<hako::IHakoMasterController> hako::create_master()
 {
-    if (master_data_ptr == nullptr) {
-        throw std::invalid_argument("ERROR: hako::init() is not called yet");
-    }
-    else if (master_ptr == nullptr) {
+    HAKO_ASSERT(master_data_ptr != nullptr);
+    if (master_ptr == nullptr) {
         master_ptr = std::make_shared<hako::HakoMasterControllerImpl>(master_data_ptr);
     }
     return master_ptr;

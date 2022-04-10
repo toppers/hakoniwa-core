@@ -133,3 +133,24 @@ bool hako::HakoSimulationEventController::reset_feedback(const std::string& asse
 
     return ret;
 }
+
+void hako::HakoSimulationEventController::run_nolock()
+{
+    auto& state = this->master_data_->ref_state_nolock();
+    switch (state) {
+        case HakoSim_Runnable:
+        case HakoSim_Stopping:
+        case HakoSim_Resetting:
+            /* todo */
+            break;
+        case HakoSim_Running:
+            /* todo */
+            break;
+        case HakoSim_Stopped:
+        case HakoSim_Terminated:
+        default:
+            break;
+    }
+
+    return;
+}

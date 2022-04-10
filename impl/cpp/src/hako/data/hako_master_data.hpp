@@ -110,6 +110,7 @@ namespace hako::data {
                 auto& entry_ev = this->master_datap_->assets_ev[i];
                 if (entry.type != hako::data::HakoAssetType::HakoAsset_Unknown) {
                     entry_ev.event = event;
+                    entry_ev.event_feedback = false;
                     switch (event) {
                         case hako::data::HakoAssetEvent_Start:
                            entry.callback.start();

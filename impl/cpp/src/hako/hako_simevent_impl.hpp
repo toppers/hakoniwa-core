@@ -25,7 +25,13 @@ namespace hako {
         bool start_feedback(const std::string& asset_name, bool isOk);
         bool stop_feedback(const std::string& asset_name, bool isOk);
         bool reset_feedback(const std::string& asset_name, bool isOk);
+
     private:
+        /*
+         * monitor
+         */
+        void run_nolock();
+        
         HakoSimulationEventController() {}
         std::shared_ptr<data::HakoMasterData> master_data_;
     };    

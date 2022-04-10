@@ -9,6 +9,7 @@ namespace hako {
     public:
         virtual ~IHakoSimulationEventController() {}
 
+        virtual HakoSimulationStateType state() = 0;
         /*
          * simulation execution event
          */

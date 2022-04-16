@@ -13,6 +13,7 @@ add_executable(
     hako-test
     hako/hako_shared_memory_test.cpp
     hako/hako_test.cpp
+    hako/hako_time_test.cpp
     hako/main.cpp
 )
 

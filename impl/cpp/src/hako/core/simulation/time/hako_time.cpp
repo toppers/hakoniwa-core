@@ -6,18 +6,18 @@ HakoTimeType hako::core::simulation::time::TheWorld::time_begins_to_move(std::ve
 
     for (HakoTimeType &asset_time : asset_times)
     {
-        HakoTimeType diff = asset_time - this->world_time_usec;
-        if (diff <= -this->max_delay_time_usec)
+        HakoTimeType diff = asset_time - this->world_time_usec_;
+        if (diff <= -this->max_delay_time_usec_)
         {
             canStep = false;
             break;
         }
     }
     if (canStep) {
-        this->world_time_usec += this->delta_time_usec;
+        this->world_time_usec_ += this->delta_time_usec_;
     }
     else {
-        this->wait_time_usec += this->delta_time_usec;
+        this->wait_time_usec_ += this->delta_time_usec_;
     }
-    return this->world_time_usec;
+    return this->world_time_usec_;
 }

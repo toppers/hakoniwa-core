@@ -5,10 +5,14 @@ static std::shared_ptr<spdlog::logger> hako_logger = nullptr;
 
 void hako::utils::logger::init()
 {
-    hako_logger = spdlog::rotating_logger_mt("hako", 
-        HAKO_LOGGER_FILEPATH, 
-        HAKO_LOGGER_MAXSIZE, 
-        HAKO_LOGGER_ROTNUM);
+    try {
+        hako_logger = spdlog::rotating_logger_mt("hako", 
+            HAKO_LOGGER_FILEPATH, 
+            HAKO_LOGGER_MAXSIZE, 
+            HAKO_LOGGER_ROTNUM);
+    } catch (std::exception e) {
+        hako_logger = spdlog::get("hako");
+    }
     hako_logger->info("hako logger initialized");
     return;
 }

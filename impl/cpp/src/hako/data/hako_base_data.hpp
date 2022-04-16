@@ -31,11 +31,13 @@ namespace hako::data {
         HakoAssetEvent_Start,
         HakoAssetEvent_Stop,
         HakoAssetEvent_Reset,
+        HakoAssetEvent_Error,
         HakoAssetEvent_Count
     } HakoAssetEventType;
 
     typedef struct {
-        HakoTimeType        ctime;
+        HakoTimeType        ctime;        /* usec: for asset simulation time */
+        HakoTimeType        update_time;  /* usec: for heartbeat check */
         HakoAssetEventType  event;
         bool                event_feedback;
     } HakoAssetEntryEventType;

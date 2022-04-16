@@ -32,7 +32,9 @@ typedef enum
     HakoSim_Running,
     HakoSim_Stopping,
     HakoSim_Resetting,
+    HakoSim_Error,
     HakoSim_Terminated,
+    HakoSim_Any,
     HakoSim_Count
 } HakoSimulationStateType;
 

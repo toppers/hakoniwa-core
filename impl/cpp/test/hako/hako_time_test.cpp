@@ -90,6 +90,7 @@ TEST_F(HakoTimeTest, TheWorld_04)
     HakoTimeType prev_time = theWorld.get_world_time_usec();
     world_time = theWorld.time_begins_to_move(asset_times);
     EXPECT_EQ(prev_time, world_time);
+    EXPECT_EQ(delta_time_usec, theWorld.get_wait_time_usec());
 }
 
 
@@ -117,6 +118,7 @@ TEST_F(HakoTimeTest, TheWorld_05)
     HakoTimeType prev_time = theWorld.get_world_time_usec();
     world_time = theWorld.time_begins_to_move(asset_times);
     EXPECT_EQ(prev_time, world_time);
+    EXPECT_EQ(delta_time_usec, theWorld.get_wait_time_usec());
 
     // only one asset stepped
     asset_times[0] = delta_time_usec;
@@ -125,6 +127,7 @@ TEST_F(HakoTimeTest, TheWorld_05)
     prev_time = theWorld.get_world_time_usec();
     world_time = theWorld.time_begins_to_move(asset_times);
     EXPECT_EQ(prev_time, world_time);
+    EXPECT_EQ(delta_time_usec * 2, theWorld.get_wait_time_usec());
 }
 
 
@@ -152,6 +155,7 @@ TEST_F(HakoTimeTest, TheWorld_06)
     HakoTimeType prev_time = theWorld.get_world_time_usec();
     world_time = theWorld.time_begins_to_move(asset_times);
     EXPECT_EQ(prev_time, world_time);
+    EXPECT_EQ(delta_time_usec, theWorld.get_wait_time_usec());
 
     // two assets stepped
     asset_times[0] = delta_time_usec;
@@ -161,4 +165,5 @@ TEST_F(HakoTimeTest, TheWorld_06)
     prev_time = theWorld.get_world_time_usec();
     world_time = theWorld.time_begins_to_move(asset_times);
     EXPECT_EQ(prev_time + delta_time_usec, world_time);
+    EXPECT_EQ(delta_time_usec, theWorld.get_wait_time_usec());
 }

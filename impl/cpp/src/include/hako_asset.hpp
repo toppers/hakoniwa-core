@@ -18,6 +18,9 @@ namespace hako {
         virtual void notify_simtime(const std::string & name, HakoTimeType simtime) = 0;
         virtual HakoTimeType get_worldtime() = 0;
 
+        //TODO
+        //get asset lists
+
     };
 }
 

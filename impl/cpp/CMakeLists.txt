@@ -27,6 +27,8 @@ if (test)
     add_subdirectory(test)
 endif()
 
+add_subdirectory(sample)
+
 set(INSTALL_CMAKE_DIR ${PROJECT_SOURCE_DIR}/public)
 
 install(

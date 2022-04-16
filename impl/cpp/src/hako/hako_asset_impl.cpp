@@ -1,5 +1,6 @@
 #include "hako_asset_impl.hpp"
 #include "utils/hako_logger.hpp"
+#include "utils/hako_clock.hpp"
 
 bool hako::HakoAssetControllerImpl::asset_register(const std::string & name, AssetCallbackType &callbacks)
 {
@@ -31,6 +32,7 @@ void hako::HakoAssetControllerImpl::notify_simtime(const std::string & name, Hak
     if (asset != nullptr) {
         auto* asset_event = this->master_data_->get_asset_event_nolock(asset->id);
         asset_event->ctime = simtime;
+        asset_event->update_time = hako_get_clock();
     }
     this->master_data_->unlock();
     return;

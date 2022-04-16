@@ -5,6 +5,7 @@
 #include "utils/hako_shared_memory.hpp"
 #include "utils/hako_string.hpp"
 #include "utils/hako_assert.hpp"
+#include "utils/hako_clock.hpp"
 #include <string.h>
 
 namespace hako::data {
@@ -89,6 +90,15 @@ namespace hako::data {
             HakoTimeSetType &timeset = this->master_datap_->time_usec;
             return timeset;
         }
+        void update_asset_time(HakoAssetIdType id)
+        {
+            if ((id >= 0) && (id < HAKO_DATA_MAX_ASSET_NUM)) {
+                if (this->master_datap_->assets[id].type != hako::data::HakoAssetType::HakoAsset_Unknown) {
+                    this->master_datap_->assets_ev[id].update_time = hako_get_clock();
+                }
+            }
+            return;
+        }
         HakoSimulationStateType& ref_state_nolock()
         {
             return this->master_datap_->state;
@@ -99,17 +109,30 @@ namespace hako::data {
                 auto& entry = this->master_datap_->assets[i];
                 auto& entry_ev = this->master_datap_->assets_ev[i];
                 if (entry.type != hako::data::HakoAssetType::HakoAsset_Unknown) {
-                    entry_ev.event = event;
-                    entry_ev.event_feedback = false;
                     switch (event) {
                         case hako::data::HakoAssetEvent_Start:
-                           entry.callback.start();
+                            entry_ev.event = event;
+                            entry_ev.event_feedback = false;
+                            entry.callback.start();
                             break;
                         case hako::data::HakoAssetEvent_Stop:
-                           entry.callback.stop();
+                            entry_ev.event = event;
+                            entry_ev.event_feedback = false;
+                            entry.callback.stop();
+                            break;
+                        case hako::data::HakoAssetEvent_Error:
+                            entry_ev.event = event;
+                            entry_ev.event_feedback = true;
                             break;
                         case hako::data::HakoAssetEvent_Reset:
-                           entry.callback.reset();
+                            if (hako::data::HakoAssetEvent_Error == entry_ev.event) {
+                                entry_ev.event_feedback = true;
+                            }
+                            else {
+                                entry_ev.event = event;
+                                entry_ev.event_feedback = false;
+                                entry.callback.reset();
+                            }
                             break;
                         default:
                             break;
@@ -140,6 +163,7 @@ namespace hako::data {
                         this->master_datap_->assets[i].type = type;
                         this->master_datap_->assets[i].callback = callback;
                         this->master_datap_->assets_ev[i].ctime = 0ULL;
+                        this->update_asset_time(i);
                         hako::utils::hako_string2fixed(name, this->master_datap_->assets[i].name);
                         id = i;
                         this->master_datap_->asset_num++;
@@ -157,7 +181,7 @@ namespace hako::data {
         {
             bool ret = false;
             this->lock();
-            if (this->master_datap_->state == HakoSim_Stopped) {
+            if ((this->master_datap_->state == HakoSim_Stopped) || (this->master_datap_->state == HakoSim_Error)) {
                 HakoAssetEntryType *entry = this->get_asset_nolock(name);
                 if (entry != nullptr) {
                     entry->type = hako::data::HakoAssetType::HakoAsset_Unknown;
@@ -209,6 +233,13 @@ namespace hako::data {
                 }
             }
             return ret;
+        }
+        bool is_asset_timeout_nolock(HakoAssetIdType id)
+        {
+            if ((id >= 0) && (id < HAKO_DATA_MAX_ASSET_NUM)) {
+                return hako_clock_is_timeout(this->master_datap_->assets_ev[id].update_time, HAKO_ASSET_TIMEOUT_USEC);
+            }
+            return false;
         }
         HakoAssetEntryType *get_asset_nolock(const std::string &name)
         {

@@ -1,11 +1,14 @@
 #include "hako_master_impl.hpp"
 #include "data/hako_master_data.hpp"
+#include "hako_simevent_impl.hpp"
 
 bool hako::HakoMasterControllerImpl::execute()
 {
     if (this->theWorld_ == nullptr) {
         return false;
     }
+    this->sim_event_->do_event_handling();
+
     auto& state = this->master_data_->ref_state_nolock();
     if (state != HakoSim_Running) {
         return false;

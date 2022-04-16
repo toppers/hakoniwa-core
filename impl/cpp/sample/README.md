@@ -2,17 +2,31 @@
 
 ## Hakoniwa Base Architecture
 
-- Hako-Master Process
+- One Hako-Master Process
   - hako-time sync manager
   - hako-assets manager
-- Hako-Asset Process
+- Multiple Hako-Asset Processes
   - hako-asset with simulation time
   - sync simulation time with other assets
     - hako-time is used for syncing
-- Hako Command
+- Hako-Command
   - hakoniwa simulation controller
     - do start, stop, reset
 
-## single-proc
+## Sample programs
+The reference implementations of above components are as follows.
 
-## multi-proc
+- Hako-Master
+  - sample/base-procs/hako-master
+- Hako-Asset
+  - sample/base-procs/hako-asset
+- Hako-Command
+  - sample/base-procs/hako-cmd
+
+
+## How to make it work with sample programs 
+
+1. Activate hako-master
+2. Activate hako-asset with unique name in hakoniwa world.
+3. Start simulation with hako-start command.
+

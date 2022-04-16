@@ -4,6 +4,7 @@
 #include "data/hako_base_data.hpp"
 #include "utils/hako_shared_memory.hpp"
 #include "utils/hako_string.hpp"
+#include "utils/hako_assert.hpp"
 #include <string.h>
 
 namespace hako::data {
@@ -28,9 +29,7 @@ namespace hako::data {
         {
             this->shmp_ = std::make_shared<hako::utils::HakoSharedMemory>();
             auto shmid = this->shmp_->create_memory(HAKO_SHARED_MEMORY_ID_0, sizeof(HakoMasterDataType));
-            if (shmid < 0) {
-                throw std::bad_alloc();
-            }
+            HAKO_ASSERT(shmid >= 0);
             void *datap = this->shmp_->lock_memory(HAKO_SHARED_MEMORY_ID_0);
             this->master_datap_ = static_cast<HakoMasterDataType*>(datap);
             {
@@ -47,9 +46,7 @@ namespace hako::data {
             this->shmp_ = std::make_shared<hako::utils::HakoSharedMemory>();
             void *datap = this->shmp_->load_memory(HAKO_SHARED_MEMORY_ID_0, sizeof(HakoMasterDataType));
             this->master_datap_ = static_cast<HakoMasterDataType*>(datap);
-            if ((this->shmp_ == nullptr) || (this->master_datap_ == nullptr)) {
-                throw std::invalid_argument("ERROR: load() not initialized yet");
-            }
+            HAKO_ASSERT((this->shmp_ != nullptr) && (this->master_datap_ != nullptr));
             return;
         }
 
@@ -67,16 +64,12 @@ namespace hako::data {
          */
         void lock()
         {
-            if ((this->shmp_ == nullptr) || (this->master_datap_ == nullptr)) {
-                throw std::invalid_argument("ERROR: lock() not initialized yet");
-            }
+            HAKO_ASSERT((this->shmp_ != nullptr) && (this->master_datap_ != nullptr));
             (void)this->shmp_->lock_memory(HAKO_SHARED_MEMORY_ID_0);
         }
         void unlock()
         {
-            if ((this->shmp_ == nullptr) || (this->master_datap_ == nullptr)) {
-                throw std::invalid_argument("ERROR: unlock() not initialized yet");
-            }
+            HAKO_ASSERT((this->shmp_ != nullptr) && (this->master_datap_ != nullptr));
             (void)this->shmp_->unlock_memory(HAKO_SHARED_MEMORY_ID_0);
         }
         /*
@@ -84,9 +77,7 @@ namespace hako::data {
          */
         HakoTimeSetType get_time()
         {
-            if ((this->shmp_ == nullptr) || (this->master_datap_ == nullptr)) {
-                throw std::invalid_argument("ERROR: get_time() not initialized yet");
-            }
+            HAKO_ASSERT((this->shmp_ != nullptr) && (this->master_datap_ != nullptr));
             this->lock();
             HakoTimeSetType timeset = this->master_datap_->time_usec;
             this->unlock();
@@ -94,9 +85,7 @@ namespace hako::data {
         }
         HakoTimeSetType& ref_time_nolock()
         {
-            if ((this->shmp_ == nullptr) || (this->master_datap_ == nullptr)) {
-                throw std::invalid_argument("ERROR: ref_time_nolock() not initialized yet");
-            }
+            HAKO_ASSERT((this->shmp_ != nullptr) && (this->master_datap_ != nullptr));
             HakoTimeSetType &timeset = this->master_datap_->time_usec;
             return timeset;
         }
@@ -133,9 +122,7 @@ namespace hako::data {
          */        
         HakoAssetIdType alloc_asset(const std::string &name, HakoAssetType type, AssetCallbackType &callback)
         {
-            if ((this->shmp_ == nullptr) || (this->master_datap_ == nullptr)) {
-                throw std::invalid_argument("ERROR: alloc_asset() not initialized yet");
-            }
+            HAKO_ASSERT((this->shmp_ != nullptr) && (this->master_datap_ != nullptr));
             if (type == hako::data::HakoAssetType::HakoAsset_Unknown) {
                 return -1;
             }

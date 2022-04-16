@@ -11,7 +11,7 @@
 /*
  * usec
  */
-typedef uint64_t HakoTimeType;
+typedef int64_t HakoTimeType;
 
 typedef int32_t HakoAssetIdType;
 typedef struct {

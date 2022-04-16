@@ -12,12 +12,14 @@ bool hako::HakoAssetControllerImpl::asset_unregister(const std::string & name)
 {
     return this->master_data_->free_asset(name);
 }
-void hako::HakoAssetControllerImpl::notify_simtime(HakoTimeType simtime)
+void hako::HakoAssetControllerImpl::notify_simtime(const std::string & name, HakoTimeType simtime)
 {
-    //TODO
     this->master_data_->lock();
-    auto& timeset = this->master_data_->ref_time_nolock();
-    timeset.current = simtime;
+    auto* asset = this->master_data_->get_asset_nolock(name);
+    if (asset != nullptr) {
+        auto* asset_event = this->master_data_->get_asset_event_nolock(asset->id);
+        asset_event->ctime = simtime;
+    }
     this->master_data_->unlock();
     return;
 }

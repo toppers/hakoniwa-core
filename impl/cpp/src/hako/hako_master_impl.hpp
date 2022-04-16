@@ -3,6 +3,7 @@
 
 #include "hako_master.hpp"
 #include "data/hako_master_data.hpp"
+#include "core/simulation/time/hako_time.hpp"
 
 namespace hako {
     class HakoMasterControllerImpl : public IHakoMasterController {
@@ -17,6 +18,7 @@ namespace hako {
         virtual HakoTimeType get_delta_time_usec();
     private:
         HakoMasterControllerImpl() {}
+        std::shared_ptr<hako::core::simulation::time::TheWorld> theWorld_;
         std::shared_ptr<data::HakoMasterData> master_data_;
     };
 }

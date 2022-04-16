@@ -227,6 +227,18 @@ namespace hako::data {
             }
             return nullptr;
         }
+        void get_asset_times(std::vector<HakoTimeType> & asset_times)
+        {
+            this->lock();
+            for (int i = 0; i < HAKO_DATA_MAX_ASSET_NUM; i++) {
+                HakoAssetEntryType &entry = this->master_datap_->assets[i];
+                if (entry.type == hako::data::HakoAssetType::HakoAsset_Unknown) {
+                    continue;
+                }                
+                asset_times.push_back(this->master_datap_->assets_ev[i].ctime);
+            }
+            this->unlock();
+        }
 
     private:
         std::shared_ptr<hako::utils::HakoSharedMemory>  shmp_;

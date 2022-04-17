@@ -3,6 +3,7 @@
 
 #include "hako_asset.hpp"
 #include "data/hako_master_data.hpp"
+#include "core/asset/hako_remote_asset_event.hpp"
 
 namespace hako {
     class HakoAssetControllerImpl : public IHakoAssetController {
@@ -10,6 +11,7 @@ namespace hako {
         HakoAssetControllerImpl(std::shared_ptr<data::HakoMasterData> master_data)
         {
             this->master_data_ = master_data;
+            this->remote_event_ = std::make_shared<core::asset::HakoRemoteAssetEvent>(master_data);
         }
         virtual bool asset_register(const std::string & name, AssetCallbackType &callbacks);
         virtual bool asset_remote_register(const std::string & name, AssetCallbackType &callbacks);
@@ -19,6 +21,7 @@ namespace hako {
     private:
         HakoAssetControllerImpl() {}
         std::shared_ptr<data::HakoMasterData> master_data_;
+        std::shared_ptr<core::asset::HakoRemoteAssetEvent> remote_event_;
     };
 }
 

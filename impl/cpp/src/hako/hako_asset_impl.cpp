@@ -16,7 +16,6 @@ bool hako::HakoAssetControllerImpl::asset_register(const std::string & name, Ass
 }
 bool hako::HakoAssetControllerImpl::asset_remote_register(const std::string & name, AssetCallbackType &callbacks)
 {
-    //TODO
     auto id = this->master_data_->alloc_asset(name, hako::data::HakoAssetType::HakoAsset_Outside, callbacks);
     if (id < 0) {
         hako::utils::logger::get("core")->error("can not registered: remote asset[{0}]", name);
@@ -24,15 +23,19 @@ bool hako::HakoAssetControllerImpl::asset_remote_register(const std::string & na
     }
     else {
         hako::utils::logger::get("core")->info("Registered: remote asset[{0}]", name);
-        return true;
     }
-    return false;
-}
+    this->remote_event_->start_monitoring(id, callbacks);
+    return true;
+ }
 
 bool hako::HakoAssetControllerImpl::asset_unregister(const std::string & name)
 {
+    auto* asset = this->master_data_->get_asset_nolock(name);
     auto ret = this->master_data_->free_asset(name);
     if (ret) {
+        if (asset->type == hako::data::HakoAsset_Outside) {
+            this->remote_event_->stop_monitoring(asset->id);
+        }
         hako::utils::logger::get("core")->info("Unregistered: asset[{0}]", name);
     }
     else {

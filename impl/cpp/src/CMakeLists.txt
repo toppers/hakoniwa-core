@@ -11,6 +11,7 @@ add_library(
     hako/hako_simevent_impl.cpp
     hako/hako_master_impl.cpp
     hako/core/simulation/time/hako_time.cpp
+    hako/core/asset/hako_remote_asset_event.cpp
     hako/utils/hako_shared_memory.cpp
     hako/utils/hako_sem.cpp
     hako/utils/hako_string.cpp

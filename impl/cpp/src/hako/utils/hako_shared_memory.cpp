@@ -115,6 +115,10 @@ void hako::utils::HakoSharedMemory::unlock_memory(int32_t key)
 #endif
     return;
 }
+int32_t hako::utils::HakoSharedMemory::get_semid(int32_t key)
+{
+    return this->shared_memory_map_[key].sem_id;
+}
 
 void hako::utils::HakoSharedMemory::destroy_memory(int32_t key)
 {

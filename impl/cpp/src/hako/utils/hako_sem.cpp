@@ -49,7 +49,7 @@ void hako::utils::sem::destroy(int32_t sem_id)
 void hako::utils::sem::asset_down(int32_t sem_id, int32_t asset_id)
 {
     struct sembuf sop;
-    sop.sem_num =  asset_id;     // Semaphore number
+    sop.sem_num =  HAKO_SEM_INX_ASSETS + asset_id;     // Semaphore number
     sop.sem_op  = -1;            // Semaphore operation is Lock
     sop.sem_flg =  0;            // Operation flag
     int32_t err = semop(sem_id, &sop, 1);
@@ -61,7 +61,7 @@ void hako::utils::sem::asset_down(int32_t sem_id, int32_t asset_id)
 void hako::utils::sem::asset_up(int32_t sem_id, int32_t asset_id)
 {
     struct sembuf sop;
-    sop.sem_num =  asset_id;     // Semaphore number
+    sop.sem_num =  HAKO_SEM_INX_ASSETS + asset_id;     // Semaphore number
     sop.sem_op  =  1;            // Semaphore operation is Lock
     sop.sem_flg =  0;            // Operation flag
     int32_t err = semop(sem_id, &sop, 1);
@@ -72,11 +72,25 @@ void hako::utils::sem::asset_up(int32_t sem_id, int32_t asset_id)
 }
 void hako::utils::sem::master_lock(int32_t sem_id)
 {
-    hako::utils::sem::asset_down(sem_id, HAKO_SEM_INX_MASTER);
+    struct sembuf sop;
+    sop.sem_num =  HAKO_SEM_INX_MASTER;     // Semaphore number
+    sop.sem_op  = -1;            // Semaphore operation is Lock
+    sop.sem_flg =  0;            // Operation flag
+    int32_t err = semop(sem_id, &sop, 1);
+    if (err < 0) {
+        hako::utils::logger::get("core")->error("master_lock() error = {0} sem_id={1} inx={2}", errno, sem_id, 0);
+    }
     return;
 }
 void hako::utils::sem::master_unlock(int32_t sem_id)
 {
-    hako::utils::sem::asset_up(sem_id, HAKO_SEM_INX_MASTER);
+    struct sembuf sop;
+    sop.sem_num =  HAKO_SEM_INX_MASTER;     // Semaphore number
+    sop.sem_op  =  1;            // Semaphore operation is Lock
+    sop.sem_flg =  0;            // Operation flag
+    int32_t err = semop(sem_id, &sop, 1);
+    if (err < 0) {
+        hako::utils::logger::get("core")->error("master_unlock() error = {0} sem_id={1} inx={2}", errno, sem_id, 0);
+    }
     return;
 }

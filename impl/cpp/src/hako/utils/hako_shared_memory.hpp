@@ -32,6 +32,7 @@ namespace hako::utils {
         void destroy_memory(int32_t key);
 
         int32_t get_shmid();
+        int32_t get_semid(int32_t key);
 
     private:
         void* load_memory_shmid(int32_t key, int32_t shmid);

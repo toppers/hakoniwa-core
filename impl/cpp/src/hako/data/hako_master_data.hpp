@@ -6,6 +6,7 @@
 #include "utils/hako_string.hpp"
 #include "utils/hako_assert.hpp"
 #include "utils/hako_clock.hpp"
+#include "utils/hako_sem.hpp"
 #include <string.h>
 
 namespace hako::data {
@@ -37,6 +38,10 @@ namespace hako::data {
                 memset(this->master_datap_, 0, sizeof(HakoMasterDataType));
             }
             this->shmp_->unlock_memory(HAKO_SHARED_MEMORY_ID_0);
+        }
+        int32_t get_semid()
+        {
+            return this->shmp_->get_semid(HAKO_SHARED_MEMORY_ID_0);
         }
 
         void load()
@@ -113,11 +118,22 @@ namespace hako::data {
                         case hako::data::HakoAssetEvent_Start:
                             entry_ev.event = event;
                             entry_ev.event_feedback = false;
-                            entry.callback.start();
+                            if (entry.type == hako::data::HakoAsset_Outside) {
+                                hako::utils::sem::asset_up(this->get_semid(), i);
+                            }
+                            else {
+                                entry.callback.start();
+                            }
                             break;
                         case hako::data::HakoAssetEvent_Stop:
                             entry_ev.event = event;
                             entry_ev.event_feedback = false;
+                            if (entry.type == hako::data::HakoAsset_Outside) {
+                                hako::utils::sem::asset_up(this->get_semid(), i);
+                            }
+                            else {
+                                entry.callback.stop();
+                            }
                             entry.callback.stop();
                             break;
                         case hako::data::HakoAssetEvent_Error:
@@ -131,7 +147,12 @@ namespace hako::data {
                             else {
                                 entry_ev.event = event;
                                 entry_ev.event_feedback = false;
-                                entry.callback.reset();
+                                if (entry.type == hako::data::HakoAsset_Outside) {
+                                    hako::utils::sem::asset_up(this->get_semid(), i);
+                                }
+                                else {
+                                    entry.callback.reset();
+                                }
                             }
                             break;
                         default:

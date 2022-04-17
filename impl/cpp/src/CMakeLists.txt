@@ -12,6 +12,7 @@ add_library(
     hako/hako_master_impl.cpp
     hako/core/simulation/time/hako_time.cpp
     hako/utils/hako_shared_memory.cpp
+    hako/utils/hako_sem.cpp
     hako/utils/hako_string.cpp
     hako/utils/hako_logger.cpp
 )

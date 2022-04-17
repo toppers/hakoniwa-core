@@ -4,17 +4,6 @@
 #include "types/hako_types.hpp"
 #include <map>
 
-#ifdef MACOSX
-#else
-union semun {
-    int val;
-    struct semid_ds *buf;
-    unsigned short int *array;
-    struct seminfo *__buf;
-};
-#endif
-
-
 namespace hako::utils {
 
     typedef struct {

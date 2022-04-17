@@ -108,7 +108,7 @@ void hako::HakoSimulationEventController::do_event_handling()
     for (auto& asset_id : error_assets) {
         hako::data::HakoAssetEntryType *entry = this->master_data_->get_asset(asset_id);
         std::shared_ptr<std::string>  asset_name = hako::utils::hako_fixed2string(entry->name);
-        hako::utils::logger::get()->error("asset[{0}] timeout", *asset_name);
+        hako::utils::logger::get("core")->error("asset[{0}] timeout", *asset_name);
         this->asset_controller_->asset_unregister(*asset_name);
     }
 }

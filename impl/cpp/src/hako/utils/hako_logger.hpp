@@ -5,8 +5,8 @@
 #include "spdlog/spdlog.h"
 
 namespace hako::utils::logger {
-    void init();
-    std::shared_ptr<spdlog::logger> get();
+    void init(const std::string &id);
+    std::shared_ptr<spdlog::logger> get(const std::string &id);
 }
 
 #endif /* _HAKO_LOGGER_HPP_ */

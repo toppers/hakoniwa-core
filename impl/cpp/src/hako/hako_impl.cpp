@@ -11,11 +11,12 @@ static std::shared_ptr<hako::IHakoSimulationEventController> simevent_ptr = null
 
 void hako::init()
 {
-    hako::utils::logger::init();
+    hako::utils::logger::init("core");
     if (master_data_ptr == nullptr) {
         master_data_ptr = std::make_shared<hako::data::HakoMasterData>();
         master_data_ptr->init();
     }
+    hako::utils::logger::get("core")->info("hakoniwa initialized");
     return;
 }
 void hako::destroy()
@@ -33,6 +34,8 @@ void hako::destroy()
     if (simevent_ptr != nullptr) {
         simevent_ptr = nullptr;
     }
+    hako::utils::logger::get("core")->info("hakoniwa destroyed");
+    hako::utils::logger::get("core")->flush();
     return;
 }
 
@@ -71,4 +74,13 @@ std::shared_ptr<hako::IHakoSimulationEventController> hako::get_simevent_control
     simevent_ptr = std::make_shared<hako::HakoSimulationEventController>(master_data_ptr);
 
     return simevent_ptr;
+}
+
+void hako::logger::init(const std::string &id)
+{
+    hako::utils::logger::init(id);
+}
+std::shared_ptr<spdlog::logger> hako::logger::get(const std::string &id)
+{
+    return hako::utils::logger::get(id);
 }

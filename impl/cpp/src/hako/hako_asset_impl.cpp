@@ -6,11 +6,11 @@ bool hako::HakoAssetControllerImpl::asset_register(const std::string & name, Ass
 {
     auto id = this->master_data_->alloc_asset(name, hako::data::HakoAssetType::HakoAsset_Inside, callbacks);
     if (id < 0) {
-        hako::utils::logger::get()->error("can not registered: asset[{0}]", name);
+        hako::utils::logger::get("core")->error("can not registered: asset[{0}]", name);
         return false;
     }
     else {
-        hako::utils::logger::get()->info("Registered: asset[{0}]", name);
+        hako::utils::logger::get("core")->info("Registered: asset[{0}]", name);
         return true;
     }
 }
@@ -18,10 +18,10 @@ bool hako::HakoAssetControllerImpl::asset_unregister(const std::string & name)
 {
     auto ret = this->master_data_->free_asset(name);
     if (ret) {
-        hako::utils::logger::get()->info("Unregistered: asset[{0}]", name);
+        hako::utils::logger::get("core")->info("Unregistered: asset[{0}]", name);
     }
     else {
-        hako::utils::logger::get()->error("can not unregistered: asset[{0}]", name);
+        hako::utils::logger::get("core")->error("can not unregistered: asset[{0}]", name);
     }
     return ret;
 }

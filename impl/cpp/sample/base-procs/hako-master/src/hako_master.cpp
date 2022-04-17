@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <signal.h>
 
-static int hako_master_is_end = false;
+static bool hako_master_is_end = false;
 
 static void hako_master_signal_handler(int sig)
 {

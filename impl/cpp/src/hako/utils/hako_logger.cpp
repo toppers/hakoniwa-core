@@ -1,9 +1,15 @@
 #include "utils/hako_logger.hpp"
 #include "spdlog/sinks/rotating_file_sink.h"
+#include <sys/types.h>
+#include <unistd.h>
 
 void hako::utils::logger::init(const std::string &id)
 {
-    std::string logfile_path = HAKO_LOGGER_FILE_PREFIX + id + HAKO_LOGGER_FILE_EXTENSION;
+    char logdir_path[4096];
+    pid_t pid = getpid();
+    sprintf(logdir_path, "%s%d/", HAKO_LOGGER_DIRPATH, pid);
+    (void)mkdir(logdir_path, 0777);
+    std::string logfile_path = logdir_path + id + HAKO_LOGGER_FILE_EXTENSION;
     spdlog::rotating_logger_mt(id, 
         logfile_path, 
         HAKO_LOGGER_MAXSIZE, 

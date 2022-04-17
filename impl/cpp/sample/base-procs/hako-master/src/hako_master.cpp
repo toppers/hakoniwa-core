@@ -18,6 +18,7 @@ int main(int argc, const char* argv[])
         printf("Usage: %s <delta_msec> <max_delay_msec>\n", argv[0]);
         return 1;
     }
+    printf("START\n");
     signal(SIGINT, hako_master_signal_handler);
     signal(SIGTERM, hako_master_signal_handler);
 
@@ -39,5 +40,6 @@ int main(int argc, const char* argv[])
     hako::logger::get("master")->flush();
 
     hako::destroy();
+    printf("EXIT\n");
     return 0;
 }

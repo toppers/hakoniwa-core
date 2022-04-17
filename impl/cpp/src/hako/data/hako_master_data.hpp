@@ -161,6 +161,12 @@ namespace hako::data {
                     if (this->master_datap_->assets[i].type == hako::data::HakoAssetType::HakoAsset_Unknown) {
                         this->master_datap_->assets[i].id = i;
                         this->master_datap_->assets[i].type = type;
+                        if (type == hako::data::HakoAssetType::HakoAsset_Outside) {
+
+                        }
+                        else {
+                            this->master_datap_->assets_ev[i].semid = -1;
+                        }
                         this->master_datap_->assets[i].callback = callback;
                         this->master_datap_->assets_ev[i].ctime = 0ULL;
                         this->update_asset_time(i);

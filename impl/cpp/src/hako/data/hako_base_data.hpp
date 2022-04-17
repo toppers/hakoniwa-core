@@ -40,6 +40,7 @@ namespace hako::data {
         HakoTimeType        update_time;  /* usec: for heartbeat check */
         HakoAssetEventType  event;
         bool                event_feedback;
+        int32_t             semid;       /* for remote asset */
     } HakoAssetEntryEventType;
 }
 

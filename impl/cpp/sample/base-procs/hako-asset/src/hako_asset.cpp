@@ -61,14 +61,15 @@ int main(int argc, const char* argv[])
         hako::logger::get(asset_name_str)->error("Can not register");
         return 1;
     }
-    hako_sim_ctrl->start();
+    //hako_sim_ctrl->start();
+    
     while (hako_asset_is_end == false) {
         hako_asset->notify_simtime(asset_name_str, hako_asset_time_usec);
         HakoTimeType world_time = hako_asset->get_worldtime();
         if (world_time >= hako_asset_time_usec) {
             hako_asset_time_usec += delta_usec;
         }
-        printf("TIME: %ld %ld\n", world_time, hako_asset_time_usec);
+        printf("TIME: W:%ld A:%ld\n", world_time, hako_asset_time_usec);
         usleep(delta_usec);
     }
     hako_asset->asset_unregister(asset_name_str);

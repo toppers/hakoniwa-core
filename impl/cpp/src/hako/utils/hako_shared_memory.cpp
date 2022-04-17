@@ -4,15 +4,6 @@
 #include<sys/sem.h>
 
 #include "utils/hako_shared_memory.hpp"
-#ifdef MACOSX
-#else
-union semun {
-    int val;
-    struct semid_ds *buf;
-    unsigned short int *array;
-    struct seminfo *__buf;
-};
-#endif
 
 int32_t hako::utils::HakoSharedMemory::create_memory(int32_t key, int32_t size)
 {

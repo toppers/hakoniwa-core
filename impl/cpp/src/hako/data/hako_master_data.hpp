@@ -7,11 +7,13 @@
 #include "utils/hako_assert.hpp"
 #include "utils/hako_clock.hpp"
 #include "utils/hako_sem.hpp"
+#include "core/context/hako_context.hpp"
 #include <string.h>
 
 namespace hako::data {
 
     typedef struct {
+        int32_t                 master_pid;
         HakoSimulationStateType state;
         HakoTimeSetType         time_usec;
         uint32_t                asset_num;
@@ -35,7 +37,9 @@ namespace hako::data {
             void *datap = this->shmp_->lock_memory(HAKO_SHARED_MEMORY_ID_0);
             this->master_datap_ = static_cast<HakoMasterDataType*>(datap);
             {
+                hako::core::context::HakoContext context;
                 memset(this->master_datap_, 0, sizeof(HakoMasterDataType));
+                this->master_datap_->master_pid = context.get_pid();
             }
             this->shmp_->unlock_memory(HAKO_SHARED_MEMORY_ID_0);
         }

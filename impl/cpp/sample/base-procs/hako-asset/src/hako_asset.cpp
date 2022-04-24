@@ -51,7 +51,6 @@ int main(int argc, const char* argv[])
     hako::logger::get(asset_name_str)->info("delta={0} usec asset_name={1}", delta_usec, asset_name_str);
 
     hako_asset = hako::create_asset_controller();
-    hako_sim_ctrl = hako::get_simevent_controller();
 
     AssetCallbackType callback;
     callback.reset = reset_callback;
@@ -62,7 +61,6 @@ int main(int argc, const char* argv[])
         hako::logger::get(asset_name_str)->error("Can not register");
         return 1;
     }
-    //hako_sim_ctrl->start();
     
     while (hako_asset_is_end == false) {
         hako_asset->notify_simtime(asset_name_str, hako_asset_time_usec);

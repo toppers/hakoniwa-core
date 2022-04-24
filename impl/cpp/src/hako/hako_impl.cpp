@@ -3,6 +3,7 @@
 #include "hako_asset_impl.hpp"
 #include "hako_simevent_impl.hpp"
 #include "utils/hako_logger.hpp"
+#include "core/context/hako_context.hpp"
 
 static std::shared_ptr<hako::data::HakoMasterData> master_data_ptr = nullptr;
 static std::shared_ptr<hako::IHakoMasterController> master_ptr = nullptr;
@@ -21,8 +22,12 @@ void hako::init()
 }
 void hako::destroy()
 {
+    hako::core::context::HakoContext context;
     if (master_ptr != nullptr) {
         master_ptr = nullptr;
+    }
+    if (!context.is_same(master_data_ptr->get_master_pid())) {
+        return;
     }
     if (master_data_ptr != nullptr) {
         master_data_ptr->destroy();

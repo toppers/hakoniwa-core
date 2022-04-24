@@ -52,16 +52,19 @@ namespace hako::data {
             return this->shmp_->get_semid(HAKO_SHARED_MEMORY_ID_0);
         }
 
-        void load()
+        bool load()
         {
             if (this->shmp_ != nullptr) {
-                return;
+                return true;
             }
             this->shmp_ = std::make_shared<hako::utils::HakoSharedMemory>();
             void *datap = this->shmp_->load_memory(HAKO_SHARED_MEMORY_ID_0, sizeof(HakoMasterDataType));
+            if (datap == nullptr) {
+                return false;
+            }
             this->master_datap_ = static_cast<HakoMasterDataType*>(datap);
             HAKO_ASSERT((this->shmp_ != nullptr) && (this->master_datap_ != nullptr));
-            return;
+            return true;
         }
 
         void destroy()

@@ -60,7 +60,9 @@ std::shared_ptr<hako::IHakoAssetController> hako::create_asset_controller()
     }
     else if (master_data_ptr == nullptr) {
         master_data_ptr = std::make_shared<hako::data::HakoMasterData>();
-        master_data_ptr->load();
+        if (master_data_ptr->load() == false) {
+            return nullptr;
+        }
     }
     asset_ptr = std::make_shared<hako::HakoAssetControllerImpl>(master_data_ptr);
 
@@ -74,7 +76,9 @@ std::shared_ptr<hako::IHakoSimulationEventController> hako::get_simevent_control
     }
     else if (master_data_ptr == nullptr) {
         master_data_ptr = std::make_shared<hako::data::HakoMasterData>();
-        master_data_ptr->load();
+        if (master_data_ptr->load() == false) {
+            return nullptr;
+        }
     }
     simevent_ptr = std::make_shared<hako::HakoSimulationEventController>(master_data_ptr);
 

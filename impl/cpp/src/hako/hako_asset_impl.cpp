@@ -60,3 +60,43 @@ HakoTimeType hako::HakoAssetControllerImpl::get_worldtime()
     hako::data::HakoTimeSetType timeset = this->master_data_->get_time();
     return timeset.current;
 }
+
+
+bool hako::HakoAssetControllerImpl::feedback(const std::string& asset_name, bool isOk, HakoSimulationStateType exp_state)
+{
+    bool ret = true;
+    this->master_data_->lock();
+    {
+        auto& state = this->master_data_->ref_state_nolock();
+        auto* entry = this->master_data_->get_asset_nolock(asset_name);
+        if (entry != nullptr) {
+            auto* entry_ev = this->master_data_->get_asset_event_nolock(entry->id);
+            entry_ev->update_time = hako_get_clock();
+            if (state == exp_state) {
+                entry_ev->event_feedback = isOk;
+            }
+            else {
+                entry_ev->event_feedback = false;
+                ret = false;
+            }
+        }
+        else {
+            ret = false;
+        }
+    }
+    this->master_data_->unlock();
+    return ret;
+}
+
+bool hako::HakoAssetControllerImpl::start_feedback(const std::string& asset_name, bool isOk)
+{
+    return this->feedback(asset_name, isOk, HakoSim_Runnable);
+}
+bool hako::HakoAssetControllerImpl::stop_feedback(const std::string& asset_name, bool isOk)
+{
+    return this->feedback(asset_name, isOk, HakoSim_Stopping);
+}
+bool hako::HakoAssetControllerImpl::reset_feedback(const std::string& asset_name, bool isOk)
+{
+    return this->feedback(asset_name, isOk, HakoSim_Resetting);
+}

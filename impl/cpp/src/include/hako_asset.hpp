@@ -21,6 +21,16 @@ namespace hako {
         virtual void notify_simtime(const std::string & name, HakoTimeType simtime) = 0;
         virtual HakoTimeType get_worldtime() = 0;
 
+
+        /*
+         * feedback events
+         */
+        virtual bool start_feedback(const std::string& asset_name, bool isOk) = 0;
+        virtual bool stop_feedback(const std::string& asset_name, bool isOk) = 0;
+        virtual bool reset_feedback(const std::string& asset_name, bool isOk) = 0;
+
+
+
         //TODO
         //get asset lists
 

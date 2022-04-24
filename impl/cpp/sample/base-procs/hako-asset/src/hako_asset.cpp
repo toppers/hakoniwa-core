@@ -9,18 +9,19 @@ static bool hako_asset_is_end = false;
 static HakoTimeType hako_asset_time_usec = 0LL;
 
 static std::shared_ptr<hako::IHakoSimulationEventController> hako_sim_ctrl = nullptr;
+static std::shared_ptr<hako::IHakoAssetController> hako_asset = nullptr;
 
 static void reset_callback()
 {
-    hako_sim_ctrl->reset_feedback(*asset_name, true);
+    hako_asset->reset_feedback(*asset_name, true);
 }
 static void start_callback()
 {
-    hako_sim_ctrl->start_feedback(*asset_name, true);
+    hako_asset->start_feedback(*asset_name, true);
 }
 static void stop_callback()
 {
-    hako_sim_ctrl->stop_feedback(*asset_name, true);
+    hako_asset->stop_feedback(*asset_name, true);
 }
 
 static void hako_asset_signal_handler(int sig)
@@ -49,7 +50,7 @@ int main(int argc, const char* argv[])
     hako::logger::init(asset_name_str);
     hako::logger::get(asset_name_str)->info("delta={0} usec asset_name={1}", delta_usec, asset_name_str);
 
-    std::shared_ptr<hako::IHakoAssetController> hako_asset = hako::create_asset_controller();
+    hako_asset = hako::create_asset_controller();
     hako_sim_ctrl = hako::get_simevent_controller();
 
     AssetCallbackType callback;

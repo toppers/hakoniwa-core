@@ -37,48 +37,12 @@ bool hako::HakoSimulationEventController::start()
 }
 
 
-bool hako::HakoSimulationEventController::feedback(const std::string& asset_name, bool isOk, HakoSimulationStateType exp_state)
-{
-    bool ret = true;
-    this->master_data_->lock();
-    {
-        auto& state = this->master_data_->ref_state_nolock();
-        auto* entry = this->master_data_->get_asset_nolock(asset_name);
-        if (entry != nullptr) {
-            auto* entry_ev = this->master_data_->get_asset_event_nolock(entry->id);
-            entry_ev->update_time = hako_get_clock();
-            if (state == exp_state) {
-                entry_ev->event_feedback = isOk;
-            }
-            else {
-                entry_ev->event_feedback = false;
-                ret = false;
-            }
-        }
-        else {
-            ret = false;
-        }
-        this->do_event_handling_nolock(nullptr);
-    }
-    this->master_data_->unlock();
-    return ret;
-}
-
-
-bool hako::HakoSimulationEventController::start_feedback(const std::string& asset_name, bool isOk)
-{
-    return this->feedback(asset_name, isOk, HakoSim_Runnable);
-}
 
 bool hako::HakoSimulationEventController::stop()
 {
     return this->trigger_event(HakoSim_Running, HakoSim_Stopping, hako::data::HakoAssetEvent_Stop);
 }
 
-bool hako::HakoSimulationEventController::stop_feedback(const std::string& asset_name, bool isOk)
-{
-    return this->feedback(asset_name, isOk, HakoSim_Stopping);
-}
 bool hako::HakoSimulationEventController::reset()
 {
     auto& state = this->master_data_->ref_state_nolock();
@@ -90,10 +54,7 @@ bool hako::HakoSimulationEventController::reset()
     }
     return false;
 }
-bool hako::HakoSimulationEventController::reset_feedback(const std::string& asset_name, bool isOk)
-{
-    return this->feedback(asset_name, isOk, HakoSim_Resetting);
-}
+
 void hako::HakoSimulationEventController::do_event_handling()
 {
     std::vector<HakoAssetIdType> error_assets;
@@ -112,6 +73,7 @@ void hako::HakoSimulationEventController::do_event_handling()
         this->asset_controller_->asset_unregister(*asset_name);
     }
 }
+
 void hako::HakoSimulationEventController::do_event_handling_nolock(std::vector<HakoAssetIdType> *error_assets)
 {
     auto& state = this->master_data_->ref_state_nolock();

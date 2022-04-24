@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <signal.h>
-
+#include <iostream>
 
 static void hako_cmd_signal_handler(int sig)
 {
@@ -35,6 +35,11 @@ int main(int argc, const char* argv[])
     hako::logger::get("cmd")->info("cmd={0}", cmd);
 
     std::shared_ptr<hako::IHakoSimulationEventController> hako_sim_ctrl = hako::get_simevent_controller();
+    if (hako_sim_ctrl == nullptr) {
+        std::cout << "ERROR: Not found hako-master on this PC" << std::endl;
+        return 1;
+    }
+
     if (cmd == "start") {
         printf("start\n");
         hako_sim_ctrl->start();

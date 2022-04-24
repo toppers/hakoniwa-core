@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <signal.h>
+#include <iostream>
 
 static std::string *asset_name = nullptr;
 static bool hako_asset_is_end = false;
@@ -38,7 +39,8 @@ int main(int argc, const char* argv[])
         printf("Usage: %s <delta_msec> <asset_name>\n", argv[0]);
         return 1;
     }
-    printf("START\n");
+    std::cout << "START" << std::endl;
+
     signal(SIGINT, hako_asset_signal_handler);
     signal(SIGTERM, hako_asset_signal_handler);
 
@@ -51,14 +53,17 @@ int main(int argc, const char* argv[])
     hako::logger::get(asset_name_str)->info("delta={0} usec asset_name={1}", delta_usec, asset_name_str);
 
     hako_asset = hako::create_asset_controller();
-
+    if (hako_asset == nullptr) {
+        std::cout << "ERROR: Not found hako-master on this PC" << std::endl;
+        return 1;
+    }
     AssetCallbackType callback;
     callback.reset = reset_callback;
     callback.start = start_callback;
     callback.stop = stop_callback;
     bool ret = hako_asset->asset_register(asset_name_str, callback);
     if (ret == false) {
-        hako::logger::get(asset_name_str)->error("Can not register");
+        std::cout << "ERROR: Can not register asset" << std::endl;
         return 1;
     }
     
@@ -68,12 +73,12 @@ int main(int argc, const char* argv[])
         if (world_time >= hako_asset_time_usec) {
             hako_asset_time_usec += delta_usec;
         }
-        printf("TIME: W:%ld A:%ld\n", world_time, hako_asset_time_usec);
+        printf("TIME: W:%lld A:%lld\n", world_time, hako_asset_time_usec);
         usleep(delta_usec);
     }
     hako_asset->asset_unregister(asset_name_str);
     hako::logger::get(asset_name_str)->flush();
 
-    printf("EXIT\n");
+    std::cout << "EXIT" << std::endl;
     return 0;
 }

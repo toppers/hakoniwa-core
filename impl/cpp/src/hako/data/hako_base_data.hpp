@@ -36,6 +36,7 @@ namespace hako::data {
     } HakoAssetEventType;
 
     typedef struct {
+        pid_t               pid;
         HakoTimeType        ctime;        /* usec: for asset simulation time */
         HakoTimeType        update_time;  /* usec: for heartbeat check */
         HakoAssetEventType  event;

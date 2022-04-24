@@ -3,7 +3,8 @@
 
 #include "hako_asset.hpp"
 #include "data/hako_master_data.hpp"
-#include "core/asset/hako_remote_asset_event.hpp"
+#include "core/context/hako_context.hpp"
+#include "core/rpc/hako_internal_rpc.hpp"
 
 namespace hako {
     class HakoAssetControllerImpl : public IHakoAssetController {
@@ -11,10 +12,14 @@ namespace hako {
         HakoAssetControllerImpl(std::shared_ptr<data::HakoMasterData> master_data)
         {
             this->master_data_ = master_data;
-            this->remote_event_ = std::make_shared<core::asset::HakoRemoteAssetEvent>(master_data);
+            this->rpc_ = nullptr;
+        }
+        virtual ~HakoAssetControllerImpl()
+        {
+            this->master_data_ = nullptr;
+            this->rpc_ = nullptr;
         }
         virtual bool asset_register(const std::string & name, AssetCallbackType &callbacks);
-        virtual bool asset_remote_register(const std::string & name, AssetCallbackType &callbacks);
         virtual bool asset_unregister(const std::string & name);
         virtual void notify_simtime(const std::string & name, HakoTimeType simtime);
         virtual HakoTimeType get_worldtime();
@@ -26,13 +31,11 @@ namespace hako {
         bool stop_feedback(const std::string& asset_name, bool isOk);
         bool reset_feedback(const std::string& asset_name, bool isOk);
 
-
-
     private:
         HakoAssetControllerImpl() {}
         bool feedback(const std::string& asset_name, bool isOk, HakoSimulationStateType exp_state);
         std::shared_ptr<data::HakoMasterData> master_data_;
-        std::shared_ptr<core::asset::HakoRemoteAssetEvent> remote_event_;
+        std::shared_ptr<hako::core::rpc::HakoInternalRpc> rpc_;
     };
 }
 

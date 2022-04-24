@@ -13,7 +13,7 @@
 namespace hako::data {
 
     typedef struct {
-        int32_t                 master_pid;
+        pid_t                   master_pid;
         HakoSimulationStateType state;
         HakoTimeSetType         time_usec;
         uint32_t                asset_num;
@@ -42,6 +42,10 @@ namespace hako::data {
                 this->master_datap_->master_pid = context.get_pid();
             }
             this->shmp_->unlock_memory(HAKO_SHARED_MEMORY_ID_0);
+        }
+        pid_t get_master_pid()
+        {
+            return this->master_datap_->master_pid;
         }
         int32_t get_semid()
         {
@@ -112,64 +116,13 @@ namespace hako::data {
         {
             return this->master_datap_->state;
         }
-        void publish_event_nolock(HakoAssetEventType event)
-        {
-            for (int i = 0; i < HAKO_DATA_MAX_ASSET_NUM; i++) {
-                auto& entry = this->master_datap_->assets[i];
-                auto& entry_ev = this->master_datap_->assets_ev[i];
-                if (entry.type != hako::data::HakoAssetType::HakoAsset_Unknown) {
-                    switch (event) {
-                        case hako::data::HakoAssetEvent_Start:
-                            entry_ev.event = event;
-                            entry_ev.event_feedback = false;
-                            if (entry.type == hako::data::HakoAsset_Outside) {
-                                hako::utils::sem::asset_up(this->get_semid(), i);
-                            }
-                            else {
-                                entry.callback.start();
-                            }
-                            break;
-                        case hako::data::HakoAssetEvent_Stop:
-                            entry_ev.event = event;
-                            entry_ev.event_feedback = false;
-                            if (entry.type == hako::data::HakoAsset_Outside) {
-                                hako::utils::sem::asset_up(this->get_semid(), i);
-                            }
-                            else {
-                                entry.callback.stop();
-                            }
-                            entry.callback.stop();
-                            break;
-                        case hako::data::HakoAssetEvent_Error:
-                            entry_ev.event = event;
-                            entry_ev.event_feedback = true;
-                            break;
-                        case hako::data::HakoAssetEvent_Reset:
-                            if (hako::data::HakoAssetEvent_Error == entry_ev.event) {
-                                entry_ev.event_feedback = true;
-                            }
-                            else {
-                                entry_ev.event = event;
-                                entry_ev.event_feedback = false;
-                                if (entry.type == hako::data::HakoAsset_Outside) {
-                                    hako::utils::sem::asset_up(this->get_semid(), i);
-                                }
-                                else {
-                                    entry.callback.reset();
-                                }
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-        }
         /*
          * Assets APIs
          */        
         HakoAssetIdType alloc_asset(const std::string &name, HakoAssetType type, AssetCallbackType &callback)
         {
+            hako::core::context::HakoContext context;
+
             HAKO_ASSERT((this->shmp_ != nullptr) && (this->master_datap_ != nullptr));
             if (type == hako::data::HakoAssetType::HakoAsset_Unknown) {
                 return -1;
@@ -193,6 +146,7 @@ namespace hako::data {
                             this->master_datap_->assets_ev[i].semid = -1;
                         }
                         this->master_datap_->assets[i].callback = callback;
+                        this->master_datap_->assets_ev[i].pid = context.get_pid();
                         this->master_datap_->assets_ev[i].ctime = 0ULL;
                         this->update_asset_time(i);
                         hako::utils::hako_string2fixed(name, this->master_datap_->assets[i].name);

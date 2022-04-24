@@ -17,9 +17,13 @@ namespace hako::core::context {
             return this->pid_;
         }
 
-        bool is_same_context(HakoContext &context)
+        bool is_same(HakoContext &context)
         {
             return (context.get_pid() == this->get_pid());
+        }
+        bool is_same(pid_t pid)
+        {
+            return (this->get_pid() == pid);
         }
 
         virtual ~HakoContext() {}

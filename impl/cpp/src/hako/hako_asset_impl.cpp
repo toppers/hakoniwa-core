@@ -4,6 +4,7 @@
 
 bool hako::HakoAssetControllerImpl::asset_register(const std::string & name, AssetCallbackType &callbacks)
 {
+    hako::core::context::HakoContext context;
     auto id = this->master_data_->alloc_asset(name, hako::data::HakoAssetType::HakoAsset_Inside, callbacks);
     if (id < 0) {
         hako::utils::logger::get("core")->error("can not registered: asset[{0}]", name);
@@ -11,36 +12,25 @@ bool hako::HakoAssetControllerImpl::asset_register(const std::string & name, Ass
     }
     else {
         hako::utils::logger::get("core")->info("Registered: asset[{0}]", name);
-        return true;
     }
-}
-bool hako::HakoAssetControllerImpl::asset_remote_register(const std::string & name, AssetCallbackType &callbacks)
-{
-    auto id = this->master_data_->alloc_asset(name, hako::data::HakoAssetType::HakoAsset_Outside, callbacks);
-    if (id < 0) {
-        hako::utils::logger::get("core")->error("can not registered: remote asset[{0}]", name);
-        return false;
-    }
-    else {
-        hako::utils::logger::get("core")->info("Registered: remote asset[{0}]", name);
-    }
-    this->remote_event_->start_monitoring(id, callbacks);
+    this->rpc_ = std::make_shared<hako::core::rpc::HakoInternalRpc>(id, this->master_data_);
+    this->rpc_->register_callback(hako::data::HakoAssetEvent_Start, callbacks.start);
+    this->rpc_->register_callback(hako::data::HakoAssetEvent_Stop, callbacks.stop);
+    this->rpc_->register_callback(hako::data::HakoAssetEvent_Reset, callbacks.reset);
+    this->rpc_->start();
     return true;
- }
+}
 
 bool hako::HakoAssetControllerImpl::asset_unregister(const std::string & name)
 {
-    auto* asset = this->master_data_->get_asset_nolock(name);
     auto ret = this->master_data_->free_asset(name);
     if (ret) {
-        if (asset->type == hako::data::HakoAsset_Outside) {
-            this->remote_event_->stop_monitoring(asset->id);
-        }
         hako::utils::logger::get("core")->info("Unregistered: asset[{0}]", name);
     }
     else {
         hako::utils::logger::get("core")->error("can not unregistered: asset[{0}]", name);
     }
+    this->rpc_->stop();
     return ret;
 }
 void hako::HakoAssetControllerImpl::notify_simtime(const std::string & name, HakoTimeType simtime)

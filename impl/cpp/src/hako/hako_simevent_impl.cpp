@@ -1,5 +1,6 @@
 #include "hako_simevent_impl.hpp"
 #include "utils/hako_logger.hpp"
+#include "core/rpc/hako_internal_rpc.hpp"
 
 HakoSimulationStateType hako::HakoSimulationEventController::state()
 {
@@ -26,7 +27,7 @@ bool hako::HakoSimulationEventController::trigger_event(HakoSimulationStateType 
     this->master_data_->unlock();
 
     if (ret) {
-        this->master_data_->publish_event_nolock(event);
+        this->publish_event_nolock(event);
     }
     return ret;
 }
@@ -118,6 +119,40 @@ void hako::HakoSimulationEventController::do_event_handling_timeout_nolock(std::
             if (this->master_data_->is_asset_timeout_nolock(id)) {
                 //hako::utils::logger::get()->info("TIMEOUT:{0}", id);
                 error_assets->push_back(id);
+            }
+        }
+    }
+}
+
+
+void hako::HakoSimulationEventController::publish_event_nolock(hako::data::HakoAssetEventType event)
+{
+    for (int i = 0; i < HAKO_DATA_MAX_ASSET_NUM; i++) {
+        hako::data::HakoAssetEntryType* entry = this->master_data_->get_asset(i);
+        if (entry == nullptr) {
+            continue;
+        }
+        hako::data::HakoAssetEntryEventType* entry_ev = this->master_data_->get_asset_event_nolock(i);
+        if (entry->type != hako::data::HakoAssetType::HakoAsset_Unknown) {
+            switch (event) {
+                case hako::data::HakoAssetEvent_Reset:
+                    if (hako::data::HakoAssetEvent_Error == entry_ev->event) {
+                        entry_ev->event_feedback = true;
+                    }
+                    else {
+                        hako::core::rpc::notify(this->master_data_, i, event);
+                    }
+                    break;
+                case hako::data::HakoAssetEvent_Start:
+                case hako::data::HakoAssetEvent_Stop:
+                    hako::core::rpc::notify(this->master_data_, i, event);
+                    break;
+                case hako::data::HakoAssetEvent_Error:
+                    entry_ev->event = event;
+                    entry_ev->event_feedback = true;
+                    break;
+                default:
+                    break;
             }
         }
     }

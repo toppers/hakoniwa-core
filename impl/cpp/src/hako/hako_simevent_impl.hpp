@@ -30,6 +30,7 @@ namespace hako {
     private:
         void do_event_handling_nolock(std::vector<HakoAssetIdType> *error_assets);
         void do_event_handling_timeout_nolock(std::vector<HakoAssetIdType> *error_assets);
+        void publish_event_nolock(hako::data::HakoAssetEventType event);
         bool trigger_event(HakoSimulationStateType curr_state, HakoSimulationStateType next_state, hako::data::HakoAssetEventType event);
         HakoSimulationEventController() {}
         std::shared_ptr<data::HakoMasterData> master_data_;

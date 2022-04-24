@@ -13,10 +13,7 @@ namespace hako {
         /*
          * Asset APIs
          */
-        virtual bool asset_register(const std::string & name, AssetCallbackType &callbacks) = 0;
-        //TODO not implementing
-        virtual bool asset_remote_register(const std::string & name, AssetCallbackType &callbacks) = 0;
-        
+        virtual bool asset_register(const std::string & name, AssetCallbackType &callbacks) = 0;      
         virtual bool asset_unregister(const std::string & name) = 0;
         virtual void notify_simtime(const std::string & name, HakoTimeType simtime) = 0;
         virtual HakoTimeType get_worldtime() = 0;
@@ -28,8 +25,6 @@ namespace hako {
         virtual bool start_feedback(const std::string& asset_name, bool isOk) = 0;
         virtual bool stop_feedback(const std::string& asset_name, bool isOk) = 0;
         virtual bool reset_feedback(const std::string& asset_name, bool isOk) = 0;
-
-
 
         //TODO
         //get asset lists

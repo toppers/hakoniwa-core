@@ -6,11 +6,14 @@
 #include "utils/hako_string.hpp"
 #include "utils/hako_assert.hpp"
 #include "utils/hako_clock.hpp"
+#include "utils/hako_sem.hpp"
+#include "core/context/hako_context.hpp"
 #include <string.h>
 
 namespace hako::data {
 
     typedef struct {
+        pid_t                   master_pid;
         HakoSimulationStateType state;
         HakoTimeSetType         time_usec;
         uint32_t                asset_num;
@@ -34,9 +37,19 @@ namespace hako::data {
             void *datap = this->shmp_->lock_memory(HAKO_SHARED_MEMORY_ID_0);
             this->master_datap_ = static_cast<HakoMasterDataType*>(datap);
             {
+                hako::core::context::HakoContext context;
                 memset(this->master_datap_, 0, sizeof(HakoMasterDataType));
+                this->master_datap_->master_pid = context.get_pid();
             }
             this->shmp_->unlock_memory(HAKO_SHARED_MEMORY_ID_0);
+        }
+        pid_t get_master_pid()
+        {
+            return this->master_datap_->master_pid;
+        }
+        int32_t get_semid()
+        {
+            return this->shmp_->get_semid(HAKO_SHARED_MEMORY_ID_0);
         }
 
         void load()
@@ -103,48 +116,13 @@ namespace hako::data {
         {
             return this->master_datap_->state;
         }
-        void publish_event_nolock(HakoAssetEventType event)
-        {
-            for (int i = 0; i < HAKO_DATA_MAX_ASSET_NUM; i++) {
-                auto& entry = this->master_datap_->assets[i];
-                auto& entry_ev = this->master_datap_->assets_ev[i];
-                if (entry.type != hako::data::HakoAssetType::HakoAsset_Unknown) {
-                    switch (event) {
-                        case hako::data::HakoAssetEvent_Start:
-                            entry_ev.event = event;
-                            entry_ev.event_feedback = false;
-                            entry.callback.start();
-                            break;
-                        case hako::data::HakoAssetEvent_Stop:
-                            entry_ev.event = event;
-                            entry_ev.event_feedback = false;
-                            entry.callback.stop();
-                            break;
-                        case hako::data::HakoAssetEvent_Error:
-                            entry_ev.event = event;
-                            entry_ev.event_feedback = true;
-                            break;
-                        case hako::data::HakoAssetEvent_Reset:
-                            if (hako::data::HakoAssetEvent_Error == entry_ev.event) {
-                                entry_ev.event_feedback = true;
-                            }
-                            else {
-                                entry_ev.event = event;
-                                entry_ev.event_feedback = false;
-                                entry.callback.reset();
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-        }
         /*
          * Assets APIs
          */        
         HakoAssetIdType alloc_asset(const std::string &name, HakoAssetType type, AssetCallbackType &callback)
         {
+            hako::core::context::HakoContext context;
+
             HAKO_ASSERT((this->shmp_ != nullptr) && (this->master_datap_ != nullptr));
             if (type == hako::data::HakoAssetType::HakoAsset_Unknown) {
                 return -1;
@@ -161,7 +139,14 @@ namespace hako::data {
                     if (this->master_datap_->assets[i].type == hako::data::HakoAssetType::HakoAsset_Unknown) {
                         this->master_datap_->assets[i].id = i;
                         this->master_datap_->assets[i].type = type;
+                        if (type == hako::data::HakoAssetType::HakoAsset_Outside) {
+
+                        }
+                        else {
+                            this->master_datap_->assets_ev[i].semid = -1;
+                        }
                         this->master_datap_->assets[i].callback = callback;
+                        this->master_datap_->assets_ev[i].pid = context.get_pid();
                         this->master_datap_->assets_ev[i].ctime = 0ULL;
                         this->update_asset_time(i);
                         hako::utils::hako_string2fixed(name, this->master_datap_->assets[i].name);

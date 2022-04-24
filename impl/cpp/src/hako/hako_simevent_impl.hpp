@@ -22,12 +22,6 @@ namespace hako {
         bool stop();
         bool reset();
 
-        /*
-         * feedback events
-         */
-        bool start_feedback(const std::string& asset_name, bool isOk);
-        bool stop_feedback(const std::string& asset_name, bool isOk);
-        bool reset_feedback(const std::string& asset_name, bool isOk);
 
         /*
          * event monitor
@@ -36,7 +30,7 @@ namespace hako {
     private:
         void do_event_handling_nolock(std::vector<HakoAssetIdType> *error_assets);
         void do_event_handling_timeout_nolock(std::vector<HakoAssetIdType> *error_assets);
-        bool feedback(const std::string& asset_name, bool isOk, HakoSimulationStateType exp_state);
+        void publish_event_nolock(hako::data::HakoAssetEventType event);
         bool trigger_event(HakoSimulationStateType curr_state, HakoSimulationStateType next_state, hako::data::HakoAssetEventType event);
         HakoSimulationEventController() {}
         std::shared_ptr<data::HakoMasterData> master_data_;

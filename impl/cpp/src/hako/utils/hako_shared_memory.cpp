@@ -4,15 +4,7 @@
 #include<sys/sem.h>
 
 #include "utils/hako_shared_memory.hpp"
-#ifdef MACOSX
-#else
-union semun {
-    int val;
-    struct semid_ds *buf;
-    unsigned short int *array;
-    struct seminfo *__buf;
-};
-#endif
+#include "utils/hako_sem.hpp"
 
 int32_t hako::utils::HakoSharedMemory::create_memory(int32_t key, int32_t size)
 {
@@ -24,6 +16,14 @@ int32_t hako::utils::HakoSharedMemory::create_memory(int32_t key, int32_t size)
     }
     void *shared_memory = shmat(shmid, 0, 0);
 
+#if 1
+    int32_t sem_id = hako::utils::sem::create(key);
+    if (sem_id < 0) {
+        (void)shmdt(shared_memory);
+        (void)shmctl (shmid, IPC_RMID, 0);
+        return -1;
+    }
+#else
     int32_t sem_id = semget(key, 1, 0666 | IPC_CREAT);
     if (sem_id < 0) {
         printf("ERROR: semget() key=%d size=%d error=%d\n", key, size, errno);
@@ -44,6 +44,7 @@ int32_t hako::utils::HakoSharedMemory::create_memory(int32_t key, int32_t size)
         (void)semctl(sem_id, 1, IPC_RMID, NULL);
         return -1;
     }
+#endif
     SharedMemoryMetaDataType *metap = static_cast<SharedMemoryMetaDataType*>(shared_memory);
     metap->sem_id = sem_id;
     metap->shm_id = shmid;
@@ -83,6 +84,9 @@ void* hako::utils::HakoSharedMemory::load_memory_shmid(int32_t key, int32_t shmi
 
 void* hako::utils::HakoSharedMemory::lock_memory(int32_t key)
 {
+#if 1
+    hako::utils::sem::master_lock(this->shared_memory_map_[key].sem_id);
+#else
     struct sembuf sop;
     sop.sem_num =  0;            // Semaphore number
     sop.sem_op  = -1;            // Semaphore operation is Lock
@@ -91,11 +95,15 @@ void* hako::utils::HakoSharedMemory::lock_memory(int32_t key)
     if (err < 0) {
         printf("ERROR: unlock_memory() semop() error=%d key=%d\n", errno, key);
     }
+#endif
     return &this->shared_memory_map_[key].addr->data[0];
 }
 
 void hako::utils::HakoSharedMemory::unlock_memory(int32_t key)
-{ 
+{
+#if 1
+    hako::utils::sem::master_unlock(this->shared_memory_map_[key].sem_id);
+#else
     struct sembuf sop;
     sop.sem_num =  0;            // Semaphore number
     sop.sem_op  =  1;            // Semaphore operation is Lock
@@ -104,7 +112,12 @@ void hako::utils::HakoSharedMemory::unlock_memory(int32_t key)
     if (err < 0) {
         printf("ERROR: unlock_memory() semop() error=%d key=%d\n", errno, key);
     }
+#endif
     return;
+}
+int32_t hako::utils::HakoSharedMemory::get_semid(int32_t key)
+{
+    return this->shared_memory_map_[key].sem_id;
 }
 
 void hako::utils::HakoSharedMemory::destroy_memory(int32_t key)
@@ -113,7 +126,11 @@ void hako::utils::HakoSharedMemory::destroy_memory(int32_t key)
     if (addr != nullptr) {
         (void)shmdt(addr);
         (void)shmctl (this->shared_memory_map_[key].shm_id, IPC_RMID, 0);
+#if 1
+        hako::utils::sem::destroy(this->shared_memory_map_[key].sem_id);
+#else
         (void)semctl(this->shared_memory_map_[key].sem_id, 1, IPC_RMID, NULL);
+#endif
         this->shared_memory_map_.erase(key);
     }
     return;

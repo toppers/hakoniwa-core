@@ -16,6 +16,7 @@ fi
 if [ ${OPT} = "clean" ]
 then
     rm -rf ./cmake-build/*
+    rm -rf ./log/*
     exit 0
 fi
 

@@ -18,13 +18,6 @@ namespace hako {
         virtual bool reset() = 0;
 
         /*
-         * feedback events
-         */
-        virtual bool start_feedback(const std::string& asset_name, bool isOk) = 0;
-        virtual bool stop_feedback(const std::string& asset_name, bool isOk) = 0;
-        virtual bool reset_feedback(const std::string& asset_name, bool isOk) = 0;
-
-        /*
          * event monitor
          */
         virtual void do_event_handling() = 0;

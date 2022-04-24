@@ -1,5 +1,6 @@
 #include "hako_simevent_impl.hpp"
 #include "utils/hako_logger.hpp"
+#include "core/rpc/hako_internal_rpc.hpp"
 
 HakoSimulationStateType hako::HakoSimulationEventController::state()
 {
@@ -26,7 +27,7 @@ bool hako::HakoSimulationEventController::trigger_event(HakoSimulationStateType 
     this->master_data_->unlock();
 
     if (ret) {
-        this->master_data_->publish_event_nolock(event);
+        this->publish_event_nolock(event);
     }
     return ret;
 }
@@ -37,48 +38,12 @@ bool hako::HakoSimulationEventController::start()
 }
 
 
-bool hako::HakoSimulationEventController::feedback(const std::string& asset_name, bool isOk, HakoSimulationStateType exp_state)
-{
-    bool ret = true;
-    this->master_data_->lock();
-    {
-        auto& state = this->master_data_->ref_state_nolock();
-        auto* entry = this->master_data_->get_asset_nolock(asset_name);
-        if (entry != nullptr) {
-            auto* entry_ev = this->master_data_->get_asset_event_nolock(entry->id);
-            entry_ev->update_time = hako_get_clock();
-            if (state == exp_state) {
-                entry_ev->event_feedback = isOk;
-            }
-            else {
-                entry_ev->event_feedback = false;
-                ret = false;
-            }
-        }
-        else {
-            ret = false;
-        }
-        this->do_event_handling_nolock(nullptr);
-    }
-    this->master_data_->unlock();
-    return ret;
-}
-
-
-bool hako::HakoSimulationEventController::start_feedback(const std::string& asset_name, bool isOk)
-{
-    return this->feedback(asset_name, isOk, HakoSim_Runnable);
-}
 
 bool hako::HakoSimulationEventController::stop()
 {
     return this->trigger_event(HakoSim_Running, HakoSim_Stopping, hako::data::HakoAssetEvent_Stop);
 }
 
-bool hako::HakoSimulationEventController::stop_feedback(const std::string& asset_name, bool isOk)
-{
-    return this->feedback(asset_name, isOk, HakoSim_Stopping);
-}
 bool hako::HakoSimulationEventController::reset()
 {
     auto& state = this->master_data_->ref_state_nolock();
@@ -90,10 +55,7 @@ bool hako::HakoSimulationEventController::reset()
     }
     return false;
 }
-bool hako::HakoSimulationEventController::reset_feedback(const std::string& asset_name, bool isOk)
-{
-    return this->feedback(asset_name, isOk, HakoSim_Resetting);
-}
+
 void hako::HakoSimulationEventController::do_event_handling()
 {
     std::vector<HakoAssetIdType> error_assets;
@@ -108,10 +70,11 @@ void hako::HakoSimulationEventController::do_event_handling()
     for (auto& asset_id : error_assets) {
         hako::data::HakoAssetEntryType *entry = this->master_data_->get_asset(asset_id);
         std::shared_ptr<std::string>  asset_name = hako::utils::hako_fixed2string(entry->name);
-        hako::utils::logger::get()->error("asset[{0}] timeout", *asset_name);
+        hako::utils::logger::get("core")->error("asset[{0}] timeout", *asset_name);
         this->asset_controller_->asset_unregister(*asset_name);
     }
 }
+
 void hako::HakoSimulationEventController::do_event_handling_nolock(std::vector<HakoAssetIdType> *error_assets)
 {
     auto& state = this->master_data_->ref_state_nolock();
@@ -156,6 +119,40 @@ void hako::HakoSimulationEventController::do_event_handling_timeout_nolock(std::
             if (this->master_data_->is_asset_timeout_nolock(id)) {
                 //hako::utils::logger::get()->info("TIMEOUT:{0}", id);
                 error_assets->push_back(id);
+            }
+        }
+    }
+}
+
+
+void hako::HakoSimulationEventController::publish_event_nolock(hako::data::HakoAssetEventType event)
+{
+    for (int i = 0; i < HAKO_DATA_MAX_ASSET_NUM; i++) {
+        hako::data::HakoAssetEntryType* entry = this->master_data_->get_asset(i);
+        if (entry == nullptr) {
+            continue;
+        }
+        hako::data::HakoAssetEntryEventType* entry_ev = this->master_data_->get_asset_event_nolock(i);
+        if (entry->type != hako::data::HakoAssetType::HakoAsset_Unknown) {
+            switch (event) {
+                case hako::data::HakoAssetEvent_Reset:
+                    if (hako::data::HakoAssetEvent_Error == entry_ev->event) {
+                        entry_ev->event_feedback = true;
+                    }
+                    else {
+                        hako::core::rpc::notify(this->master_data_, i, event);
+                    }
+                    break;
+                case hako::data::HakoAssetEvent_Start:
+                case hako::data::HakoAssetEvent_Stop:
+                    hako::core::rpc::notify(this->master_data_, i, event);
+                    break;
+                case hako::data::HakoAssetEvent_Error:
+                    entry_ev->event = event;
+                    entry_ev->event_feedback = true;
+                    break;
+                default:
+                    break;
             }
         }
     }

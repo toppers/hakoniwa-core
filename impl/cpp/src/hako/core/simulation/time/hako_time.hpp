@@ -24,6 +24,10 @@ namespace hako::core::simulation::time {
             this->wait_time_usec_ = 0;
             this->world_time_usec_ = 0;
         }
+        void reset_world_time()
+        {
+            this->world_time_usec_ = 0;
+        }
         HakoTimeType get_world_time_usec()
         {
             return this->world_time_usec_;

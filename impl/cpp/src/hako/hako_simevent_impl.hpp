@@ -27,6 +27,7 @@ namespace hako {
          * event monitor
          */
         void do_event_handling();
+        bool do_event_handling(HakoSimulationStateType &prev, HakoSimulationStateType &next);
     private:
         void do_event_handling_nolock(std::vector<HakoAssetIdType> *error_assets);
         void do_event_handling_timeout_nolock(std::vector<HakoAssetIdType> *error_assets);

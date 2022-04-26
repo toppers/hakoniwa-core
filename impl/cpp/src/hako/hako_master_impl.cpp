@@ -7,10 +7,20 @@ bool hako::HakoMasterControllerImpl::execute()
     if (this->theWorld_ == nullptr) {
         return false;
     }
-    this->sim_event_->do_event_handling();
+    HakoSimulationStateType prev;
+    HakoSimulationStateType next;
+    bool is_changed = this->sim_event_->do_event_handling(prev, next);
+    if (is_changed) {
+        if ((prev == HakoSim_Resetting) && (next == HakoSim_Stopped)) {
+            this->master_data_->lock();
+            auto& timeset = this->master_data_->ref_time_nolock();
+            timeset.current = 0;
+            this->theWorld_->reset_world_time();
+            this->master_data_->unlock();
+        }
+    }
 
-    auto& state = this->master_data_->ref_state_nolock();
-    if (state != HakoSim_Running) {
+    if (next != HakoSim_Running) {
         return false;
     }
     auto prev_world_time = this->theWorld_->get_world_time_usec();

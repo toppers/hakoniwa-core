@@ -17,10 +17,6 @@ namespace hako {
         virtual bool stop() = 0;
         virtual bool reset() = 0;
 
-        /*
-         * event monitor
-         */
-        virtual void do_event_handling() = 0;
     };
 }
 

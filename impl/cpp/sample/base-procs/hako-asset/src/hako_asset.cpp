@@ -14,6 +14,7 @@ static std::shared_ptr<hako::IHakoAssetController> hako_asset = nullptr;
 
 static void reset_callback()
 {
+    hako_asset_time_usec = 0;
     hako_asset->reset_feedback(*asset_name, true);
 }
 static void start_callback()

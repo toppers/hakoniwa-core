@@ -46,21 +46,32 @@ bool hako::HakoSimulationEventController::stop()
 
 bool hako::HakoSimulationEventController::reset()
 {
+    bool ret = false;
     auto& state = this->master_data_->ref_state_nolock();
     if (state == HakoSim_Stopped) {
-        return this->trigger_event(HakoSim_Stopped, HakoSim_Resetting, hako::data::HakoAssetEvent_Reset);
+        ret = this->trigger_event(HakoSim_Stopped, HakoSim_Resetting, hako::data::HakoAssetEvent_Reset);
     }
     else if (state == HakoSim_Error) {
-        return this->trigger_event(HakoSim_Error, HakoSim_Stopped, hako::data::HakoAssetEvent_Reset);
+        ret = this->trigger_event(HakoSim_Error, HakoSim_Stopped, hako::data::HakoAssetEvent_Reset);
     }
-    return false;
+    return ret;
 }
 
 void hako::HakoSimulationEventController::do_event_handling()
 {
+    HakoSimulationStateType prev;
+    HakoSimulationStateType next;
+    (void)this->do_event_handling(prev, next);
+}
+bool hako::HakoSimulationEventController::do_event_handling(HakoSimulationStateType &prev, HakoSimulationStateType &next)
+{
+    bool is_changed = false;
     std::vector<HakoAssetIdType> error_assets;
     this->master_data_->lock();
+    prev = this->master_data_->ref_state_nolock();
     this->do_event_handling_nolock(&error_assets);
+    next = this->master_data_->ref_state_nolock();
+    is_changed = (prev != next);
     this->master_data_->unlock();
 
     if (error_assets.size() > 0) {
@@ -73,6 +84,7 @@ void hako::HakoSimulationEventController::do_event_handling()
         hako::utils::logger::get("core")->error("asset[{0}] timeout", *asset_name);
         this->asset_controller_->asset_unregister(*asset_name);
     }
+    return is_changed;
 }
 
 void hako::HakoSimulationEventController::do_event_handling_nolock(std::vector<HakoAssetIdType> *error_assets)

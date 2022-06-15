@@ -13,20 +13,7 @@ using Hakoniwa.PluggableAsset.Communication.Connector;
 
 namespace Hakoniwa.Core.Simulation
 {
-    public enum SimulationState
-    {
-        Stopped = 0,
-        Runnable = 1,
-        Running = 2,
-        Stopping = 3,
-        Terminated = 99,
-    }
-    public enum HakoniwaSimulationResult
-    {
-        Success = 0,
-        Failed = 1,
-    }
-    public class SimulationController
+    public class SimulationController : ISimulationController, ISimulationAssetManager
     {
         private static SimulationController simulator = new SimulationController();
         private System.Object lockObj = new System.Object();
@@ -59,7 +46,7 @@ namespace Hakoniwa.Core.Simulation
             this.theWorld.SetDeltaTime(1); //TODO
         }
 
-        internal bool RegisterOutsideAsset(string name)
+        public bool RegisterOutsideAsset(string name)
         {
             lock (this.lockObj)
             {
@@ -129,7 +116,7 @@ namespace Hakoniwa.Core.Simulation
             this.sim_env.Restore();
         }
 
-        internal void Unregister(string name)
+        public void Unregister(string name)
         {
             lock (this.lockObj)
             {
@@ -267,7 +254,7 @@ namespace Hakoniwa.Core.Simulation
             }
         }
 
-        internal bool IsExist(string name)
+        public bool IsExist(string name)
         {
             lock (this.lockObj)
             {
@@ -305,7 +292,7 @@ namespace Hakoniwa.Core.Simulation
             }
         }
 
-        internal AssetEvent GetEvent(string name)
+        public AssetEvent GetEvent(string name)
         {
             lock (this.lockObj)
             {
@@ -363,7 +350,7 @@ namespace Hakoniwa.Core.Simulation
             }
         }
 
-        internal List<AssetEntry> GetAssetList()
+        public List<AssetEntry> GetAssetList()
         {
             lock (this.lockObj)
             {
@@ -371,7 +358,7 @@ namespace Hakoniwa.Core.Simulation
             }
         }
 
-        internal void UpdateTime(string name)
+        public void UpdateTime(string name)
         {
             lock (this.lockObj)
             {
@@ -408,7 +395,7 @@ namespace Hakoniwa.Core.Simulation
             return this.theWorld.GetWorldTime();
         }
 
-        public void UnregisterDeadAssets()
+        private void UnregisterDeadAssets()
         {
             if (AssetConfigLoader.core_config.asset_timeout < 0)
             {
@@ -519,6 +506,16 @@ namespace Hakoniwa.Core.Simulation
                 }
             }
             return canStep;
+        }
+
+        public ISimulationAssetManager GetAssetManager()
+        {
+            return this;
+        }
+
+        public List<IInsideAssetController> RefInsideAssetList()
+        {
+            throw new NotImplementedException();
         }
     }
 }

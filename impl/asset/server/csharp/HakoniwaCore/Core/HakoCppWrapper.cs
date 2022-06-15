@@ -112,6 +112,12 @@ namespace Hakoniwa.Core
          * for simevent
          */
         [DllImport("libshakoc", CallingConvention = CallingConvention.Cdecl)]
+        static extern bool hako_simevent_init();
+        static public bool simevent_init()
+        {
+            return HakoCppWrapper.hako_simevent_init();
+        }
+        [DllImport("libshakoc", CallingConvention = CallingConvention.Cdecl)]
         static extern int hako_simevent_get_state();
         public enum HakoState
         {

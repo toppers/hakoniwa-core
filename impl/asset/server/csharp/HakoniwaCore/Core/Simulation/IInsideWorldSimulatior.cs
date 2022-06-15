@@ -7,5 +7,6 @@ namespace Hakoniwa.Core.Simulation
     public interface IInsideWorldSimulatior
     {
         void DoSimulation();
+        long GetDeltaTimeUsec();
     }
 }

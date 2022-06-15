@@ -32,6 +32,7 @@ namespace Hakoniwa.Core.Simulation
         private ISimulationAssetManager asset_manager;
         private SimulationEnvironment sim_env;
         private IInsideWorldSimulatior inside_simulator = null;
+        private long asset_time_usec = 0;
 
         private StringBuilder my_asset_name;
         private void SetAssetName(string asset_name)
@@ -46,6 +47,7 @@ namespace Hakoniwa.Core.Simulation
 
         public void RestoreEnvironment()
         {
+            this.asset_time_usec = 0;
             this.sim_env.Restore();
         }
 
@@ -65,13 +67,24 @@ namespace Hakoniwa.Core.Simulation
 
             IntPtr inputPtr = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(HakoCppWrapper.hako_asset_callback_t)));
             Marshal.StructureToPtr<HakoCppWrapper.hako_asset_callback_t>(inputData, inputPtr, false);
-            bool ret = HakoCppWrapper.asset_register(new StringBuilder("TestAsset"), inputPtr);
+            bool ret = HakoCppWrapper.asset_register(this.my_asset_name, inputPtr);
 
             this.inside_simulator = isim;
         }
         public long GetWorldTime()
         {
             return HakoCppWrapper.get_wrold_time();
+        }
+        private bool DoStep()
+        {
+            bool ret = false;
+            if (this.asset_time_usec < this.GetWorldTime())
+            {
+                ret = true;
+                this.asset_time_usec += this.inside_simulator.GetDeltaTimeUsec();
+            }
+            HakoCppWrapper.asset_notify_simtime(this.my_asset_name, this.asset_time_usec);
+            return ret;
         }
         public bool Execute()
         {
@@ -93,7 +106,7 @@ namespace Hakoniwa.Core.Simulation
             /********************
              * Hakoniwa Time Sync
              ********************/
-            bool canStep = HakoCppWrapper.master_execute();
+            bool canStep = this.DoStep();
             if (canStep)
             {
                 /********************

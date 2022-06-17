@@ -70,7 +70,41 @@ namespace Hakoniwa.Core
         {
             return HakoCppWrapper.hako_asset_register(name, callbacks);
         }
-
+        [DllImport("libshakoc", CallingConvention = CallingConvention.Cdecl)]
+        static extern bool hako_asset_register_polling(StringBuilder name);
+        static public bool asset_register_polling(StringBuilder name)
+        {
+            return HakoCppWrapper.hako_asset_register_polling(name);
+        }
+        [DllImport("libshakoc", CallingConvention = CallingConvention.Cdecl)]
+        static extern int hako_asset_get_event(StringBuilder name);
+        public enum HakoSimAssetEvent
+        {
+            HakoSimAssetEvent_None = 0,
+            HakoSimAssetEvent_Start = 1,
+            HakoSimAssetEvent_Stop = 2,
+            HakoSimAssetEvent_Reset = 3,
+            HakoSimAssetEvent_Error = 4,
+            HakoSimAssetEvent_Count = 5
+        }
+        static public HakoSimAssetEvent asset_get_event(StringBuilder name)
+        {
+            int ev = HakoCppWrapper.hako_asset_get_event(name);
+            //Hakoniwa.Core.Utils.Logger.SimpleLogger.Get().Log(Hakoniwa.Core.Utils.Logger.Level.INFO, "asset_get_event():" + ev);
+            switch (ev)
+            {
+                case 0:
+                    return HakoSimAssetEvent.HakoSimAssetEvent_None;
+                case 1:
+                    return HakoSimAssetEvent.HakoSimAssetEvent_Start;
+                case 2:
+                    return HakoSimAssetEvent.HakoSimAssetEvent_Stop;
+                case 3:
+                    return HakoSimAssetEvent.HakoSimAssetEvent_Reset;
+                default:
+                    return HakoSimAssetEvent.HakoSimAssetEvent_Error;
+            }
+        }
         [DllImport("libshakoc", CallingConvention = CallingConvention.Cdecl)]
         static extern bool hako_asset_unregister(StringBuilder name);
         static public bool asset_unregister(StringBuilder asset_name)
@@ -99,7 +133,7 @@ namespace Hakoniwa.Core
         static extern bool hako_asset_stop_feedback(StringBuilder asset_name, bool isOk);
         static public bool asset_stop_feedback(StringBuilder asset_name, bool isOk)
         {
-            return HakoCppWrapper.hako_asset_start_feedback(asset_name, isOk);
+            return HakoCppWrapper.hako_asset_stop_feedback(asset_name, isOk);
         }
         [DllImport("libshakoc", CallingConvention = CallingConvention.Cdecl)]
         static extern bool hako_asset_reset_feedback(StringBuilder asset_name, bool isOk);

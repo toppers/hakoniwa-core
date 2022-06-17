@@ -15,7 +15,7 @@ namespace Hakoniwa.Core.Simulation
     class HakoAssetSimulationController : ISimulationController
     {
         private static HakoAssetSimulationController simulator = new HakoAssetSimulationController();
-        List<IInsideAssetController> inside_asset_list = null;
+        private List<IInsideAssetController> inside_asset_list = null;
 
         internal static ISimulationController Get(string asset_name)
         {
@@ -26,8 +26,9 @@ namespace Hakoniwa.Core.Simulation
 
         private HakoAssetSimulationController()
         {
-            this.asset_manager = new SimulationAssetManager();
-            this.sim_env = new SimulationEnvironment();
+            asset_manager = new SimulationAssetManager();
+            sim_env = new SimulationEnvironment();
+            HakoCppWrapper.asset_init();
         }
         private ISimulationAssetManager asset_manager;
         private SimulationEnvironment sim_env;
@@ -37,38 +38,31 @@ namespace Hakoniwa.Core.Simulation
         private StringBuilder my_asset_name;
         private void SetAssetName(string asset_name)
         {
-            this.my_asset_name = new StringBuilder(asset_name);
+            my_asset_name = new StringBuilder(asset_name);
         }
 
         public void RegisterEnvironmentOperation(IEnvironmentOperation env_op)
         {
-            this.sim_env.Register(env_op);
+            sim_env.Register(env_op);
         }
 
         public void RestoreEnvironment()
         {
             this.asset_time_usec = 0;
-            this.sim_env.Restore();
+            sim_env.Restore();
         }
 
         public void SaveEnvironment()
         {
-            this.sim_env.Save();
+            sim_env.Save();
         }
 
         public void SetInsideWorldSimulator(IInsideWorldSimulatior isim)
         {
-            HakoCppWrapper.hako_asset_callback_t inputData = new HakoCppWrapper.hako_asset_callback_t()
-            {
-                start = new HakoCppWrapper.HakoAssetCblkStart(StartCallback),
-                stop = new HakoCppWrapper.HakoAssetCblkStop(StopCallback),
-                reset = new HakoCppWrapper.HakoAssetCblkReset(ResetCallback)
-            };
-
-            IntPtr inputPtr = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(HakoCppWrapper.hako_asset_callback_t)));
-            Marshal.StructureToPtr<HakoCppWrapper.hako_asset_callback_t>(inputData, inputPtr, false);
-            bool ret = HakoCppWrapper.asset_register(this.my_asset_name, inputPtr);
-
+            bool ret = HakoCppWrapper.asset_register_polling(my_asset_name);
+            if (ret != true) {
+                SimpleLogger.Get().Log(Level.ERROR, "SetInsideWorldSimulator:can not register asset");
+            }
             this.inside_simulator = isim;
         }
         public long GetWorldTime()
@@ -83,11 +77,29 @@ namespace Hakoniwa.Core.Simulation
                 ret = true;
                 this.asset_time_usec += this.inside_simulator.GetDeltaTimeUsec();
             }
-            HakoCppWrapper.asset_notify_simtime(this.my_asset_name, this.asset_time_usec);
+            HakoCppWrapper.asset_notify_simtime(my_asset_name, this.asset_time_usec);
             return ret;
+        }
+        private void PollEvent()
+        {
+            HakoSimAssetEvent ev = HakoCppWrapper.asset_get_event(this.my_asset_name);
+            switch (ev) {
+                case HakoSimAssetEvent.HakoSimAssetEvent_Start:
+                    StartCallback();
+                    break;
+                case HakoSimAssetEvent.HakoSimAssetEvent_Stop:
+                    StopCallback();
+                    break;
+                case HakoSimAssetEvent.HakoSimAssetEvent_Reset:
+                    ResetCallback();
+                    break;
+                default:
+                    break;
+            }
         }
         public bool Execute()
         {
+            this.PollEvent();
             /********************
              * Inside assets
              * - Recv Actuation Data
@@ -113,14 +125,14 @@ namespace Hakoniwa.Core.Simulation
                  * Inside Assets 
                  * - Do Simulation
                  ********************/
-                foreach (var asset in this.inside_asset_list)
+                foreach (var asset in inside_asset_list)
                 {
                     asset.DoActuation();
                 }
 
                 this.inside_simulator.DoSimulation();
 
-                foreach (var asset in this.inside_asset_list)
+                foreach (var asset in inside_asset_list)
                 {
                     asset.CopySensingDataToPdu();
                 }
@@ -146,19 +158,19 @@ namespace Hakoniwa.Core.Simulation
         private void StartCallback()
         {
             SimpleLogger.Get().Log(Level.INFO, "StartCallback");
-            this.inside_asset_list = this.asset_manager.RefInsideAssetList();
-            HakoCppWrapper.asset_start_feedback(this.my_asset_name, true);
+            inside_asset_list = asset_manager.RefInsideAssetList();
+            HakoCppWrapper.asset_start_feedback(my_asset_name, true);
         }
         private void StopCallback()
         {
             SimpleLogger.Get().Log(Level.INFO, "StopCallback");
-            HakoCppWrapper.asset_stop_feedback(this.my_asset_name, true);
+            HakoCppWrapper.asset_stop_feedback(my_asset_name, true);
         }
         private void ResetCallback()
         {
             SimpleLogger.Get().Log(Level.INFO, "ResetCallback");
             PduIoConnector.Reset();
-            this.sim_env.Restore();
+            sim_env.Restore();
             foreach (var connector in AssetConfigLoader.RefPduChannelConnector())
             {
                 if (connector.Reader != null)
@@ -166,7 +178,7 @@ namespace Hakoniwa.Core.Simulation
                     connector.Reader.Reset();
                 }
             }
-            HakoCppWrapper.asset_reset_feedback(this.my_asset_name, true);
+            HakoCppWrapper.asset_reset_feedback(my_asset_name, true);
         }
 
         public SimulationState GetState()
@@ -207,7 +219,7 @@ namespace Hakoniwa.Core.Simulation
 
         public ISimulationAssetManager GetAssetManager()
         {
-            return this.asset_manager;
+            return asset_manager;
         }
 
 

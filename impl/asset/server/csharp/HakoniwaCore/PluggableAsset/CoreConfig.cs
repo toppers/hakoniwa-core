@@ -8,6 +8,8 @@ namespace Hakoniwa.PluggableAsset
     [System.Serializable]
     public class CoreConfig
     {
+        public string cpp_mode; // asset or master
+        public string cpp_asset_name;
         public string core_ipaddr;
         public int core_portno;
         public long asset_timeout;

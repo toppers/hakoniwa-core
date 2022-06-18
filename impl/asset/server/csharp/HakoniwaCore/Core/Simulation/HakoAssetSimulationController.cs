@@ -100,6 +100,10 @@ namespace Hakoniwa.Core.Simulation
         public bool Execute()
         {
             this.PollEvent();
+
+            if (this.GetState() != SimulationState.Running) {
+                return false;
+            }
             /********************
              * Inside assets
              * - Recv Actuation Data

@@ -203,5 +203,61 @@ namespace Hakoniwa.Core
         {
             return HakoCppWrapper.hako_simevent_reset();
         }
+        [DllImport("libshakoc", CallingConvention = CallingConvention.Cdecl)]
+        static extern bool hako_asset_create_pdu_channel(StringBuilder asset_name, int channel_id, uint pdu_size);
+        static public bool asset_create_pdu_channel(StringBuilder asset_name, int channel_id, uint pdu_size)
+        {
+            return HakoCppWrapper.hako_asset_create_pdu_channel(asset_name, channel_id, pdu_size);
+        }
+        [DllImport("libshakoc", CallingConvention = CallingConvention.Cdecl)]
+        static extern bool hako_asset_is_pdu_dirty(int channel_id);
+        static public bool asset_is_pdu_dirty(int channel_id)
+        {
+            return HakoCppWrapper.hako_asset_is_pdu_dirty(channel_id);
+        }
+
+        [DllImport("libshakoc", CallingConvention = CallingConvention.Cdecl)]
+        static extern bool hako_asset_write_pdu(StringBuilder asset_name, int channel_id, IntPtr pdu_data, uint len);
+        static public bool asset_write_pdu(StringBuilder asset_name, int channel_id, IntPtr pdu_data, uint len)
+        {
+            return HakoCppWrapper.hako_asset_write_pdu(asset_name, channel_id, pdu_data, len);
+        }
+        [DllImport("libshakoc", CallingConvention = CallingConvention.Cdecl)]
+        static extern bool hako_asset_read_pdu(StringBuilder asset_name, int channel_id, IntPtr pdu_data, uint len);
+        static public bool asset_read_pdu(StringBuilder asset_name, int channel_id, IntPtr pdu_data, uint len)
+        {
+            return HakoCppWrapper.hako_asset_read_pdu(asset_name, channel_id, pdu_data, len);
+        }
+        [DllImport("libshakoc", CallingConvention = CallingConvention.Cdecl)]
+        static extern void hako_asset_notify_read_pdu_done(StringBuilder asset_name);
+        static public void asset_notify_read_pdu_done(StringBuilder asset_name)
+        {
+            HakoCppWrapper.hako_asset_notify_read_pdu_done(asset_name);
+        }
+        [DllImport("libshakoc", CallingConvention = CallingConvention.Cdecl)]
+        static extern void hako_asset_notify_write_pdu_done(StringBuilder asset_name);
+        static public void asset_notify_write_pdu_done(StringBuilder asset_name)
+        {
+            HakoCppWrapper.hako_asset_notify_write_pdu_done(asset_name);
+        }
+        [DllImport("libshakoc", CallingConvention = CallingConvention.Cdecl)]
+        static extern bool hako_asset_is_pdu_sync_mode(StringBuilder asset_name);
+        static public bool asset_is_pdu_sync_mode(StringBuilder asset_name)
+        {
+            return HakoCppWrapper.hako_asset_is_pdu_sync_mode(asset_name);
+        }
+        [DllImport("libshakoc", CallingConvention = CallingConvention.Cdecl)]
+        static extern bool hako_asset_is_simulation_mode();
+        static public bool asset_is_simulation_mode()
+        {
+            return HakoCppWrapper.hako_asset_is_simulation_mode();
+        }
+        [DllImport("libshakoc", CallingConvention = CallingConvention.Cdecl)]
+        static extern bool hako_asset_is_pdu_created();
+        static public bool asset_is_pdu_created()
+        {
+            return HakoCppWrapper.hako_asset_is_pdu_created();
+        }
+
     }
 }

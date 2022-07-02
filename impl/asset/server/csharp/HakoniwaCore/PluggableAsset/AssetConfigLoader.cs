@@ -5,6 +5,7 @@ using Hakoniwa.PluggableAsset.Communication.Connector;
 using Hakoniwa.PluggableAsset.Communication.Method;
 using Hakoniwa.PluggableAsset.Communication.Method.Mmap;
 using Hakoniwa.PluggableAsset.Communication.Method.ROS;
+using Hakoniwa.PluggableAsset.Communication.Method.Shm;
 using Hakoniwa.PluggableAsset.Communication.Method.Udp;
 using Hakoniwa.PluggableAsset.Communication.Pdu;
 using Newtonsoft.Json;
@@ -12,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Text;
 
 namespace Hakoniwa.PluggableAsset
 {
@@ -691,6 +693,41 @@ namespace Hakoniwa.PluggableAsset
                 }
             }
         }
+        private static void LoadShmMethods(string filepath)
+        {
+            if (filepath != null)
+            {
+                if (File.Exists(filepath))
+                {
+                    core_config.shm_methods = LoadJsonFile<ShmMethodConfig[]>(filepath);
+                }
+            }
+            if (core_config.shm_methods != null)
+            {
+                //shm method configs
+                foreach (var method in core_config.shm_methods)
+                {
+                    var config = new ShmConfig();
+                    config.io_size = method.iosize;
+                    config.asset_name = new StringBuilder(method.asset_name);
+                    config.channel_id = method.channel_id;
+                    if (method.is_read)
+                    {
+                        var real_method = new ShmReader();
+                        real_method.Initialize(config);
+                        real_method.Name = method.method_name;
+                        AssetConfigLoader.io_readers.Add(real_method);
+                    }
+                    else
+                    {
+                        var real_method = new ShmWriter();
+                        real_method.Initialize(config);
+                        real_method.Name = method.method_name;
+                        AssetConfigLoader.io_writers.Add(real_method);
+                    }
+                }
+            }
+        }
         private static void LoadWorldConfig(string filepath)
         {
             if (filepath != null)
@@ -721,6 +758,8 @@ namespace Hakoniwa.PluggableAsset
             LoadUdpMethods(core_config.udp_methods_path);
             //mmap methods configs
             LoadMmapMethods(core_config.mmap_methods_path);
+            //shm methods configs
+            LoadShmMethods(core_config.mmap_methods_path);
 
             LoadRosTopicMethod(core_config.ros_topic_method_path);
             //reader connectors configs

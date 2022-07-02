@@ -35,6 +35,9 @@ namespace Hakoniwa.PluggableAsset
         public string mmap_methods_path;
         public MmapMethodConfig[] mmap_methods;
 
+        public string shm_methods_path;
+        public ShmMethodConfig[] shm_methods;
+
         public string ros_topic_method_path;
         public RosTopicMethodConfig ros_topic_method;
         public string reader_connectors_path;
@@ -108,6 +111,15 @@ namespace Hakoniwa.PluggableAsset
     {
         public string method_name;
         public string filepath;
+        public int iosize;
+        public bool is_read;
+    }
+    [System.Serializable]
+    public class ShmMethodConfig
+    {
+        public string method_name;
+        public string asset_name;
+        public int channel_id;
         public int iosize;
         public bool is_read;
     }

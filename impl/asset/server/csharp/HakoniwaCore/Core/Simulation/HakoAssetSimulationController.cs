@@ -69,17 +69,6 @@ namespace Hakoniwa.Core.Simulation
         {
             return HakoCppWrapper.get_wrold_time();
         }
-        private bool DoStep()
-        {
-            bool ret = false;
-            if (this.asset_time_usec < this.GetWorldTime())
-            {
-                ret = true;
-                this.asset_time_usec += this.inside_simulator.GetDeltaTimeUsec();
-            }
-            HakoCppWrapper.asset_notify_simtime(my_asset_name, this.asset_time_usec);
-            return ret;
-        }
         private void PollEvent()
         {
             HakoSimAssetEvent ev = HakoCppWrapper.asset_get_event(this.my_asset_name);
@@ -97,17 +86,12 @@ namespace Hakoniwa.Core.Simulation
                     break;
             }
         }
-        public bool Execute()
+        public void ReadPdu()
         {
-            this.PollEvent();
-
-            if (this.GetState() != SimulationState.Running) {
-                return false;
-            }
             /********************
              * Inside assets
              * - Recv Actuation Data
-             ********************/
+            ********************/
             foreach (var connector in AssetConfigLoader.RefPduChannelConnector())
             {
                 if (
@@ -115,33 +99,16 @@ namespace Hakoniwa.Core.Simulation
                         && (connector.Reader != null)
                     )
                 {
+                    //TODO pdu read
                     connector.Reader.Recv();
                 }
             }
 
-            /********************
-             * Hakoniwa Time Sync
-             ********************/
-            bool canStep = this.DoStep();
-            if (canStep)
-            {
-                /********************
-                 * Inside Assets 
-                 * - Do Simulation
-                 ********************/
-                foreach (var asset in inside_asset_list)
-                {
-                    asset.DoActuation();
-                }
+            HakoCppWrapper.asset_notify_read_pdu_done(my_asset_name);
+        }
 
-                this.inside_simulator.DoSimulation();
-
-                foreach (var asset in inside_asset_list)
-                {
-                    asset.CopySensingDataToPdu();
-                }
-            }
-
+        public void WritePdu()
+        {
             /********************
              * Onside assets 
              * - Send Sensor Data 
@@ -152,11 +119,70 @@ namespace Hakoniwa.Core.Simulation
                     ((connector.GetName() == null) || connector.GetName().Equals("None"))
                         && (connector.Writer != null))
                 {
+                    //TODO write pdu
                     connector.Writer.SendWriterPdu();
                     connector.Writer.SendReaderPdu();
                 }
             }
-            return canStep;
+            HakoCppWrapper.asset_notify_write_pdu_done(my_asset_name);     
+        }
+
+        public void ExecuteSimulation()
+        {
+            /********************
+             * Inside Assets 
+             * - Do Simulation
+             ********************/
+            foreach (var asset in inside_asset_list)
+            {
+                asset.DoActuation();
+            }
+
+            this.inside_simulator.DoSimulation();
+
+            foreach (var asset in inside_asset_list)
+            {
+                asset.CopySensingDataToPdu();
+            }
+        }
+        public bool Execute()
+        {
+            this.PollEvent();
+
+            if (this.GetState() != SimulationState.Running) {
+                return false;
+            }
+
+            /********************
+             * Hakoniwa Time Sync
+             ********************/
+            if (HakoCppWrapper.asset_is_pdu_created() == false)
+            {
+                /* nothing to do */
+                return false;
+            }
+            else if (HakoCppWrapper.asset_is_simulation_mode())
+            {
+                if (this.asset_time_usec < this.GetWorldTime())
+                {
+                    this.asset_time_usec += this.inside_simulator.GetDeltaTimeUsec();
+                    HakoCppWrapper.asset_notify_simtime(my_asset_name, this.asset_time_usec);
+                }
+                else {
+                    // can not do simulation because world time is slow...
+                    return false;
+                }
+                this.ReadPdu();
+                this.ExecuteSimulation();
+                this.WritePdu();
+                return true;
+            }
+            else if (HakoCppWrapper.asset_is_pdu_sync_mode(my_asset_name))
+            {
+                this.WritePdu();
+                return false;
+            }
+            return false;
         }
 
         private void StartCallback()

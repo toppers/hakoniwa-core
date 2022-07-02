@@ -199,6 +199,7 @@ namespace Hakoniwa.PluggableAsset
         public string roboname;
         public string robotype;
         public Vector3 pos;
+        public Vector3 angle;
     }
     [System.Serializable]
     public class LoginRobot

@@ -759,7 +759,7 @@ namespace Hakoniwa.PluggableAsset
             //mmap methods configs
             LoadMmapMethods(core_config.mmap_methods_path);
             //shm methods configs
-            LoadShmMethods(core_config.mmap_methods_path);
+            LoadShmMethods(core_config.shm_methods_path);
 
             LoadRosTopicMethod(core_config.ros_topic_method_path);
             //reader connectors configs

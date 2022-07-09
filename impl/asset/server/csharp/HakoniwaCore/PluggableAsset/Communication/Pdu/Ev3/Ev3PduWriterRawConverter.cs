@@ -26,7 +26,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
                 Buffer.BlockCopy(tmp_bytes, 0, this.my_buffer, 4, tmp_bytes.Length);
 
                 //int64 hakoniwa_time
-                tmp_bytes = BitConverter.GetBytes(src.GetReadOps().Ref("header").GetDataInt64("hakoniwa_time"));
+                tmp_bytes = BitConverter.GetBytes(src.GetReadOps().Ref("head").GetDataInt64("hakoniwa_time"));
                 Buffer.BlockCopy(tmp_bytes, 0, this.my_buffer, 16, tmp_bytes.Length);
 
                 //uint32 ext_off

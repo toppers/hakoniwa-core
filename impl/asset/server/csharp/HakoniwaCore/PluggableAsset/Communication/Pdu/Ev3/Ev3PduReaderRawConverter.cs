@@ -25,15 +25,15 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
             byte[] header_name = new byte[4];
             Buffer.BlockCopy(buffer, 0, header_name, 0, header_name.Length);
             //SimpleLogger.Get().Log(Level.DEBUG, "Ev3PduReaderRawConverter.ConvertToPduData: name=" + System.Text.Encoding.ASCII.GetString(header_name));
-            dst.GetWriteOps().Ref("header").SetData("name", System.Text.Encoding.ASCII.GetString(header_name));
+            dst.GetWriteOps().Ref("head").SetData("name", System.Text.Encoding.ASCII.GetString(header_name));
             //header:version
-            dst.GetWriteOps().Ref("header").SetData("version", BitConverter.ToUInt32(buffer, 4));
+            dst.GetWriteOps().Ref("head").SetData("version", BitConverter.ToUInt32(buffer, 4));
             //header:asset_time
-            dst.GetWriteOps().Ref("header").SetData("asset_time", BitConverter.ToInt64(buffer, 8));
+            dst.GetWriteOps().Ref("head").SetData("asset_time", BitConverter.ToInt64(buffer, 8));
             //header:ext_off
-            dst.GetWriteOps().Ref("header").SetData("ext_off", BitConverter.ToUInt32(buffer, 24));
+            dst.GetWriteOps().Ref("head").SetData("ext_off", BitConverter.ToUInt32(buffer, 24));
             //header:ext_size
-            dst.GetWriteOps().Ref("header").SetData("ext_size", BitConverter.ToUInt32(buffer, 28));
+            dst.GetWriteOps().Ref("head").SetData("ext_size", BitConverter.ToUInt32(buffer, 28));
 
             //body:led
             byte[] leds = new byte[1];
@@ -65,7 +65,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
             //Actuator
             //SimpleLogger.Get().Log(Level.DEBUG, "dbg1");
             //header:name
-            var tmp_name = src.GetReadOps().Ref("header").GetDataString("name");
+            var tmp_name = src.GetReadOps().Ref("head").GetDataString("name");
             //SimpleLogger.Get().Log(Level.DEBUG, "tmp_name=" + tmp_name);
             byte[] tmp_bytes = System.Text.Encoding.ASCII.GetBytes(tmp_name);
             //SimpleLogger.Get().Log(Level.DEBUG, "tmp_bytes.Length=" + tmp_bytes.Length);
@@ -73,22 +73,22 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
 
             //SimpleLogger.Get().Log(Level.DEBUG, "dbg2");
             //header:version
-            tmp_bytes = BitConverter.GetBytes(src.GetReadOps().Ref("header").GetDataUInt32("version"));
+            tmp_bytes = BitConverter.GetBytes(src.GetReadOps().Ref("head").GetDataUInt32("version"));
             Buffer.BlockCopy(tmp_bytes, 0, this.my_buffer, 4, tmp_bytes.Length);
 
             //SimpleLogger.Get().Log(Level.DEBUG, "dbg3");
             //header:asset_time
-            tmp_bytes = BitConverter.GetBytes(src.GetReadOps().Ref("header").GetDataInt64("asset_time"));
+            tmp_bytes = BitConverter.GetBytes(src.GetReadOps().Ref("head").GetDataInt64("asset_time"));
             Buffer.BlockCopy(tmp_bytes, 0, this.my_buffer, 8, tmp_bytes.Length);
 
             //SimpleLogger.Get().Log(Level.DEBUG, "dbg4");
             //header:ext_off
-            tmp_bytes = BitConverter.GetBytes(src.GetReadOps().Ref("header").GetDataUInt32("ext_off"));
+            tmp_bytes = BitConverter.GetBytes(src.GetReadOps().Ref("head").GetDataUInt32("ext_off"));
             Buffer.BlockCopy(tmp_bytes, 0, this.my_buffer, 24, tmp_bytes.Length);
 
             //SimpleLogger.Get().Log(Level.DEBUG, "dbg5");
             //header:ext_size
-            tmp_bytes = BitConverter.GetBytes(src.GetReadOps().Ref("header").GetDataUInt32("ext_size"));
+            tmp_bytes = BitConverter.GetBytes(src.GetReadOps().Ref("head").GetDataUInt32("ext_size"));
             Buffer.BlockCopy(tmp_bytes, 0, this.my_buffer, 28, tmp_bytes.Length);
 
             //SimpleLogger.Get().Log(Level.DEBUG, "dbg6");

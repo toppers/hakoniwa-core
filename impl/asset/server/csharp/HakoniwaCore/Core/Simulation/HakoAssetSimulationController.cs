@@ -147,6 +147,8 @@ namespace Hakoniwa.Core.Simulation
         }
         public bool Execute()
         {
+            //for heartbeat 
+            HakoCppWrapper.asset_notify_simtime(my_asset_name, this.asset_time_usec);
             this.PollEvent();
 
             if (this.GetState() != SimulationState.Running) {
@@ -159,17 +161,20 @@ namespace Hakoniwa.Core.Simulation
             if (HakoCppWrapper.asset_is_pdu_created() == false)
             {
                 /* nothing to do */
+                SimpleLogger.Get().Log(Level.INFO, "Execute:pdu is not created");
                 return false;
             }
             else if (HakoCppWrapper.asset_is_simulation_mode())
             {
-                if (this.asset_time_usec < this.GetWorldTime())
+                long world_time = this.GetWorldTime();
+                if (this.asset_time_usec < world_time)
                 {
                     this.asset_time_usec += this.inside_simulator.GetDeltaTimeUsec();
                     HakoCppWrapper.asset_notify_simtime(my_asset_name, this.asset_time_usec);
                 }
                 else {
                     // can not do simulation because world time is slow...
+                    //SimpleLogger.Get().Log(Level.INFO, "Execute:skip.. asset_time={0} world_time={1}", this.asset_time_usec, world_time);
                     return false;
                 }
                 this.ReadPdu();
@@ -180,8 +185,10 @@ namespace Hakoniwa.Core.Simulation
             else if (HakoCppWrapper.asset_is_pdu_sync_mode(my_asset_name))
             {
                 this.WritePdu();
+                //SimpleLogger.Get().Log(Level.INFO, "Execute:skip.. WritePdu()");
                 return false;
             }
+            //SimpleLogger.Get().Log(Level.INFO, "Execute:skip.. why??");
             return false;
         }
 

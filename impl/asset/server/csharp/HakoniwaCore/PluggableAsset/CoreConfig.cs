@@ -191,6 +191,9 @@ namespace Hakoniwa.PluggableAsset
     [System.Serializable]
     public class RosTopicMessageConfigContainer
     {
+        public int robot_num;
+        public int ros_robot_num;
+        public int hakoenv_num;
         public RosTopicMessageConfig[] fields;
     }
     [System.Serializable]

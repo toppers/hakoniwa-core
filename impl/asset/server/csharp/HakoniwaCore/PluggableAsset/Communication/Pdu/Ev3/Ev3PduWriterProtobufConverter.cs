@@ -16,7 +16,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
                 Header = new Ev3PduSensor.Types.Header
                 {
                     Name = "ETRX",
-                    HakoniwaTime = (ulong)src.GetReadOps().Ref("header").GetDataInt64("hakoniwa_time"),
+                    HakoniwaTime = (ulong)src.GetReadOps().Ref("head").GetDataInt64("hakoniwa_time"),
                     Version = 0x1,
                     ExtOff = 512,
                     ExtSize = 512

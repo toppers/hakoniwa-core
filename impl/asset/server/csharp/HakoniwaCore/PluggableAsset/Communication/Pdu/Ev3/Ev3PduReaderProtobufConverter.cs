@@ -15,11 +15,11 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
             {
                 Header = new Ev3PduActuator.Types.Header
                 {
-                    Name = src.GetReadOps().Ref("header").GetDataString("name"),
-                    AssetTime = (ulong)src.GetReadOps().Ref("header").GetDataInt64("asset_time"),
-                    Version = src.GetReadOps().Ref("header").GetDataUInt32("version"),
-                    ExtOff = src.GetReadOps().Ref("header").GetDataUInt32("ext_off"),
-                    ExtSize = src.GetReadOps().Ref("header").GetDataUInt32("ext_size"),
+                    Name = src.GetReadOps().Ref("head").GetDataString("name"),
+                    AssetTime = (ulong)src.GetReadOps().Ref("head").GetDataInt64("asset_time"),
+                    Version = src.GetReadOps().Ref("head").GetDataUInt32("version"),
+                    ExtOff = src.GetReadOps().Ref("head").GetDataUInt32("ext_off"),
+                    ExtSize = src.GetReadOps().Ref("head").GetDataUInt32("ext_size"),
                 },
                 Body = new Ev3PduActuator.Types.Body
                 {
@@ -66,11 +66,11 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
 
             var parser = new MessageParser<Ev3PduActuator>(() => new Ev3PduActuator());
             var packet = parser.ParseFrom(new MemoryStream(binary.GetData()));
-            dst.GetWriteOps().Ref("header").SetData("name", packet.Header.Name);
-            dst.GetWriteOps().Ref("header").SetData("version", packet.Header.Version);
-            dst.GetWriteOps().Ref("header").SetData("asset_time", (long)packet.Header.AssetTime);
-            dst.GetWriteOps().Ref("header").SetData("ext_off", packet.Header.ExtOff);
-            dst.GetWriteOps().Ref("header").SetData("ext_size", packet.Header.ExtSize);
+            dst.GetWriteOps().Ref("head").SetData("name", packet.Header.Name);
+            dst.GetWriteOps().Ref("head").SetData("version", packet.Header.Version);
+            dst.GetWriteOps().Ref("head").SetData("asset_time", (long)packet.Header.AssetTime);
+            dst.GetWriteOps().Ref("head").SetData("ext_off", packet.Header.ExtOff);
+            dst.GetWriteOps().Ref("head").SetData("ext_size", packet.Header.ExtSize);
 
             dst.GetWriteOps().SetData("leds", packet.Body.Leds.ToByteArray());
 

@@ -36,5 +36,6 @@ namespace Hakoniwa.Core.Simulation
         bool Reset();
 
         ISimulationAssetManager GetAssetManager();
+        int RefOutsideAssetListCount();
     }
 }

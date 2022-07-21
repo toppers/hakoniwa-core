@@ -259,6 +259,9 @@ namespace Hakoniwa.Core.Simulation
             return asset_manager;
         }
 
-
+        public int RefOutsideAssetListCount()
+        {
+            return 0;
+        }
     }
 }

@@ -53,15 +53,15 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Udp
         private void ThreadMethod()
         {
             UdpClient client;
-            //client = new UdpClient(udp_config.IpAddr, udp_config.Portno);
-            client = new UdpClient(udp_config.Portno);
+            client = new UdpClient(udp_config.IpAddr, udp_config.Portno);
+            //client = new UdpClient(udp_config.Portno);
             while (true)
             {
                 IPEndPoint remoteEP = null;
                 byte[] data = client.Receive(ref remoteEP);
                 lock (this.lockObj)
                 {
-                    //Buffer.BlockCopy(data, 0, buffer, 0, data.Length);
+                    Buffer.BlockCopy(data, 0, buffer, 0, data.Length);
                     this.buffer = data;
                 }
             }

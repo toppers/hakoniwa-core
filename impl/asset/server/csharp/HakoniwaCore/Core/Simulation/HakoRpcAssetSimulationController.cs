@@ -3,13 +3,14 @@ using Hakoniwa.Core.Simulation.Environment;
 using Hakoniwa.Core.Utils.Logger;
 using Hakoniwa.PluggableAsset;
 using Hakoniwa.PluggableAsset.Assets;
+using Hakoniwa.PluggableAsset.Communication.Connector;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Hakoniwa.Core.Simulation
 {
-    class HakoRpcAssetSimulationController : ISimulationController
+    class HakoRpcAssetSimulationController : ISimulationController, RpcClientCallback
     {
         private static HakoRpcAssetSimulationController simulator = new HakoRpcAssetSimulationController();
         private List<IInsideAssetController> inside_asset_list = null;
@@ -30,43 +31,71 @@ namespace Hakoniwa.Core.Simulation
         {
             asset_manager = new SimulationAssetManager();
             sim_env = new SimulationEnvironment();
+            this.attrs.state = SimulationState.Stopped;
+            this.attrs.master_time = 0;
+            this.attrs.is_simulation_mode = false;
+            this.attrs.is_pdu_sync_mode = false;
+            this.attrs.is_pdu_created = false;
         }
 
         private ISimulationAssetManager asset_manager;
         private SimulationEnvironment sim_env;
         private IInsideWorldSimulatior inside_simulator = null;
         private long asset_time_usec = 0;
+        private SimulationAttrs attrs = new SimulationAttrs();
+        private bool is_pdu_read_done = false;
+        private bool is_pdu_write_done = false;
 
-        //TODO created_pdu && sync_mode check
         public bool Execute()
         {
             //for heartbeat
-            RpcClient.NotifySimtime(my_asset_name, asset_time_usec);
-
+            bool result = RpcClient.NotifySimtime(
+                this.my_asset_name,
+                this.asset_time_usec,
+                this.is_pdu_read_done,
+                this.is_pdu_write_done,
+                ref this.attrs);
+            if (result == false)
+            {
+                return false;
+            }
             if (this.GetState() != SimulationState.Running)
             {
                 return false;
             }
-
-            /********************
-             * Hakoniwa Time Sync
-             ********************/
-            long world_time = this.GetWorldTime();
-            if (this.asset_time_usec < world_time)
+            if (this.attrs.is_pdu_created == false)
             {
-                this.asset_time_usec += this.inside_simulator.GetDeltaTimeUsec();
-                RpcClient.NotifySimtime(my_asset_name, asset_time_usec);
-            }
-            else
-            {
-                // can not do simulation because world time is slow...
-                //SimpleLogger.Get().Log(Level.INFO, "Execute:skip.. asset_time={0} world_time={1}", this.asset_time_usec, world_time);
+                /* nothing to do */
+                SimpleLogger.Get().Log(Level.INFO, "Execute:pdu is not created");
                 return false;
             }
-            this.ReadPdu();
-            this.ExecuteSimulation();
-            this.WritePdu();
-            return true;
+            else if (this.attrs.is_simulation_mode)
+            {
+                long world_time = this.GetWorldTime();
+                if (this.asset_time_usec < world_time)
+                {
+                    this.asset_time_usec += this.inside_simulator.GetDeltaTimeUsec();
+                }
+                else
+                {
+                    // can not do simulation because world time is slow...
+                    //SimpleLogger.Get().Log(Level.INFO, "Execute:skip.. asset_time={0} world_time={1}", this.asset_time_usec, world_time);
+                    return false;
+                }
+                this.ReadPdu();
+                this.ExecuteSimulation();
+                this.WritePdu();
+                return true;
+            }
+            else if (this.attrs.is_pdu_sync_mode)
+            {
+                this.WritePdu();
+                //SimpleLogger.Get().Log(Level.INFO, "Execute:skip.. WritePdu()");
+                return false;
+            }
+            //SimpleLogger.Get().Log(Level.INFO, "Execute:skip.. why??");
+            return false;
+
         }
         public void ReadPdu()
         {
@@ -81,12 +110,10 @@ namespace Hakoniwa.Core.Simulation
                         && (connector.Reader != null)
                     )
                 {
-                    //TODO pdu read
                     connector.Reader.Recv();
                 }
             }
-
-            //TODO HakoCppWrapper.asset_notify_read_pdu_done(my_asset_name);
+            this.is_pdu_read_done = true;
         }
         public void WritePdu()
         {
@@ -104,7 +131,7 @@ namespace Hakoniwa.Core.Simulation
                     connector.Writer.SendReaderPdu();
                 }
             }
-            //TODO HakoCppWrapper.asset_notify_write_pdu_done(my_asset_name);
+            this.is_pdu_write_done = true;
         }
 
         private void ExecuteSimulation()
@@ -126,16 +153,14 @@ namespace Hakoniwa.Core.Simulation
             }
         }
 
-        //TODO
         public SimulationState GetState()
         {
-            throw new NotImplementedException();
+            return this.attrs.state;
         }
 
-        //TODO
         public long GetWorldTime()
         {
-            throw new NotImplementedException();
+            return this.attrs.master_time;
         }
 
         public ISimulationAssetManager GetAssetManager()
@@ -165,7 +190,7 @@ namespace Hakoniwa.Core.Simulation
 
         public void SetInsideWorldSimulator(IInsideWorldSimulatior isim)
         {
-            bool ret = RpcClient.Register(my_asset_name);
+            bool ret = RpcClient.Register(my_asset_name, this);
             if (ret != true)
             {
                 SimpleLogger.Get().Log(Level.ERROR, "SetInsideWorldSimulator:can not register asset");
@@ -188,6 +213,33 @@ namespace Hakoniwa.Core.Simulation
         public bool Reset()
         {
             throw new NotImplementedException();
+        }
+
+        public void StartCallback()
+        {
+            SimpleLogger.Get().Log(Level.INFO, "StartCallback");
+            RpcClient.AssetNotificationFeedbackStart(my_asset_name, true);
+        }
+
+        public void StopCallback()
+        {
+            SimpleLogger.Get().Log(Level.INFO, "StopCallback");
+            RpcClient.AssetNotificationFeedbackStop(my_asset_name, true);
+        }
+
+        public void ResetCallback()
+        {
+            SimpleLogger.Get().Log(Level.INFO, "ResetCallback");
+            PduIoConnector.Reset();
+            sim_env.Restore();
+            foreach (var connector in AssetConfigLoader.RefPduChannelConnector())
+            {
+                if (connector.Reader != null)
+                {
+                    connector.Reader.Reset();
+                }
+            }
+            RpcClient.AssetNotificationFeedbackReset(my_asset_name, true);
         }
     }
 }

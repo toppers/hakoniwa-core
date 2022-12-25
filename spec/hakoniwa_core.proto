@@ -94,11 +94,17 @@ message SimulationTimeSyncOutputFile {
 message NotifySimtimeRequest {
   AssetInfo asset = 1;
   int64 asset_time = 2;
+  bool is_read_pdu_done = 3;
+  bool is_write_pdu_done = 4;
 }
 
 message NotifySimtimeReply {
   ErrorCode ercd = 1;
   int64 master_time = 2;
+  SimulationStatus status = 3;
+  bool is_pdu_created = 4;
+  bool is_simulation_mode = 5;
+  bool is_pdu_sync_mode = 6;
 }
 
 message CreatePduChannelRequest {

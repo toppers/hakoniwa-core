@@ -1,23 +1,32 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Hakoniwa.Core.Simulation;
 using Hakoniwa.Core.Utils.Logger;
-using Hakoniwa.PluggableAsset;
-using Hakoniwa.PluggableAsset.Communication.Connector;
 using HakoniwaGrpc;
 using static HakoniwaGrpc.CoreService;
 
 namespace Hakoniwa.Core.Rpc
 {
+    public struct SimulationAttrs
+    {
+        public long master_time;
+        public SimulationState state;
+        public bool is_pdu_created;
+        public bool is_simulation_mode;
+        public bool is_pdu_sync_mode;
+    }
+    public interface RpcClientCallback
+    {
+        void StartCallback();
+        void StopCallback();
+        void ResetCallback();
+    }
     public class RpcClient
     {
         private static CoreServiceClient client;
+        private static RpcClientCallback callback;
 
         static public void StartClient(string ipaddr, int portno)
         {
@@ -35,8 +44,9 @@ namespace Hakoniwa.Core.Rpc
             return client;
         }
 
-        static public bool Register(string asset_name)
+        static public bool Register(string asset_name, RpcClientCallback obj)
         {
+            callback = obj;
             AssetInfo request = new AssetInfo();
             request.Name = asset_name;
             var res = client.Register(request);
@@ -67,15 +77,10 @@ namespace Hakoniwa.Core.Rpc
                 return false;
             }
         }
-        static public SimulationState GetSimStatus()
+
+        static SimulationState GetState(SimulationStatus status)
         {
-            var empty = new Empty();
-            var res = client.GetSimStatus(empty);
-            if (res.Ercd != ErrorCode.Ok)
-            {
-                return SimulationState.Terminated;
-            }
-            switch (res.Status)
+            switch (status)
             {
                 case SimulationStatus.StatusStopped:
                     return SimulationState.Stopped;
@@ -88,6 +93,17 @@ namespace Hakoniwa.Core.Rpc
                 default:
                     return SimulationState.Terminated;
             }
+        }
+
+        static public SimulationState GetSimStatus()
+        {
+            var empty = new Empty();
+            var res = client.GetSimStatus(empty);
+            if (res.Ercd != ErrorCode.Ok)
+            {
+                return SimulationState.Terminated;
+            }
+            return GetState(res.Status);
         }
         static public bool StartSimulation()
         {
@@ -132,31 +148,6 @@ namespace Hakoniwa.Core.Rpc
             }
         }
 
-        private static void StartCallback(string asset_name)
-        {
-            SimpleLogger.Get().Log(Level.INFO, "StartCallback");
-            RpcClient.AssetNotificationFeedbackStart(asset_name, true);
-        }
-        private static void StopCallback(string asset_name)
-        {
-            SimpleLogger.Get().Log(Level.INFO, "StopCallback");
-            RpcClient.AssetNotificationFeedbackStop(asset_name, true);
-        }
-        private static void ResetCallback(string asset_name)
-        {
-            SimpleLogger.Get().Log(Level.INFO, "ResetCallback");
-            PduIoConnector.Reset();
-            //sim_env.Restore(); //TODO
-            foreach (var connector in AssetConfigLoader.RefPduChannelConnector())
-            {
-                if (connector.Reader != null)
-                {
-                    connector.Reader.Reset();
-                }
-            }
-            RpcClient.AssetNotificationFeedbackReset(asset_name, true);
-        }
-
         static public async Task AssetNotificationStartAsync(string asset_name)
         {
             var asset_info = new AssetInfo();
@@ -172,13 +163,13 @@ namespace Hakoniwa.Core.Rpc
                     case AssetNotificationEvent.None:
                         break;
                     case AssetNotificationEvent.Start:
-                        StartCallback(asset_name);
+                        callback.StartCallback();
                         break;
                     case AssetNotificationEvent.Stop:
-                        StopCallback(asset_name);
+                        callback.StopCallback();
                         break;
                     case AssetNotificationEvent.Reset:
-                        ResetCallback(asset_name);
+                        callback.ResetCallback();
                         break;
                     case AssetNotificationEvent.Heartbeat:
                         break;
@@ -231,21 +222,28 @@ namespace Hakoniwa.Core.Rpc
         {
             return AssetNotificationFeedback(asset_name, AssetNotificationEvent.Heartbeat, result);
         }
-        static public long NotifySimtime(string asset_name, long asset_time)
+        static public bool NotifySimtime(string asset_name, long asset_time, bool is_read_pdu_done, bool is_write_pdu_done, ref SimulationAttrs attrs)
         {
             var req = new NotifySimtimeRequest();
             req.Asset.Name = asset_name;
             req.AssetTime = asset_time;
+            req.IsReadPduDone = is_read_pdu_done;
+            req.IsWritePduDone = is_write_pdu_done;
             var res = client.NotifySimtime(req);
             if (res.Ercd == ErrorCode.Ok)
             {
                 SimpleLogger.Get().Log(Level.INFO, "NotifySimtime(" + asset_time + ") Success");
-                return res.MasterTime;
+                attrs.master_time = res.MasterTime;
+                attrs.is_pdu_created = res.IsPduCreated;
+                attrs.is_pdu_sync_mode = res.IsPduSyncMode;
+                attrs.is_simulation_mode = res.IsSimulationMode;
+                attrs.state = GetState(res.Status);
+                return true;
             }
             else
             {
                 SimpleLogger.Get().Log(Level.ERROR, "NotifySimtime(" + asset_time + ") Failed: ercd=" + res.Ercd);
-                return 0;
+                return false;
             }
         }
         static public int CreatePduChannel(string asset_name, int channel_id, int pdu_size)

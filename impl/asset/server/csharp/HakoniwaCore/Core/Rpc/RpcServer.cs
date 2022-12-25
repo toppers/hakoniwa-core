@@ -187,7 +187,7 @@ namespace Hakoniwa.Core.Rpc
                 case CoreAssetNotificationEvent.Start:
                     return AssetNotificationEvent.Start;
                 case CoreAssetNotificationEvent.Stop:
-                    return AssetNotificationEvent.End;
+                    return AssetNotificationEvent.Stop;
                 default:
                     return AssetNotificationEvent.None;
             }
@@ -248,7 +248,7 @@ namespace Hakoniwa.Core.Rpc
                 case AssetNotificationEvent.Start:
                     RpcServer.GetSimulator().StartFeedback(feedback.Asset.Name, isOk);
                     break;
-                case AssetNotificationEvent.End:
+                case AssetNotificationEvent.Stop:
                     RpcServer.GetSimulator().StopFeedback(feedback.Asset.Name, isOk);
                     break;
                 case AssetNotificationEvent.Heartbeat:

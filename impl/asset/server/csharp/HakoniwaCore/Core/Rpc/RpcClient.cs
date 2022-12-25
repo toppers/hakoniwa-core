@@ -8,6 +8,8 @@ using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Hakoniwa.Core.Simulation;
 using Hakoniwa.Core.Utils.Logger;
+using Hakoniwa.PluggableAsset;
+using Hakoniwa.PluggableAsset.Communication.Connector;
 using HakoniwaGrpc;
 using static HakoniwaGrpc.CoreService;
 
@@ -130,7 +132,64 @@ namespace Hakoniwa.Core.Rpc
             }
         }
 
-        //AssetNotificationStartStream
+        private static void StartCallback(string asset_name)
+        {
+            SimpleLogger.Get().Log(Level.INFO, "StartCallback");
+            RpcClient.AssetNotificationFeedbackStart(asset_name, true);
+        }
+        private static void StopCallback(string asset_name)
+        {
+            SimpleLogger.Get().Log(Level.INFO, "StopCallback");
+            RpcClient.AssetNotificationFeedbackStop(asset_name, true);
+        }
+        private static void ResetCallback(string asset_name)
+        {
+            SimpleLogger.Get().Log(Level.INFO, "ResetCallback");
+            PduIoConnector.Reset();
+            //sim_env.Restore(); //TODO
+            foreach (var connector in AssetConfigLoader.RefPduChannelConnector())
+            {
+                if (connector.Reader != null)
+                {
+                    connector.Reader.Reset();
+                }
+            }
+            RpcClient.AssetNotificationFeedbackReset(asset_name, true);
+        }
+
+        static public async Task AssetNotificationStartAsync(string asset_name)
+        {
+            var asset_info = new AssetInfo();
+            asset_info.Name = asset_name;
+            var call = client.AssetNotificationStart(asset_info);
+
+            while (true)
+            {
+                await call.ResponseStream.MoveNext();
+                var ev = call.ResponseStream.Current.Event;
+                Console.WriteLine("Recv Event: " + ev);
+                switch (ev) {
+                    case AssetNotificationEvent.None:
+                        break;
+                    case AssetNotificationEvent.Start:
+                        StartCallback(asset_name);
+                        break;
+                    case AssetNotificationEvent.Stop:
+                        StopCallback(asset_name);
+                        break;
+                    case AssetNotificationEvent.Reset:
+                        ResetCallback(asset_name);
+                        break;
+                    case AssetNotificationEvent.Heartbeat:
+                        break;
+                    default:
+                        SimpleLogger.Get().Log(Level.ERROR, "Invalid Event" + ev);
+                        break;
+                }
+            }
+        }
+
+
         static private bool AssetNotificationFeedback(string asset_name, AssetNotificationEvent ev, bool result)
         {
             AssetNotificationReply arg = new AssetNotificationReply();
@@ -162,7 +221,11 @@ namespace Hakoniwa.Core.Rpc
         }
         static public bool AssetNotificationFeedbackStop(string asset_name, bool result)
         {
-            return AssetNotificationFeedback(asset_name, AssetNotificationEvent.End, result);
+            return AssetNotificationFeedback(asset_name, AssetNotificationEvent.Stop, result);
+        }
+        static public bool AssetNotificationFeedbackReset(string asset_name, bool result)
+        {
+            return AssetNotificationFeedback(asset_name, AssetNotificationEvent.Reset, result);
         }
         static public bool AssetNotificationFeedbackHeartbeat(string asset_name, bool result)
         {

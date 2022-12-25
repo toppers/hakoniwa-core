@@ -6,6 +6,7 @@ using Hakoniwa.PluggableAsset.Communication.Method;
 using Hakoniwa.PluggableAsset.Communication.Method.Mmap;
 using Hakoniwa.PluggableAsset.Communication.Method.ROS;
 using Hakoniwa.PluggableAsset.Communication.Method.Shm;
+using Hakoniwa.PluggableAsset.Communication.Method.Rpc;
 using Hakoniwa.PluggableAsset.Communication.Method.Udp;
 using Hakoniwa.PluggableAsset.Communication.Pdu;
 using Newtonsoft.Json;
@@ -728,6 +729,41 @@ namespace Hakoniwa.PluggableAsset
                 }
             }
         }
+        private static void LoadRpcMethods(string filepath)
+        {
+            if (filepath != null)
+            {
+                if (File.Exists(filepath))
+                {
+                    core_config.rpc_methods = LoadJsonFile<RpcMethodConfig[]>(filepath);
+                }
+            }
+            if (core_config.rpc_methods != null)
+            {
+                //rpc method configs
+                foreach (var method in core_config.rpc_methods)
+                {
+                    var config = new RpcConfig();
+                    config.PduSize = method.pdu_size;
+                    config.asset_name = method.asset_name;
+                    config.channel_id = method.channel_id;
+                    if (method.is_read)
+                    {
+                        var real_method = new RpcReader();
+                        real_method.Initialize(config);
+                        real_method.Name = method.method_name;
+                        AssetConfigLoader.io_readers.Add(real_method);
+                    }
+                    else
+                    {
+                        var real_method = new RpcWriter();
+                        real_method.Initialize(config);
+                        real_method.Name = method.method_name;
+                        AssetConfigLoader.io_writers.Add(real_method);
+                    }
+                }
+            }
+        }
         private static void LoadWorldConfig(string filepath)
         {
             if (filepath != null)
@@ -760,6 +796,8 @@ namespace Hakoniwa.PluggableAsset
             LoadMmapMethods(core_config.mmap_methods_path);
             //shm methods configs
             LoadShmMethods(core_config.shm_methods_path);
+            //rpc methods configs
+            LoadRpcMethods(core_config.rpc_methods_path);
 
             LoadRosTopicMethod(core_config.ros_topic_method_path);
             //reader connectors configs

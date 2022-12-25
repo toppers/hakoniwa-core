@@ -20,9 +20,9 @@ namespace Hakoniwa.Core.Rpc
         static public void StartClient(string ipaddr, int portno)
         {
             var channel = new Channel(ipaddr, portno, ChannelCredentials.Insecure);
-            var client = new CoreServiceClient(channel);
+            RpcClient.client = new CoreServiceClient(channel);
 
-            if (RpcClient.client != null)
+            if (RpcClient.client == null)
             {
                 throw new InvalidOperationException();
             }
@@ -33,7 +33,7 @@ namespace Hakoniwa.Core.Rpc
             return client;
         }
 
-        static public bool Register(String asset_name)
+        static public bool Register(string asset_name)
         {
             AssetInfo request = new AssetInfo();
             request.Name = asset_name;
@@ -49,7 +49,7 @@ namespace Hakoniwa.Core.Rpc
                 return false;
             }
         }
-        static public bool Unregister(String asset_name)
+        static public bool Unregister(string asset_name)
         {
             AssetInfo request = new AssetInfo();
             request.Name = asset_name;
@@ -131,7 +131,7 @@ namespace Hakoniwa.Core.Rpc
         }
 
         //AssetNotificationStartStream
-        static private bool AssetNotificationFeedback(String asset_name, AssetNotificationEvent ev, bool result)
+        static private bool AssetNotificationFeedback(string asset_name, AssetNotificationEvent ev, bool result)
         {
             AssetNotificationReply arg = new AssetNotificationReply();
             arg.Asset.Name = asset_name;
@@ -156,19 +156,19 @@ namespace Hakoniwa.Core.Rpc
                 return false;
             }
         }
-        static public bool AssetNotificationFeedbackStart(String asset_name, bool result)
+        static public bool AssetNotificationFeedbackStart(string asset_name, bool result)
         {
             return AssetNotificationFeedback(asset_name, AssetNotificationEvent.Start, result);
         }
-        static public bool AssetNotificationFeedbackStop(String asset_name, bool result)
+        static public bool AssetNotificationFeedbackStop(string asset_name, bool result)
         {
             return AssetNotificationFeedback(asset_name, AssetNotificationEvent.End, result);
         }
-        static public bool AssetNotificationFeedbackHeartbeat(String asset_name, bool result)
+        static public bool AssetNotificationFeedbackHeartbeat(string asset_name, bool result)
         {
             return AssetNotificationFeedback(asset_name, AssetNotificationEvent.Heartbeat, result);
         }
-        static public long NotifySimtime(String asset_name, long asset_time)
+        static public long NotifySimtime(string asset_name, long asset_time)
         {
             var req = new NotifySimtimeRequest();
             req.Asset.Name = asset_name;
@@ -185,7 +185,7 @@ namespace Hakoniwa.Core.Rpc
                 return 0;
             }
         }
-        static public int CreatePduChannel(String asset_name, int channel_id, int pdu_size)
+        static public int CreatePduChannel(string asset_name, int channel_id, int pdu_size)
         {
             var req = new CreatePduChannelRequest();
             req.AssetName = asset_name;
@@ -203,13 +203,13 @@ namespace Hakoniwa.Core.Rpc
                 return -1;
             }
         }
-        static public bool SubscribePduChannel(String asset_name, int channel_id, int pdu_size, string ipaddr, int port)
+        static public bool SubscribePduChannel(string asset_name, int channel_id, int pdu_size, string ipaddr, int port)
         {
             var req = new SubscribePduChannelRequest();
             req.AssetName = asset_name;
             req.ChannelId = channel_id;
             req.PduSize = pdu_size;
-            req.ListenUdpIpPort = ipaddr + ":" + port.ToString();
+            req.ListenUdpIpPort = ipaddr + ":" + port;
             var res = client.SubscribePduChannel(req);
             if (res.Ercd == ErrorCode.Ok)
             {

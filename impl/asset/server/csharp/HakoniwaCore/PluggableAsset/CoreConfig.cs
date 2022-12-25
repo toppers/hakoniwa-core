@@ -8,7 +8,7 @@ namespace Hakoniwa.PluggableAsset
     [System.Serializable]
     public class CoreConfig
     {
-        public string cpp_mode; // asset or master
+        public string cpp_mode; // asset or asset_rpc or master
         public string cpp_asset_name;
         public string core_ipaddr;
         public int core_portno;
@@ -37,6 +37,11 @@ namespace Hakoniwa.PluggableAsset
 
         public string shm_methods_path;
         public ShmMethodConfig[] shm_methods;
+
+        public string asset_ipaddr;
+        public int pdu_udp_portno_asset;
+        public string rpc_methods_path;
+        public RpcMethodConfig[] rpc_methods;
 
         public string ros_topic_method_path;
         public RosTopicMethodConfig ros_topic_method;
@@ -121,6 +126,15 @@ namespace Hakoniwa.PluggableAsset
         public string asset_name;
         public int channel_id;
         public int iosize;
+        public bool is_read;
+    }
+    [System.Serializable]
+    public class RpcMethodConfig
+    {
+        public string method_name;
+        public string asset_name;
+        public int channel_id;
+        public int pdu_size;
         public bool is_read;
     }
     [System.Serializable]

@@ -4,6 +4,7 @@ using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Hakoniwa.Core.Simulation;
 using Hakoniwa.Core.Utils.Logger;
+using Hakoniwa.PluggableAsset;
 using HakoniwaGrpc;
 using static HakoniwaGrpc.CoreService;
 
@@ -30,6 +31,7 @@ namespace Hakoniwa.Core.Rpc
 
         static public void StartClient(string ipaddr, int portno)
         {
+            SimpleLogger.Get().Log(Level.INFO, "StartClient");
             var channel = new Channel(ipaddr, portno, ChannelCredentials.Insecure);
             RpcClient.client = new CoreServiceClient(channel);
 

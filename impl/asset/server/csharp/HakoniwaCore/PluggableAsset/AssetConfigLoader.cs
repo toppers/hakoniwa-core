@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using Hakoniwa.Core.Rpc;
 
 namespace Hakoniwa.PluggableAsset
 {
@@ -797,6 +798,20 @@ namespace Hakoniwa.PluggableAsset
                 var container = JsonConvert.DeserializeObject<RosTopicMessageConfigContainer>(jsonString);
                 core_config.ros_topics = container.fields;
             }
+
+            if (core_config.cpp_asset_name != null)
+            {
+                if (core_config.cpp_asset_name.Contains("Rpc"))
+                {
+                    SimpleLogger.Get().Log(Level.INFO, "START CLIENT");
+                    RpcClient.StartClient(AssetConfigLoader.core_config.core_ipaddr, AssetConfigLoader.core_config.core_portno);
+                }
+                else
+                {
+                    SimpleLogger.Get().Log(Level.INFO, "SERVER MODE");
+                }
+            }
+
             LoadWorldConfig(core_config.param_world_config_path);
             //writer pdu configs
             LoadPduWriters(core_config.pdu_writers_path);

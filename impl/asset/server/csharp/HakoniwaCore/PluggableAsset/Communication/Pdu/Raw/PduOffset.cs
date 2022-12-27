@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hakoniwa.Core.Utils.Logger;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -95,9 +96,18 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Raw
         static public void ParseAll(string package_dirs)
         {
             string[] package_names = Directory.GetDirectories(package_dirs);
-            foreach (var package_name in package_names)
+            SimpleLogger.Get().Log(Level.INFO, "ParseAll() package_dirs=" + package_dirs);
+            foreach (var package_path in package_names)
             {
-                Parse(package_dirs + Path.DirectorySeparatorChar + package_name);
+                var tmp = package_path.Split(Path.DirectorySeparatorChar);
+                var package_name = tmp[tmp.Length - 1];
+                SimpleLogger.Get().Log(Level.INFO, "package_name=" + package_name);
+                var tmp_dir = package_dirs + Path.DirectorySeparatorChar + package_name;
+                string[] filepaths = Directory.GetDirectories(tmp_dir);
+                foreach (var filepath in filepaths)
+                {
+                    Parse(filepath);
+                }
             }
         }
     }

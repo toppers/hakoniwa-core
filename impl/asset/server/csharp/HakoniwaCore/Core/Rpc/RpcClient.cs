@@ -31,13 +31,18 @@ namespace Hakoniwa.Core.Rpc
 
         static public void StartClient(string ipaddr, int portno)
         {
-            SimpleLogger.Get().Log(Level.INFO, "StartClient");
+            SimpleLogger.Get().Log(Level.INFO, "StartClient:ipaddr=" + ipaddr);
+            SimpleLogger.Get().Log(Level.INFO, "StartClient:portno=" + portno);
             var channel = new Channel(ipaddr, portno, ChannelCredentials.Insecure);
             RpcClient.client = new CoreServiceClient(channel);
 
             if (RpcClient.client == null)
             {
                 throw new InvalidOperationException();
+            }
+            else
+            {
+                SimpleLogger.Get().Log(Level.INFO, "Client is OK");
             }
         }
 
@@ -186,6 +191,7 @@ namespace Hakoniwa.Core.Rpc
         static private bool AssetNotificationFeedback(string asset_name, AssetNotificationEvent ev, bool result)
         {
             AssetNotificationReply arg = new AssetNotificationReply();
+            arg.Asset = new AssetInfo();
             arg.Asset.Name = asset_name;
             arg.Event = ev;
             if (result)
@@ -227,6 +233,7 @@ namespace Hakoniwa.Core.Rpc
         static public bool NotifySimtime(string asset_name, long asset_time, bool is_read_pdu_done, bool is_write_pdu_done, ref SimulationAttrs attrs)
         {
             var req = new NotifySimtimeRequest();
+            req.Asset = new AssetInfo();
             req.Asset.Name = asset_name;
             req.AssetTime = asset_time;
             req.IsReadPduDone = is_read_pdu_done;

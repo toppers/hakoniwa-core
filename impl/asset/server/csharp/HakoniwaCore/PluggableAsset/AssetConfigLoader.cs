@@ -9,6 +9,7 @@ using Hakoniwa.PluggableAsset.Communication.Method.Shm;
 using Hakoniwa.PluggableAsset.Communication.Method.Rpc;
 using Hakoniwa.PluggableAsset.Communication.Method.Udp;
 using Hakoniwa.PluggableAsset.Communication.Pdu;
+using Hakoniwa.PluggableAsset.Communication.Pdu.Raw;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -775,6 +776,17 @@ namespace Hakoniwa.PluggableAsset
             }
         }
 
+        private static void LoadPduOffsetConfig(string filepath)
+        {
+            if (filepath != null)
+            {
+                if (Directory.Exists(filepath))
+                {
+                    PduOffset.ParseAll(filepath);
+                }
+            }
+        }
+
         public static void Load(string filepath)
         {
             core_config = LoadJsonFile<CoreConfig>(filepath);
@@ -812,6 +824,9 @@ namespace Hakoniwa.PluggableAsset
 
             //outside asset configs
             LoadOutsideAssets(core_config.outside_assets_path);
+
+            //Pdu offset configs
+            LoadPduOffsetConfig(core_config.pdu_bin_offset_package_dir);
         }
     }
 }

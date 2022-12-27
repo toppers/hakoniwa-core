@@ -20,9 +20,11 @@
 	<ItemGroup>
 		<None Remove="..\..\..\..\..\spec\hakoniwa_core.proto" />
 		<None Remove="..\..\..\..\..\spec\\ev3\hakoniwa_core.proto" />
+		<None Remove="PluggableAsset\Communication\Pdu\Raw\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Core\Simulation\State\" />
+	  <Folder Include="PluggableAsset\Communication\Pdu\Raw\" />
 	</ItemGroup>
 
 </Project>

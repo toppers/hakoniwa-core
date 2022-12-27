@@ -38,6 +38,8 @@ namespace Hakoniwa.PluggableAsset
         public string shm_methods_path;
         public ShmMethodConfig[] shm_methods;
 
+        public string pdu_bin_offset_package_dir;
+
         public string asset_ipaddr;
         public int pdu_udp_portno_asset;
         public string rpc_methods_path;
@@ -240,4 +242,5 @@ namespace Hakoniwa.PluggableAsset
     {
         public string [] robotype;
     }
+
 }

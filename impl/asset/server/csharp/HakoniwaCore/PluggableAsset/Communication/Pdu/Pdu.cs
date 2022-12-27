@@ -550,6 +550,14 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
             }
             this.field_uint8_array[field_name] = value;
         }
+        public void SetData(string field_name, int off, byte value)
+        {
+            if (!this.field_uint8_array.ContainsKey(field_name))
+            {
+                throw new ArgumentException("Invalid PDU access : field_name=" + field_name + " value=" + value);
+            }
+            this.field_uint8_array[field_name][off] = value;
+        }
 
         public void SetData(string field_name, sbyte[] value)
         {
@@ -558,6 +566,14 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
                 throw new ArgumentException("Invalid PDU access : field_name=" + field_name + " value=" + value);
             }
             this.field_int8_array[field_name] = value;
+        }
+        public void SetData(string field_name, int off, sbyte value)
+        {
+            if (!this.field_int8_array.ContainsKey(field_name))
+            {
+                throw new ArgumentException("Invalid PDU access : field_name=" + field_name + " value=" + value);
+            }
+            this.field_int8_array[field_name][off] = value;
         }
 
         public void SetData(string field_name, ushort[] value)
@@ -568,6 +584,14 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
             }
             this.field_uint16_array[field_name] = value;
         }
+        public void SetData(string field_name, int off, ushort value)
+        {
+            if (!this.field_uint16_array.ContainsKey(field_name))
+            {
+                throw new ArgumentException("Invalid PDU access : field_name=" + field_name + " value=" + value);
+            }
+            this.field_uint16_array[field_name][off] = value;
+        }
 
         public void SetData(string field_name, short[] value)
         {
@@ -576,6 +600,14 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
                 throw new ArgumentException("Invalid PDU access : field_name=" + field_name + " value=" + value);
             }
             this.field_int16_array[field_name] = value;
+        }
+        public void SetData(string field_name, int off, short value)
+        {
+            if (!this.field_int16_array.ContainsKey(field_name))
+            {
+                throw new ArgumentException("Invalid PDU access : field_name=" + field_name + " value=" + value);
+            }
+            this.field_int16_array[field_name][off] = value;
         }
 
         public void SetData(string field_name, uint[] value)
@@ -586,6 +618,14 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
             }
             this.field_uint32_array[field_name] = value;
         }
+        public void SetData(string field_name, int off, uint value)
+        {
+            if (!this.field_uint32_array.ContainsKey(field_name))
+            {
+                throw new ArgumentException("Invalid PDU access : field_name=" + field_name + " value=" + value);
+            }
+            this.field_uint32_array[field_name][off] = value;
+        }
 
         public void SetData(string field_name, int[] value)
         {
@@ -594,6 +634,14 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
                 throw new ArgumentException("Invalid PDU access : field_name=" + field_name + " value=" + value);
             }
             this.field_int32_array[field_name] = value;
+        }
+        public void SetData(string field_name, int off, int value)
+        {
+            if (!this.field_int32_array.ContainsKey(field_name))
+            {
+                throw new ArgumentException("Invalid PDU access : field_name=" + field_name + " value=" + value);
+            }
+            this.field_int32_array[field_name][off] = value;
         }
 
         public void SetData(string field_name, ulong[] value)
@@ -604,6 +652,14 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
             }
             this.field_uint64_array[field_name] = value;
         }
+        public void SetData(string field_name, int off, ulong value)
+        {
+            if (!this.field_uint64_array.ContainsKey(field_name))
+            {
+                throw new ArgumentException("Invalid PDU access : field_name=" + field_name + " value=" + value);
+            }
+            this.field_uint64_array[field_name][off] = value;
+        }
 
         public void SetData(string field_name, long[] value)
         {
@@ -612,6 +668,14 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
                 throw new ArgumentException("Invalid PDU access : field_name=" + field_name + " value=" + value);
             }
             this.field_int64_array[field_name] = value;
+        }
+        public void SetData(string field_name, int off, long value)
+        {
+            if (!this.field_int64_array.ContainsKey(field_name))
+            {
+                throw new ArgumentException("Invalid PDU access : field_name=" + field_name + " value=" + value);
+            }
+            this.field_int64_array[field_name][off] = value;
         }
 
         public void SetData(string field_name, double[] value)
@@ -622,6 +686,14 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
             }
             this.field_float64_array[field_name] = value;
         }
+        public void SetData(string field_name, int off, double value)
+        {
+            if (!this.field_float64_array.ContainsKey(field_name))
+            {
+                throw new ArgumentException("Invalid PDU access : field_name=" + field_name + " value=" + value);
+            }
+            this.field_float64_array[field_name][off] = value;
+        }
 
         public void SetData(string field_name, float[] value)
         {
@@ -630,6 +702,14 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
                 throw new ArgumentException("Invalid PDU access : field_name=" + field_name + " value=" + value);
             }
             this.field_float32_array[field_name] = value;
+        }
+        public void SetData(string field_name, int off, float value)
+        {
+            if (!this.field_float32_array.ContainsKey(field_name))
+            {
+                throw new ArgumentException("Invalid PDU access : field_name=" + field_name + " value=" + value);
+            }
+            this.field_float32_array[field_name][off] = value;
         }
 
         public void SetData(string field_name, string[] value)
@@ -640,6 +720,14 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
             }
             this.field_string_array[field_name] = value;
         }
+        public void SetData(string field_name, int off, string value)
+        {
+            if (!this.field_string_array.ContainsKey(field_name))
+            {
+                throw new ArgumentException("Invalid PDU access : field_name=" + field_name + " value=" + value);
+            }
+            this.field_string_array[field_name][off] = value;
+        }
 
         public void SetData(string field_name, bool[] value)
         {
@@ -648,6 +736,14 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
                 throw new ArgumentException("Invalid PDU access : field_name=" + field_name + " value=" + value);
             }
             this.field_bool_array[field_name] = value;
+        }
+        public void SetData(string field_name, int off, bool value)
+        {
+            if (!this.field_bool_array.ContainsKey(field_name))
+            {
+                throw new ArgumentException("Invalid PDU access : field_name=" + field_name + " value=" + value);
+            }
+            this.field_bool_array[field_name][off] = value;
         }
 
         public void SetData(string field_name, Pdu pdu)
@@ -666,6 +762,14 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu
                 throw new ArgumentException("Invalid PDU access : field_name=" + field_name);
             }
             this.field_struct_array[field_name] = pdu;
+        }
+        public void SetData(string field_name, int off, Pdu pdu)
+        {
+            if (!this.field_struct_array.ContainsKey(field_name))
+            {
+                throw new ArgumentException("Invalid PDU access : field_name=" + field_name);
+            }
+            this.field_struct_array[field_name][off] = pdu;
         }
 
 

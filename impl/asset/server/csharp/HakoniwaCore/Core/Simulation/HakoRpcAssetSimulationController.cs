@@ -198,21 +198,19 @@ namespace Hakoniwa.Core.Simulation
             this.inside_simulator = isim;
         }
 
-        //TODO
         public bool Start()
         {
-            throw new NotImplementedException();
+            return RpcClient.StartSimulation();
         }
 
-        //TODO
         public bool Stop()
         {
-            throw new NotImplementedException();
+            return RpcClient.StoptSimulation();
         }
-        //TODO
+
         public bool Reset()
         {
-            throw new NotImplementedException();
+            return RpcClient.ResettSimulation();
         }
 
         public void StartCallback()

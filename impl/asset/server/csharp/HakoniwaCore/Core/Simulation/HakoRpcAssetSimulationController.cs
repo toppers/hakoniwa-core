@@ -7,6 +7,8 @@ using Hakoniwa.PluggableAsset.Communication.Connector;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Hakoniwa.Core.Simulation
 {
@@ -187,14 +189,22 @@ namespace Hakoniwa.Core.Simulation
         {
             sim_env.Save();
         }
-
-        public void SetInsideWorldSimulator(IInsideWorldSimulatior isim)
+        private async Task StartServiceAsync()
         {
             bool ret = RpcClient.Register(my_asset_name, this);
             if (ret != true)
             {
                 SimpleLogger.Get().Log(Level.ERROR, "SetInsideWorldSimulator:can not register asset");
             }
+            else
+            {
+                await RpcClient.AssetNotificationStartAsync(my_asset_name);
+            }
+        }
+
+        public void SetInsideWorldSimulator(IInsideWorldSimulatior isim)
+        {
+            Task.Run(() => StartServiceAsync());
             this.inside_simulator = isim;
         }
 

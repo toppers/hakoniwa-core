@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hakoniwa.PluggableAsset;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -12,7 +13,7 @@ namespace Hakoniwa.Core.Simulation
             {
                 return SimulationController.Get();
             }
-            else if (asset_name.Contains("Rpc"))
+            else if (AssetConfigLoader.core_config.cpp_mode.Equals("asset_rpc"))
             {
                 return HakoRpcAssetSimulationController.Get(asset_name);
             }

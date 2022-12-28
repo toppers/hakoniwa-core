@@ -801,7 +801,7 @@ namespace Hakoniwa.PluggableAsset
 
             if (core_config.cpp_asset_name != null)
             {
-                if (core_config.cpp_asset_name.Contains("Rpc"))
+                if (core_config.cpp_mode.Equals("asset_rpc"))
                 {
                     SimpleLogger.Get().Log(Level.INFO, "START CLIENT");
                     RpcClient.StartClient(AssetConfigLoader.core_config.core_ipaddr, AssetConfigLoader.core_config.core_portno);

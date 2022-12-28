@@ -165,7 +165,7 @@ namespace Hakoniwa.Core.Rpc
             {
                 await call.ResponseStream.MoveNext();
                 var ev = call.ResponseStream.Current.Event;
-                Console.WriteLine("Recv Event: " + ev);
+                SimpleLogger.Get().Log(Level.INFO, "Recv Event: " + ev);
                 switch (ev) {
                     case AssetNotificationEvent.None:
                         break;
@@ -241,7 +241,7 @@ namespace Hakoniwa.Core.Rpc
             var res = client.NotifySimtime(req);
             if (res.Ercd == ErrorCode.Ok)
             {
-                SimpleLogger.Get().Log(Level.INFO, "NotifySimtime(" + asset_time + ") Success");
+                //SimpleLogger.Get().Log(Level.INFO, "NotifySimtime(" + asset_time + ") Success");
                 attrs.master_time = res.MasterTime;
                 attrs.is_pdu_created = res.IsPduCreated;
                 attrs.is_pdu_sync_mode = res.IsPduSyncMode;

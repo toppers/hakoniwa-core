@@ -63,6 +63,8 @@ namespace Hakoniwa.Core.Simulation
             }
             if (this.GetState() != SimulationState.Running)
             {
+                //SimpleLogger.Get().Log(Level.INFO, "SKIP state is not Running: " + this.GetState());
+                DoResetCallback();
                 return false;
             }
             if (this.attrs.is_pdu_created == false)
@@ -81,7 +83,7 @@ namespace Hakoniwa.Core.Simulation
                 else
                 {
                     // can not do simulation because world time is slow...
-                    //SimpleLogger.Get().Log(Level.INFO, "Execute:skip.. asset_time={0} world_time={1}", this.asset_time_usec, world_time);
+                    SimpleLogger.Get().Log(Level.INFO, "Execute:skip.. asset_time={0} world_time={1}", this.asset_time_usec, world_time);
                     return false;
                 }
                 this.ReadPdu();
@@ -92,10 +94,10 @@ namespace Hakoniwa.Core.Simulation
             else if (this.attrs.is_pdu_sync_mode)
             {
                 this.WritePdu();
-                //SimpleLogger.Get().Log(Level.INFO, "Execute:skip.. WritePdu()");
+                SimpleLogger.Get().Log(Level.INFO, "Execute:skip.. WritePdu()");
                 return false;
             }
-            //SimpleLogger.Get().Log(Level.INFO, "Execute:skip.. why??");
+            SimpleLogger.Get().Log(Level.INFO, "Execute:skip.. why??");
             return false;
 
         }
@@ -226,6 +228,7 @@ namespace Hakoniwa.Core.Simulation
         public void StartCallback()
         {
             SimpleLogger.Get().Log(Level.INFO, "StartCallback");
+            inside_asset_list = asset_manager.RefInsideAssetList();
             RpcClient.AssetNotificationFeedbackStart(my_asset_name, true);
         }
 
@@ -234,20 +237,32 @@ namespace Hakoniwa.Core.Simulation
             SimpleLogger.Get().Log(Level.INFO, "StopCallback");
             RpcClient.AssetNotificationFeedbackStop(my_asset_name, true);
         }
+        private bool has_reset_req = false;
+        private void DoResetCallback()
+        {
+            if (has_reset_req)
+            {
+                has_reset_req = false;
+                PduIoConnector.Reset();
+                SimpleLogger.Get().Log(Level.INFO, "ResetCallback:PduIoConnector.Reset(): OK");
+                sim_env.Restore();
+                SimpleLogger.Get().Log(Level.INFO, "ResetCallback:sim_env.Restore(): OK");
+                foreach (var connector in AssetConfigLoader.RefPduChannelConnector())
+                {
+                    if (connector.Reader != null)
+                    {
+                        connector.Reader.Reset();
+                        SimpleLogger.Get().Log(Level.INFO, "ResetCallback:connector.Reader.Reset(): OK");
+                    }
+                }
+                RpcClient.AssetNotificationFeedbackReset(my_asset_name, true);
+            }
+        }
 
         public void ResetCallback()
         {
             SimpleLogger.Get().Log(Level.INFO, "ResetCallback");
-            PduIoConnector.Reset();
-            sim_env.Restore();
-            foreach (var connector in AssetConfigLoader.RefPduChannelConnector())
-            {
-                if (connector.Reader != null)
-                {
-                    connector.Reader.Reset();
-                }
-            }
-            RpcClient.AssetNotificationFeedbackReset(my_asset_name, true);
+            has_reset_req = true;
         }
     }
 }

@@ -87,6 +87,7 @@ namespace Hakoniwa.Core.Rpc
 
         static SimulationState GetState(SimulationStatus status)
         {
+            //SimpleLogger.Get().Log(Level.INFO, "GetState(): status=" + status);
             switch (status)
             {
                 case SimulationStatus.StatusStopped:

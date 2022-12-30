@@ -1,5 +1,6 @@
 ﻿using Hakoniwa.Core;
 using Hakoniwa.Core.Rpc;
+using Hakoniwa.Core.Utils.Logger;
 using Hakoniwa.PluggableAsset.Communication.Pdu;
 using System;
 using System.Collections.Generic;
@@ -36,6 +37,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
                 byte[] data = client.Receive(ref remoteEP);
                 int channel_id = BitConverter.ToInt32(data, 0);
                 int pdu_size = BitConverter.ToInt32(data, 4);
+                //SimpleLogger.Get().Log(Level.DEBUG, "recv channel_id=" + channel_id + " len=" + pdu_size);
                 var obj = map[channel_id];
                 lock (obj.lockObj)
                 {

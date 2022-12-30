@@ -557,6 +557,14 @@ namespace Hakoniwa.PluggableAsset
                 {
                     throw new InvalidDataException("ERROR: can not found pdu channel connector writer=" + connector.writer_connector_name + " reader=" + connector.reader_connector_name);
                 }
+                if (writer == null)
+                {
+                    SimpleLogger.Get().Log(Level.WARN, "not found writer: " + connector.writer_connector_name);
+                }
+                if (reader == null)
+                {
+                    SimpleLogger.Get().Log(Level.WARN, "not found writer: " + connector.reader_connector_name);
+                }
                 real_connector.Writer = writer;
                 real_connector.Reader = reader;
                 AssetConfigLoader.pdu_channel_connectors.Add(real_connector);

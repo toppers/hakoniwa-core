@@ -1,5 +1,6 @@
 ﻿using Hakoniwa.Core;
 using Hakoniwa.Core.Rpc;
+using Hakoniwa.Core.Utils.Logger;
 using Hakoniwa.PluggableAsset.Communication.Pdu;
 using System;
 using System.Collections.Generic;
@@ -31,10 +32,16 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
             }
             byte[] buf = binary.GetData();
             //Debug.Log("UdpSend:" + buf.Length);
-            //SimpleLogger.Get().Log(Level.DEBUG, "flush ipaddr=" + udp_config.IpAddr +" port="+ udp_config.Portno + " len=" + buf.Length);
+            //SimpleLogger.Get().Log(Level.DEBUG, "flush channel_id=" + rpc_config.channel_id +" port="+ this.portno + " len=" + buf.Length);
             try
             {
                 Buffer.BlockCopy(buf, 0, this.buffer, 8, buf.Length);
+#if false
+                for (int i = 0; i < buf.Length; i++)
+                {
+                    SimpleLogger.Get().Log(Level.INFO, "value[" + i + "] = " + this.buffer[i]);
+                }
+#endif
                 client.Send(this.buffer, this.buffer.Length);
             }
             catch (Exception)

@@ -166,17 +166,19 @@ namespace Hakoniwa.Core.Rpc
             {
                 await call.ResponseStream.MoveNext();
                 var ev = call.ResponseStream.Current.Event;
-                SimpleLogger.Get().Log(Level.INFO, "Recv Event: " + ev);
                 switch (ev) {
                     case AssetNotificationEvent.None:
                         break;
                     case AssetNotificationEvent.Start:
+                        SimpleLogger.Get().Log(Level.INFO, "Recv Event: " + ev);
                         callback.StartCallback();
                         break;
                     case AssetNotificationEvent.Stop:
+                        SimpleLogger.Get().Log(Level.INFO, "Recv Event: " + ev);
                         callback.StopCallback();
                         break;
                     case AssetNotificationEvent.Reset:
+                        SimpleLogger.Get().Log(Level.INFO, "Recv Event: " + ev);
                         callback.ResetCallback();
                         break;
                     case AssetNotificationEvent.Heartbeat:

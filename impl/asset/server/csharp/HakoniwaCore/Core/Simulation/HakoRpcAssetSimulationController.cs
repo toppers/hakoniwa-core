@@ -127,10 +127,12 @@ namespace Hakoniwa.Core.Simulation
              ********************/
             foreach (var connector in AssetConfigLoader.RefPduChannelConnector())
             {
+                //SimpleLogger.Get().Log(Level.INFO, "connector(write):" + connector.GetName());
                 if (
                     ((connector.GetName() == null) || connector.GetName().Equals("None"))
                         && (connector.Writer != null))
                 {
+                    //SimpleLogger.Get().Log(Level.INFO, "WRITE START:" + connector.GetName());
                     connector.Writer.SendWriterPdu();
                     connector.Writer.SendReaderPdu();
                 }

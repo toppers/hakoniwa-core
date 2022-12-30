@@ -30,15 +30,49 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Raw
          *  string: <package_name>/<type_name>
          */ 
         static private Dictionary<string, PduBinOffsetInfo> map = new Dictionary<string, PduBinOffsetInfo>();
+        static private bool IsPrimitive(string type_name)
+        {
+            switch (type_name)
+            {
+                case "int8":
+                    return true;
+                case "int16":
+                    return true;
+                case "int32":
+                    return true;
+                case "int64":
+                    return true;
+                case "uint8":
+                    return true;
+                case "uint16":
+                    return true;
+                case "uint32":
+                    return true;
+                case "uint64":
+                    return true;
+                case "float32":
+                    return true;
+                case "float64":
+                    return true;
+                case "bool":
+                    return true;
+                case "string":
+                    return true;
+                default:
+                    return false;
+            }
+        }
 
         static private void Put(string package_name, string type_name, PduBinOffsetInfo elm)
         {
             if (type_name.Contains("/"))
             {
+                SimpleLogger.Get().Log(Level.INFO, "PduOffset key=" + type_name);
                 map[type_name] = elm;
             }
             else
             {
+                SimpleLogger.Get().Log(Level.INFO, "PduOffset key=" + package_name + "/" + type_name);
                 map[package_name + "/" + type_name] = elm;
             }
         }
@@ -52,7 +86,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Raw
         {
             PduBinOffsetInfo off_info = new PduBinOffsetInfo();
 
-            var tmp = filepath.Split(Path.DirectorySeparatorChar);
+            var tmp = filepath.Split('/');
             int len = tmp.Length;
             var filename = tmp[len - 1];
             var package_name = tmp[len - 2];
@@ -61,14 +95,16 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Raw
             off_info.type_name = type_name;
             off_info.elms = new List<PduBinOffsetElmInfo>();
             off_info.size = 0;
+            SimpleLogger.Get().Log(Level.INFO, "Parse filepath=" + filepath);
             foreach (string line in File.ReadLines(filepath))
             {
+                SimpleLogger.Get().Log(Level.INFO, "PduOffset line=" + line);
                 string[] attr = line.Split(':');
                 PduBinOffsetElmInfo elm = new PduBinOffsetElmInfo();
                 elm.is_array = attr[0].Equals("array");
                 elm.is_primitive = attr[1].Equals("primitive");
                 elm.field_name = attr[2];
-                if (attr[3].Contains("/"))
+                if (attr[3].Contains("/") || IsPrimitive(attr[3]))
                 {
                     elm.type_name = attr[3];
                 }
@@ -77,7 +113,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Raw
                     elm.type_name = package_name + "/" + attr[3];
                 }
                 elm.offset = int.Parse(attr[4]);
-                off_info.size += int.Parse(attr[5]);
+                off_info.size = elm.offset + int.Parse(attr[5]);
                 if (attr.Length >= 7)
                 {
                     elm.array_size = int.Parse(attr[6]);
@@ -102,11 +138,13 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Raw
                 var tmp = package_path.Split(Path.DirectorySeparatorChar);
                 var package_name = tmp[tmp.Length - 1];
                 SimpleLogger.Get().Log(Level.INFO, "package_name=" + package_name);
-                var tmp_dir = package_dirs + Path.DirectorySeparatorChar + package_name;
-                string[] filepaths = Directory.GetDirectories(tmp_dir);
+                var tmp_dir = package_dirs + "/" + package_name;
+                string[] filepaths = Directory.GetFiles(tmp_dir);
+                SimpleLogger.Get().Log(Level.INFO, "tmp_dir=" + tmp_dir);
+                SimpleLogger.Get().Log(Level.INFO, "filepaths.Length=" + filepaths.Length);
                 foreach (var filepath in filepaths)
                 {
-                    Parse(filepath);
+                    Parse(filepath.Replace(Path.DirectorySeparatorChar, '/'));
                 }
             }
         }

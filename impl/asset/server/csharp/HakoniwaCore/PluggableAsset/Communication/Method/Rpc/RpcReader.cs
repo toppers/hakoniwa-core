@@ -29,8 +29,15 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
         }
         private static void ThreadMethod()
         {
-            UdpClient client;
-            client = new UdpClient(AssetConfigLoader.core_config.pdu_udp_portno_asset);
+            string localIpString = AssetConfigLoader.core_config.asset_ipaddr;
+            IPAddress localAddress = IPAddress.Parse(localIpString);
+            int localPort = AssetConfigLoader.core_config.pdu_udp_portno_asset;
+
+            IPEndPoint localEP = new IPEndPoint(localAddress, localPort);
+            UdpClient client = new System.Net.Sockets.UdpClient(localEP);
+            SimpleLogger.Get().Log(Level.DEBUG, "UDP listen IP=" + localIpString + " port=" + localPort);
+
+            //client = new UdpClient(AssetConfigLoader.core_config.pdu_udp_portno_asset);
             while (true)
             {
                 IPEndPoint remoteEP = null;

@@ -247,7 +247,7 @@ namespace Hakoniwa.Core.Simulation
                 has_reset_req = false;
                 PduIoConnector.Reset();
                 SimpleLogger.Get().Log(Level.INFO, "ResetCallback:PduIoConnector.Reset(): OK");
-                sim_env.Restore();
+                this.RestoreEnvironment();
                 SimpleLogger.Get().Log(Level.INFO, "ResetCallback:sim_env.Restore(): OK");
                 foreach (var connector in AssetConfigLoader.RefPduChannelConnector())
                 {

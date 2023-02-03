@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if NO_USE_GRPC
+#else
+using System;
 using System.Threading.Tasks;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
@@ -298,3 +300,4 @@ namespace Hakoniwa.Core.Rpc
         /* end */
     }
 }
+#endif

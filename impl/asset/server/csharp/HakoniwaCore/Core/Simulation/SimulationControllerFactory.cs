@@ -15,7 +15,11 @@ namespace Hakoniwa.Core.Simulation
             }
             else if (AssetConfigLoader.core_config.cpp_mode.Equals("asset_rpc"))
             {
+#if NO_USE_GRPC
+                throw new NotSupportedException("ERROR: asset_rpc is not supported..");
+#else
                 return HakoRpcAssetSimulationController.Get(asset_name);
+#endif
             }
             else
             {

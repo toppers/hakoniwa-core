@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if NO_USE_GRPC
+#else
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
@@ -286,3 +288,4 @@ namespace Hakoniwa.Core.Rpc
 
     }
 }
+#endif

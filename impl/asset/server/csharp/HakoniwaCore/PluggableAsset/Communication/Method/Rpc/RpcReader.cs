@@ -1,4 +1,7 @@
-﻿using Hakoniwa.Core;
+﻿#if NO_USE_GRPC
+#else
+
+using Hakoniwa.Core;
 using Hakoniwa.Core.Rpc;
 using Hakoniwa.Core.Utils.Logger;
 using Hakoniwa.PluggableAsset.Communication.Pdu;
@@ -110,3 +113,4 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
 
     }
 }
+#endif

@@ -1,4 +1,7 @@
-﻿using Hakoniwa.Core.Rpc;
+﻿#if NO_USE_GRPC
+#else
+
+using Hakoniwa.Core.Rpc;
 using Hakoniwa.Core.Simulation.Environment;
 using Hakoniwa.Core.Utils.Logger;
 using Hakoniwa.PluggableAsset;
@@ -268,3 +271,4 @@ namespace Hakoniwa.Core.Simulation
         }
     }
 }
+#endif

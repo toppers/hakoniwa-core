@@ -16,7 +16,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
+#if NO_USE_GRPC
+#else
 using Hakoniwa.Core.Rpc;
+#endif
 
 namespace Hakoniwa.PluggableAsset
 {
@@ -748,6 +751,8 @@ namespace Hakoniwa.PluggableAsset
                     core_config.rpc_methods = LoadJsonFile<RpcMethodConfig[]>(filepath);
                 }
             }
+#if NO_USE_GRPC
+#else
             if (core_config.rpc_methods != null)
             {
                 //rpc method configs
@@ -773,6 +778,7 @@ namespace Hakoniwa.PluggableAsset
                     }
                 }
             }
+#endif
         }
         private static void LoadWorldConfig(string filepath)
         {
@@ -811,8 +817,12 @@ namespace Hakoniwa.PluggableAsset
             {
                 if (core_config.cpp_mode.Equals("asset_rpc"))
                 {
+#if NO_USE_GRPC
+                    throw new NotSupportedException("ERROR: asset_rpc is not supported..");
+#else
                     SimpleLogger.Get().Log(Level.INFO, "START CLIENT");
                     RpcClient.StartClient(AssetConfigLoader.core_config.core_ipaddr, AssetConfigLoader.core_config.core_portno);
+#endif
                 }
                 else
                 {

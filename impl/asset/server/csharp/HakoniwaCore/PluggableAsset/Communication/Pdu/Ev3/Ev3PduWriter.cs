@@ -1,4 +1,6 @@
-﻿using Google.Protobuf;
+﻿#if NO_USE_GRPC
+#else
+using Google.Protobuf;
 using Hakoniwa.Core.Utils.Logger;
 using Hakoniwa.PluggableAsset.Communication.Method;
 using System;
@@ -56,3 +58,4 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Ev3
     }
 
 }
+#endif

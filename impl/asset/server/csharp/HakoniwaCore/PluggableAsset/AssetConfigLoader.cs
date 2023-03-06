@@ -762,6 +762,7 @@ namespace Hakoniwa.PluggableAsset
                     config.PduSize = method.pdu_size;
                     config.asset_name = method.asset_name;
                     config.channel_id = method.channel_id;
+                    config.method_type = method.method_type;
                     if (method.is_read)
                     {
                         var real_method = new RpcReader();

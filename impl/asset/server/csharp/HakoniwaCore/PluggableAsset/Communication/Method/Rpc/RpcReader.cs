@@ -86,7 +86,8 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
                 rpc_config.channel_id, 
                 rpc_config.PduSize,
                 AssetConfigLoader.core_config.asset_ipaddr,
-                AssetConfigLoader.core_config.pdu_udp_portno_asset);
+                AssetConfigLoader.core_config.pdu_udp_portno_asset,
+                rpc_config.get_method_type());
             if (result == false)
             {
                 throw new InvalidOperationException("RPC ERROR");

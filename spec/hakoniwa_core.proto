@@ -111,11 +111,12 @@ message CreatePduChannelRequest {
   string asset_name = 1;
   int32 channel_id = 2;
   int32 pdu_size = 3;
+  string method_type = 4;
 }
 
 message CreatePduChannelReply {
   ErrorCode ercd = 1;
-  int32 master_udp_port = 2;
+  int32 port = 2;
 }
 
 message SubscribePduChannelRequest {
@@ -123,6 +124,7 @@ message SubscribePduChannelRequest {
   int32 channel_id = 2;
   int32 pdu_size = 3;
   string listen_udp_ip_port = 4;
+  string method_type = 5;
 }
 message SubscribePduChannelReply {
   ErrorCode ercd = 1;

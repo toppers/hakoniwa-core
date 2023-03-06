@@ -260,17 +260,18 @@ namespace Hakoniwa.Core.Rpc
                 return false;
             }
         }
-        static public int CreatePduChannel(string asset_name, int channel_id, int pdu_size)
+        static public int CreatePduChannel(string asset_name, int channel_id, int pdu_size, string method_type)
         {
             var req = new CreatePduChannelRequest();
             req.AssetName = asset_name;
             req.ChannelId = channel_id;
             req.PduSize = pdu_size;
+            req.MethodType = method_type;
             var res = client.CreatePduChannel(req);
             if (res.Ercd == ErrorCode.Ok)
             {
                 SimpleLogger.Get().Log(Level.INFO, "CreatePduChannel(" + asset_name + ") Success");
-                return res.MasterUdpPort;
+                return res.Port;
             }
             else
             {
@@ -278,13 +279,14 @@ namespace Hakoniwa.Core.Rpc
                 return -1;
             }
         }
-        static public bool SubscribePduChannel(string asset_name, int channel_id, int pdu_size, string ipaddr, int port)
+        static public bool SubscribePduChannel(string asset_name, int channel_id, int pdu_size, string ipaddr, int port, string method_type)
         {
             var req = new SubscribePduChannelRequest();
             req.AssetName = asset_name;
             req.ChannelId = channel_id;
             req.PduSize = pdu_size;
             req.ListenUdpIpPort = ipaddr + ":" + port;
+            req.MethodType = method_type;
             var res = client.SubscribePduChannel(req);
             if (res.Ercd == ErrorCode.Ok)
             {

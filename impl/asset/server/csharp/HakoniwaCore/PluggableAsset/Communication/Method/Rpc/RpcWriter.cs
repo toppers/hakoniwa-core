@@ -20,18 +20,8 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
         private RpcConfig rpc_config;
         private UdpClient client;
 
-        public void Flush(IPduCommData data)
+        private void FlushUdp(PduCommBinaryData binary)
         {
-            PduCommBinaryData binary = null;
-
-            if (data is PduCommBinaryData)
-            {
-                binary = (PduCommBinaryData)data;
-            }
-            if (data == null)
-            {
-                return;
-            }
             byte[] buf = binary.GetData();
             //Debug.Log("UdpSend:" + buf.Length);
             //SimpleLogger.Get().Log(Level.DEBUG, "flush channel_id=" + rpc_config.channel_id +" port="+ this.portno + " len=" + buf.Length);
@@ -51,6 +41,28 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
             }
         }
 
+        public void Flush(IPduCommData data)
+        {
+            PduCommBinaryData binary = null;
+
+            if (data is PduCommBinaryData)
+            {
+                binary = (PduCommBinaryData)data;
+            }
+            if (data == null)
+            {
+                return;
+            }
+            if (this.rpc_config.get_method_type().Equals("UDP"))
+            {
+                this.FlushUdp(binary);
+            }
+            else
+            {
+                //TODO MQTT
+            }
+        }
+
         public string GetName()
         {
             return Name;
@@ -59,21 +71,30 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
         public void Initialize(IIoWriterConfig config)
         {
             this.rpc_config = config as RpcConfig;
-            this.buffer = new byte[rpc_config.PduSize + 8];
-            //chanel_id
-            var tmp_bytes = BitConverter.GetBytes(rpc_config.channel_id);
-            Buffer.BlockCopy(tmp_bytes, 0, this.buffer, 0, tmp_bytes.Length);
-            //pdu_size
-            tmp_bytes = BitConverter.GetBytes(rpc_config.PduSize);
-            Buffer.BlockCopy(tmp_bytes, 0, this.buffer, 4, tmp_bytes.Length);
-
-            this.portno = RpcClient.CreatePduChannel(rpc_config.asset_name, rpc_config.channel_id, rpc_config.PduSize);
-            if (this.portno < 0)
+            if (this.rpc_config.get_method_type().Equals("UDP"))
             {
-                throw new InvalidOperationException("RPC ERROR");
+                this.buffer = new byte[rpc_config.PduSize + 8];
+                //chanel_id
+                var tmp_bytes = BitConverter.GetBytes(rpc_config.channel_id);
+                Buffer.BlockCopy(tmp_bytes, 0, this.buffer, 0, tmp_bytes.Length);
+                //pdu_size
+                tmp_bytes = BitConverter.GetBytes(rpc_config.PduSize);
+                Buffer.BlockCopy(tmp_bytes, 0, this.buffer, 4, tmp_bytes.Length);
+                this.portno = RpcClient.CreatePduChannel(rpc_config.asset_name, rpc_config.channel_id, rpc_config.PduSize, rpc_config.get_method_type());
+                if (this.portno < 0)
+                {
+                    throw new InvalidOperationException("RPC ERROR");
+                }
+                client = new UdpClient();
+                client.Connect(AssetConfigLoader.core_config.core_ipaddr, this.portno);
             }
-            client = new UdpClient();
-            client.Connect(AssetConfigLoader.core_config.core_ipaddr, this.portno);
+            else
+            {
+                //mqtt
+                this.buffer = new byte[rpc_config.PduSize];
+                //TODO
+            }
+
         }
     }
 }

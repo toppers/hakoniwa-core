@@ -20,15 +20,19 @@
 		<PackageReference Include="System.Memory" Version="4.5.3" />
 		<Protobuf Include="..\..\..\..\..\spec\*.proto" HakoniwaCoreService="Both" />
 		<Protobuf Include="..\..\..\..\..\spec\ev3\*.proto" HakoniwaCoreService="Both" />
+		<PackageReference Include="MQTTnet" Version="4.1.4.563" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Remove="..\..\..\..\..\spec\hakoniwa_core.proto" />
 		<None Remove="..\..\..\..\..\spec\\ev3\hakoniwa_core.proto" />
 		<None Remove="PluggableAsset\Communication\Pdu\Raw\" />
+		<None Remove="MQTTnet" />
+		<None Remove="PluggableAsset\Communication\Method\Mqtt\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Core\Simulation\State\" />
 	  <Folder Include="PluggableAsset\Communication\Pdu\Raw\" />
+	  <Folder Include="PluggableAsset\Communication\Method\Mqtt\" />
 	</ItemGroup>
 
 </Project>

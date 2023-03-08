@@ -20,6 +20,9 @@ namespace Hakoniwa.PluggableAsset.Communication.Pdu.Raw
             }
             else
             {
+                //TODO ロボットの書き込み周期に合わせて結果を変えたい。
+                //書き込み周期と一致：現行通り
+                //書き込み周期と不一致：nullを返す
                 return this.converter.ConvertToIoData(this);
             }
         }

@@ -3,12 +3,14 @@
 using Hakoniwa.Core;
 using Hakoniwa.Core.Rpc;
 using Hakoniwa.Core.Utils.Logger;
+using Hakoniwa.PluggableAsset.Communication.Method.Mqtt;
 using Hakoniwa.PluggableAsset.Communication.Pdu;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
 {
@@ -19,6 +21,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
         private byte[] buffer = null;
         private RpcConfig rpc_config;
         private UdpClient client;
+        private string mqtt_topic = null;
 
         private void FlushUdp(PduCommBinaryData binary)
         {
@@ -40,8 +43,11 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
             {
             }
         }
-
-        public void Flush(IPduCommData data)
+        private async Task FlushMqtt(PduCommBinaryData binary)
+        {
+            await HakoMqtt.SendMessage(this.mqtt_topic, binary.GetData());
+        }
+        public async void Flush(IPduCommData data)
         {
             PduCommBinaryData binary = null;
 
@@ -51,6 +57,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
             }
             if (data == null)
             {
+                //書き込み周期でない場合はnullが入って来る
                 return;
             }
             if (this.rpc_config.get_method_type().Equals("UDP"))
@@ -59,7 +66,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
             }
             else
             {
-                //TODO MQTT
+                await this.FlushMqtt(binary);
             }
         }
 
@@ -68,7 +75,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
             return Name;
         }
 
-        public void Initialize(IIoWriterConfig config)
+        public async void Initialize(IIoWriterConfig config)
         {
             this.rpc_config = config as RpcConfig;
             if (this.rpc_config.get_method_type().Equals("UDP"))
@@ -83,7 +90,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
                 this.portno = RpcClient.CreatePduChannel(rpc_config.asset_name, rpc_config.channel_id, rpc_config.PduSize, rpc_config.get_method_type());
                 if (this.portno < 0)
                 {
-                    throw new InvalidOperationException("RPC ERROR");
+                    throw new InvalidOperationException("RPC UDP ERROR");
                 }
                 client = new UdpClient();
                 client.Connect(AssetConfigLoader.core_config.core_ipaddr, this.portno);
@@ -91,8 +98,14 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
             else
             {
                 //mqtt
+                this.mqtt_topic = "hako_mqtt_" + this.rpc_config.channel_id;
                 this.buffer = new byte[rpc_config.PduSize];
-                //TODO
+                this.portno = RpcClient.CreatePduChannel(rpc_config.asset_name, rpc_config.channel_id, rpc_config.PduSize, rpc_config.get_method_type());
+                if (this.portno < 0)
+                {
+                    throw new InvalidOperationException("RPC MQTT ERROR");
+                }
+                await HakoMqtt.Connect(AssetConfigLoader.core_config.core_ipaddr, this.portno);
             }
 
         }

@@ -21,7 +21,8 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Mqtt
             mqtt_port = broker_port;
 
             var mqttClientOptions = new MqttClientOptionsBuilder()
-                .WithTcpServer("mqtt://" + broker_ip + ":" + broker_port)
+                //.WithTcpServer("mqtt://" + broker_ip + ":" + broker_port)
+                .WithTcpServer(broker_ip, broker_port)
                 .Build();
 
             await mqttClient.ConnectAsync(mqttClientOptions, CancellationToken.None);

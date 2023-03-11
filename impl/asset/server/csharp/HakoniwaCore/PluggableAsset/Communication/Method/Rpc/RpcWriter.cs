@@ -22,6 +22,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
         private RpcConfig rpc_config;
         private UdpClient client;
         private string mqtt_topic = null;
+        private int count = 0;
 
         private void FlushUdp(PduCommBinaryData binary)
         {
@@ -49,6 +50,12 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
         }
         public async void Flush(IPduCommData data)
         {
+            this.count++;
+            if ((this.count % this.rpc_config.write_count) != 0)
+            {
+                return;
+            }
+            this.count = 0;
             PduCommBinaryData binary = null;
 
             if (data is PduCommBinaryData)

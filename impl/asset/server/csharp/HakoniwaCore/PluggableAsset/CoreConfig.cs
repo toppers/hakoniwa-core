@@ -135,9 +135,10 @@ namespace Hakoniwa.PluggableAsset
     {
         public string method_name;
         public string asset_name;
-        public string method_type;
         public int channel_id;
         public int pdu_size;
+        public string method_type;
+        public int write_cycle;
         public bool is_read;
     }
     [System.Serializable]

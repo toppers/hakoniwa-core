@@ -10,6 +10,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
         public string method_type;
         public int channel_id;
         private int pdu_size;
+        public int write_count;
         public int PduSize
         {
             set { this.pdu_size = value; }

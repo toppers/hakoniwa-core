@@ -10,22 +10,26 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Mqtt
     public static class HakoMqtt
     {
         private static IMqttClient mqttClient = new MqttFactory().CreateMqttClient();
-        private static string mqtt_ipaddr;
+        private static string mqtt_ipaddr = null;
         private static int mqtt_port;
         private static List<string> topics = new List<string>();
         private static Dictionary<string, byte[]> buffers = new Dictionary<string, byte[]>();
 
         public static async Task Connect(string broker_ip, int broker_port)
         {
-            mqtt_ipaddr = broker_ip;
-            mqtt_port = broker_port;
 
-            var mqttClientOptions = new MqttClientOptionsBuilder()
-                //.WithTcpServer("mqtt://" + broker_ip + ":" + broker_port)
-                .WithTcpServer(broker_ip, broker_port)
-                .Build();
+            if (mqtt_ipaddr == null)
+            {
+                mqtt_ipaddr = broker_ip;
+                mqtt_port = broker_port;
+                var mqttClientOptions = new MqttClientOptionsBuilder()
+                    //.WithTcpServer("mqtt://" + broker_ip + ":" + broker_port)
+                    .WithTcpServer(broker_ip, broker_port)
+                    .Build();
 
-            await mqttClient.ConnectAsync(mqttClientOptions, CancellationToken.None);
+                await mqttClient.ConnectAsync(mqttClientOptions, CancellationToken.None);
+
+            }
         }
         private static async Task Recconect()
         {

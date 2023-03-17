@@ -16,6 +16,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using Hakoniwa.PluggableAsset.Communication.Method.Mqtt;
+using System.Threading.Tasks;
 #if NO_USE_GRPC
 #else
 using Hakoniwa.Core.Rpc;
@@ -742,7 +744,7 @@ namespace Hakoniwa.PluggableAsset
                 }
             }
         }
-        private static void LoadRpcMethods(string filepath)
+        private static void LoadRpcMethodsAsync(string filepath)
         {
             if (filepath != null)
             {
@@ -755,6 +757,7 @@ namespace Hakoniwa.PluggableAsset
 #else
             if (core_config.rpc_methods != null)
             {
+                SimpleLogger.Get().Log(Level.INFO, "START RPC CONFIG PARSE");
                 //rpc method configs
                 foreach (var method in core_config.rpc_methods)
                 {
@@ -779,6 +782,10 @@ namespace Hakoniwa.PluggableAsset
                         AssetConfigLoader.io_writers.Add(real_method);
                     }
                 }
+                SimpleLogger.Get().Log(Level.INFO, "END RPC CONFIG PARSE");
+                SimpleLogger.Get().Log(Level.INFO, "ACTIVATE START MQTT SUBSCRIBE");
+                HakoMqtt.StartSubscribe();
+                SimpleLogger.Get().Log(Level.INFO, "ACTIVATE DONE MQTT SUBSCRIBE");
             }
 #endif
         }
@@ -844,7 +851,7 @@ namespace Hakoniwa.PluggableAsset
             //shm methods configs
             LoadShmMethods(core_config.shm_methods_path);
             //rpc methods configs
-            LoadRpcMethods(core_config.rpc_methods_path);
+            LoadRpcMethodsAsync(core_config.rpc_methods_path);
 
             LoadRosTopicMethod(core_config.ros_topic_method_path);
             //reader connectors configs

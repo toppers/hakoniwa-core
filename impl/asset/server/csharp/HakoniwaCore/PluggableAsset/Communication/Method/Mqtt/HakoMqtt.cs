@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Hakoniwa.Core.Utils.Logger;
 using MQTTnet;
 using MQTTnet.Client;
 
@@ -12,7 +13,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Mqtt
         private static IMqttClient mqttClient = new MqttFactory().CreateMqttClient();
         private static string mqtt_ipaddr = null;
         private static int mqtt_port;
-        private static List<string> topics = new List<string>();
+        private static List<string> sub_topics = new List<string>();
         private static Dictionary<string, byte[]> buffers = new Dictionary<string, byte[]>();
 
         public static async Task Connect(string broker_ip, int broker_port)
@@ -23,7 +24,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Mqtt
                 mqtt_ipaddr = broker_ip;
                 mqtt_port = broker_port;
                 var mqttClientOptions = new MqttClientOptionsBuilder()
-                    //.WithTcpServer("mqtt://" + broker_ip + ":" + broker_port)
+                    .WithClientId("hako-mqtt_unity_sender")
                     .WithTcpServer(broker_ip, broker_port)
                     .Build();
 
@@ -35,7 +36,12 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Mqtt
         {
             while (mqttClient.IsConnected == false)
             {
-                await Connect(mqtt_ipaddr, mqtt_port);
+                var mqttClientOptions = new MqttClientOptionsBuilder()
+                    .WithClientId("hako-mqtt_unity_sender")
+                    .WithTcpServer(mqtt_ipaddr, mqtt_port)
+                    .Build();
+
+                await mqttClient.ConnectAsync(mqttClientOptions, CancellationToken.None);
                 if (mqttClient.IsConnected)
                 {
                     break;
@@ -58,43 +64,78 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Mqtt
         }
         public static void AddSubscribeTopic(string topic)
         {
-            topics.Add(topic);
+            SimpleLogger.Get().Log(Level.INFO, "AddSubscribeTopic=" + topic);
+            buffers[topic] = null;
+            sub_topics.Add(topic);
         }
-        public static async Task StartSubscrive()
+        public static byte[] GetData(string topic)
         {
-            var mqttFactory = new MqttFactory();
-            var mqttSubscribeOptions = mqttFactory.CreateSubscribeOptionsBuilder();
-            foreach (var topic in topics)
+            return buffers[topic];
+        }
+        private static async Task SubRecconect(IMqttClient mqttSubClient)
+        {
+            while (mqttSubClient.IsConnected == false)
             {
-                var next = mqttSubscribeOptions.WithTopicFilter(
-                    f =>
-                    {
-                        f.WithTopic(topic);
-                    }
-                );
-                mqttSubscribeOptions = next;
+                SimpleLogger.Get().Log(Level.INFO, "SubRecconect found connection failed... retry connect..");
+                var mqttClientOptions = new MqttClientOptionsBuilder()
+                    .WithClientId("hako-mqtt_unity_reciever")
+                    .WithTcpServer(mqtt_ipaddr, mqtt_port)
+                    .Build();
+
+                await mqttSubClient.ConnectAsync(mqttClientOptions, CancellationToken.None);
+                if (mqttSubClient.IsConnected)
+                {
+                    break;
+                }
+                await Task.Delay(1000);
             }
-            var args = mqttSubscribeOptions.Build();
-            // Setup message handling before connecting so that queued messages
-            // are also handled properly. When there is no event handler attached all
-            // received messages get lost.
-            mqttClient.ApplicationMessageReceivedAsync += e =>
+        }
+        private static void OnAppMessage(MqttApplicationMessageReceivedEventArgs e)
+        {
+            string topic_name = e.ApplicationMessage.ResponseTopic;
+            SimpleLogger.Get().Log(Level.INFO, "recv topic topic_name=" + topic_name);
+            byte[] data = e.ApplicationMessage.Payload;
+            buffers[topic_name] = data;
+        }
+        public static void StartSubscribe()
+        {
+            var thread = new Thread(new ThreadStart(ThreadMethod));
+            thread.Start();
+        }
+        private static async void ThreadMethod()
+        {
+            SimpleLogger.Get().Log(Level.INFO, "MQTT SUB THREAD ACTIVATED");
+            SimpleLogger.Get().Log(Level.INFO, "sub_topics.Count=" + sub_topics.Count);
+            if (sub_topics.Count == 0)
             {
-                Console.WriteLine("Received application message.");
-                string topic_name = e.ApplicationMessage.ResponseTopic;
-                byte[] data = e.ApplicationMessage.Payload;
-                buffers[topic_name] = data;
+                return;
+            }
+            SimpleLogger.Get().Log(Level.INFO, "START MQTT SUB SERVICE");
+            var mqttFactory = new MqttFactory();
+            IMqttClient mqttSubClient = mqttFactory.CreateMqttClient();
+            mqttSubClient.ApplicationMessageReceivedAsync += e =>
+            {
+                OnAppMessage(e);
                 return Task.CompletedTask;
             };
+            await SubRecconect(mqttSubClient);
+            var mqttSubscribeOptions = mqttFactory.CreateSubscribeOptionsBuilder().WithTopicFilter(
+                f =>
+                {
+                    f.WithTopic("hako_mqtt_0");
+                }).Build();
+
             while (true)
             {
-                if (mqttClient.IsConnected == false)
+                if (mqttSubClient.IsConnected == false)
                 {
-                    await Recconect();
+                    await SubRecconect(mqttSubClient);
                     continue;
                 }
-                await mqttClient.SubscribeAsync(args, CancellationToken.None);
+                SimpleLogger.Get().Log(Level.INFO, "wait subscribe...");
+                await mqttSubClient.SubscribeAsync(mqttSubscribeOptions, CancellationToken.None);
             }
+
         }
     }
 }

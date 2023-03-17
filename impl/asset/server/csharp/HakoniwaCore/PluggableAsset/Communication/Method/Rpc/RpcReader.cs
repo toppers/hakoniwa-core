@@ -4,6 +4,7 @@
 using Hakoniwa.Core;
 using Hakoniwa.Core.Rpc;
 using Hakoniwa.Core.Utils.Logger;
+using Hakoniwa.PluggableAsset.Communication.Method.Mqtt;
 using Hakoniwa.PluggableAsset.Communication.Pdu;
 using System;
 using System.Collections.Generic;
@@ -19,14 +20,14 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
     {
         private static Dictionary<int, RpcReader> map = new Dictionary<int, RpcReader>();
         private static Thread thread;
-        private static bool isActive = false;
-        public static void StartServer()
+        private static bool isUdpActive = false;
+        public static void StartUdpServer()
         {
-            if (isActive)
+            if (isUdpActive)
             {
                 return;
             }
-            isActive = true;
+            isUdpActive = true;
             thread = new Thread(new ThreadStart(ThreadMethod));
             thread.Start();
         }
@@ -65,36 +66,67 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
         private RpcConfig rpc_config;
         protected byte[] buffer = null;
         protected System.Object lockObj = new System.Object();
-       
+        private string mqtt_topic;
+
         public string GetName()
         {
             return Name;
         }
 
-        public void Initialize(IIoReaderConfig config)
+        private void InitUdpServer()
         {
-            this.rpc_config = config as RpcConfig;
             map.Add(this.rpc_config.channel_id, this);
 
-            if (RpcReader.isActive == false)
+            if (RpcReader.isUdpActive == false)
             {
-                RpcReader.StartServer();
+                RpcReader.StartUdpServer();
             }
 
             var result = RpcClient.SubscribePduChannel(
-                rpc_config.asset_name, 
-                rpc_config.channel_id, 
+                rpc_config.asset_name,
+                rpc_config.channel_id,
                 rpc_config.PduSize,
                 AssetConfigLoader.core_config.asset_ipaddr,
                 AssetConfigLoader.core_config.pdu_udp_portno_asset,
                 rpc_config.get_method_type());
             if (result == false)
             {
-                throw new InvalidOperationException("RPC ERROR");
+                throw new InvalidOperationException("RPC ERROR UDP");
             }
         }
+        private void InitMqttServer()
+        {
+            this.mqtt_topic = "hako_mqtt_" + this.rpc_config.channel_id;
+            HakoMqtt.AddSubscribeTopic(this.mqtt_topic);
+            var result = RpcClient.SubscribePduChannel(
+                rpc_config.asset_name,
+                rpc_config.channel_id,
+                rpc_config.PduSize,
+                AssetConfigLoader.core_config.asset_ipaddr,
+                AssetConfigLoader.core_config.pdu_udp_portno_asset,
+                rpc_config.get_method_type());
+            if (result == false)
+            {
+                throw new InvalidOperationException("RPC ERROR MQTT");
+            }
+        }
+        public void Initialize(IIoReaderConfig config)
+        {
+            this.rpc_config = config as RpcConfig;
+            SimpleLogger.Get().Log(Level.INFO, "RpcReader: channel_id=" + this.rpc_config.channel_id);
+            SimpleLogger.Get().Log(Level.INFO, "RpcReader: method_type=" + this.rpc_config.method_type);
+            if (this.rpc_config.method_type == "UDP")
+            {
+                this.InitUdpServer();
+            }
+            else
+            {
+                this.InitMqttServer();
+            }
 
-        public IPduCommData Recv(string io_key)
+        }
+
+        private IPduCommData RecvUdp(string io_key)
         {
             lock (this.lockObj)
             {
@@ -109,6 +141,31 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
                     //SimpleLogger.Get().Log(Level.DEBUG, "recv:" + buffer.Length);
                     return new PduCommBinaryData(tmp_buf);
                 }
+            }
+        }
+        private IPduCommData RecvMqtt(string io_key)
+        {
+            var data = HakoMqtt.GetData(this.mqtt_topic);
+            if (data == null)
+            {
+                return null;
+            }
+            else {
+                byte[] tmp_buf = new byte[data.Length];
+                Buffer.BlockCopy(data, 0, tmp_buf, 0, data.Length);
+                return new PduCommBinaryData(tmp_buf);
+            }
+        }
+
+        public IPduCommData Recv(string io_key)
+        {
+            if (this.rpc_config.method_type == "UDP")
+            {
+                return RecvUdp(io_key);
+            }
+            else
+            {
+                return RecvMqtt(io_key);
             }
         }
 

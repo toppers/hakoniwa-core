@@ -114,8 +114,8 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
         {
             this.rpc_config = config as RpcConfig;
             SimpleLogger.Get().Log(Level.INFO, "RpcReader: channel_id=" + this.rpc_config.channel_id);
-            SimpleLogger.Get().Log(Level.INFO, "RpcReader: method_type=" + this.rpc_config.method_type);
-            if (this.rpc_config.method_type == "UDP")
+            SimpleLogger.Get().Log(Level.INFO, "RpcReader: method_type=" + this.rpc_config.get_method_type());
+            if (this.rpc_config.get_method_type() == "UDP")
             {
                 this.InitUdpServer();
             }
@@ -159,7 +159,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
 
         public IPduCommData Recv(string io_key)
         {
-            if (this.rpc_config.method_type == "UDP")
+            if (this.rpc_config.get_method_type() == "UDP")
             {
                 return RecvUdp(io_key);
             }

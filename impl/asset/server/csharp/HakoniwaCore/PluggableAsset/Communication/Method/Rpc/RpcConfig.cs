@@ -7,7 +7,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
     class RpcConfig : IIoReaderConfig, IIoWriterConfig
     {
         public string asset_name;
-        public string method_type;
+        private string method_type;
         public int channel_id;
         private int pdu_size;
         public int write_count;
@@ -15,6 +15,10 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
         {
             set { this.pdu_size = value; }
             get { return this.pdu_size; }
+        }
+        public string MethodType
+        {
+            set { this.method_type = value; }
         }
         public string get_method_type()
         {

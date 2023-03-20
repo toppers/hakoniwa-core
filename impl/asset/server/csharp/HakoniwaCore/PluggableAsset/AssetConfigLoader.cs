@@ -16,10 +16,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
-using Hakoniwa.PluggableAsset.Communication.Method.Mqtt;
 using System.Threading.Tasks;
 #if NO_USE_GRPC
 #else
+using Hakoniwa.PluggableAsset.Communication.Method.Mqtt;
 using Hakoniwa.Core.Rpc;
 #endif
 

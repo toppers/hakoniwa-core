@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if NO_USE_GRPC
+#else
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -139,3 +141,4 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Mqtt
         }
     }
 }
+#endif

@@ -204,10 +204,10 @@ namespace Hakoniwa.Core
             return HakoCppWrapper.hako_simevent_reset();
         }
         [DllImport("libshakoc", CallingConvention = CallingConvention.Cdecl)]
-        static extern bool hako_asset_create_pdu_channel(int channel_id, uint pdu_size);
-        static public bool asset_create_pdu_channel(int channel_id, uint pdu_size)
+        static extern bool hako_asset_create_pdu_lchannel(StringBuilder asset_name, int channel_id, uint pdu_size);
+        static public bool asset_create_pdu_lchannel(StringBuilder asset_name, int channel_id, uint pdu_size)
         {
-            return HakoCppWrapper.hako_asset_create_pdu_channel(channel_id, pdu_size);
+            return HakoCppWrapper.hako_asset_create_pdu_lchannel(asset_name, channel_id, pdu_size);
         }
         [DllImport("libshakoc", CallingConvention = CallingConvention.Cdecl)]
         static extern bool hako_asset_is_pdu_dirty(int channel_id);

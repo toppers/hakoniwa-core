@@ -16,9 +16,14 @@ using System.Threading;
 
 namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
 {
+    class UdpChannelEntry
+    {
+        public int channel_id;
+        public string robo_name;
+    }
     class RpcReader: IIoReader
     {
-        private static Dictionary<int, RpcReader> map = new Dictionary<int, RpcReader>();
+        private static Dictionary<UdpChannelEntry, RpcReader> map = new Dictionary<UdpChannelEntry, RpcReader>();
         private static Thread thread;
         private static bool isUdpActive = false;
         public static void StartUdpServer()
@@ -44,19 +49,28 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
             //client = new UdpClient(AssetConfigLoader.core_config.pdu_udp_portno_asset);
             while (true)
             {
+                int header_off = 12;
                 IPEndPoint remoteEP = null;
                 byte[] data = client.Receive(ref remoteEP);
                 int channel_id = BitConverter.ToInt32(data, 0);
                 int pdu_size = BitConverter.ToInt32(data, 4);
+                int name_len = BitConverter.ToInt32(data, 8);
+                byte[] robo_name_bytes = new byte[name_len];
+                Buffer.BlockCopy(data, header_off, robo_name_bytes, 0, name_len);
+                header_off += name_len;
+                string robo_name = System.Text.Encoding.ASCII.GetString(robo_name_bytes);
                 //SimpleLogger.Get().Log(Level.DEBUG, "recv channel_id=" + channel_id + " len=" + pdu_size);
-                var obj = map[channel_id];
+                UdpChannelEntry key = new UdpChannelEntry();
+                key.channel_id = channel_id;
+                key.robo_name = robo_name;
+                var obj = map[key];
                 lock (obj.lockObj)
                 {
                     if (obj.buffer == null)
                     {
                         obj.buffer = new byte[pdu_size];
                     }
-                    Buffer.BlockCopy(data, 8, obj.buffer, 0, pdu_size);
+                    Buffer.BlockCopy(data, header_off, obj.buffer, 0, pdu_size);
                 }
             }
         }
@@ -75,7 +89,10 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
 
         private void InitUdpServer()
         {
-            map.Add(this.rpc_config.channel_id, this);
+            var key = new UdpChannelEntry();
+            key.channel_id = this.rpc_config.channel_id;
+            key.robo_name = this.rpc_config.asset_name;
+            map.Add(key, this);
 
             if (RpcReader.isUdpActive == false)
             {

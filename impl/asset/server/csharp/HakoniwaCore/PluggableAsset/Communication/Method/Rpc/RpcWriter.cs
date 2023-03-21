@@ -23,6 +23,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
         private UdpClient client;
         private string mqtt_topic = null;
         private int count = 0;
+        private int header_off = 0;
 
         private void FlushUdp(PduCommBinaryData binary)
         {
@@ -31,7 +32,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
             //SimpleLogger.Get().Log(Level.DEBUG, "flush channel_id=" + rpc_config.channel_id +" port="+ this.portno + " len=" + buf.Length);
             try
             {
-                Buffer.BlockCopy(buf, 0, this.buffer, 8, buf.Length);
+                Buffer.BlockCopy(buf, 0, this.buffer, this.header_off, buf.Length);
 #if false
                 for (int i = 0; i < buf.Length; i++)
                 {
@@ -87,13 +88,19 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
             this.rpc_config = config as RpcConfig;
             if (this.rpc_config.get_method_type().Equals("UDP"))
             {
-                this.buffer = new byte[rpc_config.PduSize + 8];
+                this.buffer = new byte[rpc_config.PduSize + 8 + 4 + 256 /* for asset name */ ];
                 //chanel_id
                 var tmp_bytes = BitConverter.GetBytes(rpc_config.channel_id);
                 Buffer.BlockCopy(tmp_bytes, 0, this.buffer, 0, tmp_bytes.Length);
                 //pdu_size
                 tmp_bytes = BitConverter.GetBytes(rpc_config.PduSize);
                 Buffer.BlockCopy(tmp_bytes, 0, this.buffer, 4, tmp_bytes.Length);
+                //asset_name
+                tmp_bytes = System.Text.Encoding.ASCII.GetBytes(rpc_config.asset_name);
+                var len_bytes = BitConverter.GetBytes(tmp_bytes.Length);
+                Buffer.BlockCopy(len_bytes, 0, this.buffer, 8, len_bytes.Length);
+                Buffer.BlockCopy(tmp_bytes, 0, this.buffer, (8 + 4), tmp_bytes.Length);
+                this.header_off = 8 + 4 + tmp_bytes.Length;
                 this.portno = RpcClient.CreatePduChannel(AssetConfigLoader.core_config.cpp_asset_name, rpc_config.asset_name, rpc_config.channel_id, rpc_config.PduSize, rpc_config.get_method_type());
                 if (this.portno < 0)
                 {
@@ -105,7 +112,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
             else
             {
                 //mqtt
-                this.mqtt_topic = "hako_mqtt_" + this.rpc_config.channel_id;
+                this.mqtt_topic = "hako_mqtt_" + this.rpc_config.asset_name + "_" + this.rpc_config.channel_id;
                 this.buffer = new byte[rpc_config.PduSize];
                 this.portno = RpcClient.CreatePduChannel(AssetConfigLoader.core_config.cpp_asset_name, rpc_config.asset_name, rpc_config.channel_id, rpc_config.PduSize, rpc_config.get_method_type());
                 if (this.portno < 0)

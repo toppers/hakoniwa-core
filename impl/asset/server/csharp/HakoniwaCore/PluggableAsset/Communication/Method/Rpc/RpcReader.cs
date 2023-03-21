@@ -83,6 +83,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
             }
 
             var result = RpcClient.SubscribePduChannel(
+                AssetConfigLoader.core_config.cpp_asset_name,
                 rpc_config.asset_name,
                 rpc_config.channel_id,
                 rpc_config.PduSize,
@@ -99,6 +100,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
             this.mqtt_topic = "hako_mqtt_" + this.rpc_config.channel_id;
             HakoMqtt.AddSubscribeTopic(this.mqtt_topic);
             var result = RpcClient.SubscribePduChannel(
+                AssetConfigLoader.core_config.cpp_asset_name,
                 rpc_config.asset_name,
                 rpc_config.channel_id,
                 rpc_config.PduSize,

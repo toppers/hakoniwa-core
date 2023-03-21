@@ -112,6 +112,7 @@ message CreatePduChannelRequest {
   int32 channel_id = 2;
   int32 pdu_size = 3;
   string method_type = 4;
+  string robo_name = 5;
 }
 
 message CreatePduChannelReply {
@@ -125,6 +126,7 @@ message SubscribePduChannelRequest {
   int32 pdu_size = 3;
   string listen_udp_ip_port = 4;
   string method_type = 5;
+  string robo_name = 6;
 }
 message SubscribePduChannelReply {
   ErrorCode ercd = 1;

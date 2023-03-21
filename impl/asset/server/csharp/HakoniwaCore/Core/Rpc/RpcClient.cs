@@ -260,10 +260,11 @@ namespace Hakoniwa.Core.Rpc
                 return false;
             }
         }
-        static public int CreatePduChannel(string asset_name, int channel_id, int pdu_size, string method_type)
+        static public int CreatePduChannel(string asset_name, string robo_name, int channel_id, int pdu_size, string method_type)
         {
             var req = new CreatePduChannelRequest();
             req.AssetName = asset_name;
+            req.RoboName = robo_name;
             req.ChannelId = channel_id;
             req.PduSize = pdu_size;
             req.MethodType = method_type;
@@ -279,10 +280,11 @@ namespace Hakoniwa.Core.Rpc
                 return -1;
             }
         }
-        static public bool SubscribePduChannel(string asset_name, int channel_id, int pdu_size, string ipaddr, int port, string method_type)
+        static public bool SubscribePduChannel(string asset_name, string robo_name, int channel_id, int pdu_size, string ipaddr, int port, string method_type)
         {
             var req = new SubscribePduChannelRequest();
             req.AssetName = asset_name;
+            req.RoboName = robo_name;
             req.ChannelId = channel_id;
             req.PduSize = pdu_size;
             req.ListenUdpIpPort = ipaddr + ":" + port;

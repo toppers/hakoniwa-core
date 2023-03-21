@@ -16,14 +16,9 @@ using System.Threading;
 
 namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
 {
-    class UdpChannelEntry
-    {
-        public int channel_id;
-        public string robo_name;
-    }
     class RpcReader: IIoReader
     {
-        private static Dictionary<UdpChannelEntry, RpcReader> map = new Dictionary<UdpChannelEntry, RpcReader>();
+        private static Dictionary<string, RpcReader> map = new Dictionary<string, RpcReader>();
         private static Thread thread;
         private static bool isUdpActive = false;
         public static void StartUdpServer()
@@ -60,10 +55,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
                 header_off += name_len;
                 string robo_name = System.Text.Encoding.ASCII.GetString(robo_name_bytes);
                 //SimpleLogger.Get().Log(Level.DEBUG, "recv channel_id=" + channel_id + " len=" + pdu_size);
-                UdpChannelEntry key = new UdpChannelEntry();
-                key.channel_id = channel_id;
-                key.robo_name = robo_name;
-                var obj = map[key];
+                var obj = map[robo_name + ":" + channel_id];
                 lock (obj.lockObj)
                 {
                     if (obj.buffer == null)
@@ -89,10 +81,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
 
         private void InitUdpServer()
         {
-            var key = new UdpChannelEntry();
-            key.channel_id = this.rpc_config.channel_id;
-            key.robo_name = this.rpc_config.asset_name;
-            map.Add(key, this);
+            map.Add(this.rpc_config.asset_name + ":" + this.rpc_config.channel_id, this);
 
             if (RpcReader.isUdpActive == false)
             {

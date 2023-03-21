@@ -101,6 +101,8 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Rpc
                 Buffer.BlockCopy(len_bytes, 0, this.buffer, 8, len_bytes.Length);
                 Buffer.BlockCopy(tmp_bytes, 0, this.buffer, (8 + 4), tmp_bytes.Length);
                 this.header_off = 8 + 4 + tmp_bytes.Length;
+                SimpleLogger.Get().Log(Level.INFO, "robo_name=" + rpc_config.asset_name);
+                SimpleLogger.Get().Log(Level.INFO, "name_len=" + tmp_bytes.Length);
                 this.portno = RpcClient.CreatePduChannel(AssetConfigLoader.core_config.cpp_asset_name, rpc_config.asset_name, rpc_config.channel_id, rpc_config.PduSize, rpc_config.get_method_type());
                 if (this.portno < 0)
                 {

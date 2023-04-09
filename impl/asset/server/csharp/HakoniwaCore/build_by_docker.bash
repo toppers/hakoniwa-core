@@ -24,12 +24,15 @@ if [ "$command" = Rebuild ]; then
     cp -rf ./hakoniwa-core ./.hakoniwa-core
     dotnet restore ./.hakoniwa-core/impl/asset/server/csharp/HakoniwaCore/Hakoniwa.csproj
     dotnet build --configuration ${target} --output /hakoniwa-core/dst ./.hakoniwa-core/impl/asset/server/csharp/HakoniwaCore/Hakoniwa.csproj
+    dotnet restore ./.hakoniwa-core/impl/asset/server/csharp/HakoniwaCore/Hakoniwa_NoGRPC.csproj
+    dotnet build --configuration ${target} --output /hakoniwa-core/dst ./.hakoniwa-core/impl/asset/server/csharp/HakoniwaCore/Hakoniwa_NoGRPC.csproj
     "
 elif [ "$command" = Build ]; then
   docker start hakoniwa-core-builder
   docker exec -it hakoniwa-core-builder /bin/bash -c "
     cp -rf ./hakoniwa-core ./.hakoniwa-core
     dotnet build --configuration ${target} --output /hakoniwa-core/dst ./.hakoniwa-core/impl/asset/server/csharp/HakoniwaCore/Hakoniwa.csproj
+    dotnet build --configuration ${target} --output /hakoniwa-core/dst ./.hakoniwa-core/impl/asset/server/csharp/HakoniwaCore/Hakoniwa_NoGRPC.csproj
     "
 else
   echo "Invalid Command type. You can use {Rebuild|Build}."

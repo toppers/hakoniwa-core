@@ -11,7 +11,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Get DateTime
       id: date
-      run: echo "::set-output name=date::$(date +'%Y%m%d%H%M%S')"
+      run: echo "date=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_OUTPUT
     - name: Build
       run: |
         bash ./impl/asset/server/csharp/HakoniwaCore/build_by_docker.bash Rebuild Debug
@@ -26,3 +26,6 @@ jobs:
           dst/Hakoniwa.deps.json
           dst/Hakoniwa.dll
           dst/Hakoniwa.pdb
+          dst/Hakoniwa_NoGRPC.deps.json
+          dst/Hakoniwa_NoGRPC.dll
+          dst/Hakoniwa_NoGRPC.pdb

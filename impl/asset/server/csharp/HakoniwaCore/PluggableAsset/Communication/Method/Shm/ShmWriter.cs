@@ -1,4 +1,5 @@
 ﻿using Hakoniwa.Core;
+using Hakoniwa.Core.Utils.Logger;
 using Hakoniwa.PluggableAsset.Communication.Pdu;
 using System;
 using System.Collections.Generic;
@@ -36,6 +37,10 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Shm
             bool ret = HakoCppWrapper.asset_write_pdu(this.asset_name, this.shm_config.asset_name, shm_config.channel_id, buffer, (uint)shm_config.io_size);
             if (ret == false)
             {
+                SimpleLogger.Get().Log(Level.INFO, "this.asset_name=" + this.asset_name);
+                SimpleLogger.Get().Log(Level.INFO, "shm_config.asset_name=" + this.shm_config.asset_name);
+                SimpleLogger.Get().Log(Level.INFO, "channel_id=" + this.shm_config.channel_id);
+                SimpleLogger.Get().Log(Level.INFO, "io_size=" + this.shm_config.io_size);
                 throw new ArgumentException("Can not write pdul!! " + this.shm_config.asset_name + " channel_id=" + this.shm_config.channel_id);
             }
         }
@@ -52,7 +57,11 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Shm
             byte[] array = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
             buffer_size = Marshal.SizeOf(array[0]) * shm_config.io_size;
             this.buffer = Marshal.AllocHGlobal(buffer_size);
-            bool ret = HakoCppWrapper.asset_create_pdu_lchannel(this.asset_name, this.shm_config.asset_name, this.shm_config.channel_id, (uint)shm_config.io_size);
+            SimpleLogger.Get().Log(Level.INFO, "this.asset_name=" + this.asset_name);
+            SimpleLogger.Get().Log(Level.INFO, "shm_config.asset_name=" + this.shm_config.asset_name);
+            SimpleLogger.Get().Log(Level.INFO, "channel_id=" + this.shm_config.channel_id);
+            SimpleLogger.Get().Log(Level.INFO, "io_size=" + this.shm_config.io_size);
+            bool ret = HakoCppWrapper.asset_create_pdu_lchannel(this.shm_config.asset_name, this.shm_config.channel_id, (uint)shm_config.io_size);
             if (ret == false)
             {
                 throw new ArgumentException("Can not create pdu channel!! channel_id=" + this.shm_config.channel_id);

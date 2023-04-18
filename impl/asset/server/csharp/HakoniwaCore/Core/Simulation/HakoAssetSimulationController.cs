@@ -35,10 +35,10 @@ namespace Hakoniwa.Core.Simulation
         private IInsideWorldSimulatior inside_simulator = null;
         private long asset_time_usec = 0;
 
-        private StringBuilder my_asset_name;
+        private string my_asset_name;
         private void SetAssetName(string asset_name)
         {
-            my_asset_name = new StringBuilder(asset_name);
+            my_asset_name = asset_name;
         }
 
         public void RegisterEnvironmentOperation(IEnvironmentOperation env_op)

@@ -725,7 +725,7 @@ namespace Hakoniwa.PluggableAsset
                 {
                     var config = new ShmConfig();
                     config.io_size = method.iosize;
-                    config.asset_name = new StringBuilder(method.asset_name);
+                    config.asset_name = method.asset_name;
                     config.channel_id = method.channel_id;
                     if (method.is_read)
                     {

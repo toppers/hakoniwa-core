@@ -12,7 +12,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Shm
         public string Name { get; internal set; }
         private ShmConfig shm_config;
         private byte[] arg_buffer = null;
-        private StringBuilder asset_name;
+        private string asset_name;
         public string GetName()
         {
             return Name;
@@ -21,7 +21,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Shm
         public void Initialize(IIoReaderConfig config)
         {
             this.shm_config = config as ShmConfig;
-            this.asset_name = new StringBuilder(AssetConfigLoader.core_config.cpp_asset_name);
+            this.asset_name = AssetConfigLoader.core_config.cpp_asset_name;
             this.arg_buffer = new byte[shm_config.io_size];
         }
 

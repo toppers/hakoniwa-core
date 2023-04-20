@@ -14,7 +14,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Shm
         private IntPtr buffer;
         private int buffer_size;
         private ShmConfig shm_config;
-        private StringBuilder asset_name;
+        private string asset_name;
 
         public void Flush(IPduCommData data)
         {
@@ -53,7 +53,7 @@ namespace Hakoniwa.PluggableAsset.Communication.Method.Shm
         public void Initialize(IIoWriterConfig config)
         {
             this.shm_config = config as ShmConfig;
-            this.asset_name = new StringBuilder(AssetConfigLoader.core_config.cpp_asset_name);
+            this.asset_name = AssetConfigLoader.core_config.cpp_asset_name;
             byte[] array = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
             buffer_size = Marshal.SizeOf(array[0]) * shm_config.io_size;
             this.buffer = Marshal.AllocHGlobal(buffer_size);
